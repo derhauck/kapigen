@@ -9,7 +9,13 @@ cli:
 .PHONY: run
 run: DOCKER_ARGS=$(GO_ARGS)
 run:
-	$(DOCKER_RUN) -w $(GO_SRC_PATH) $(GO_IMAGE) go run .
+	$(DOCKER_RUN) -w $(GO_SRC_PATH) $(GO_IMAGE) go run . $(ARGS)
+
+.PHONY: build
+build: DOCKER_ARGS=$(GO_ARGS)
+build:
+	$(DOCKER_RUN) -w $(GO_SRC_PATH) $(GO_IMAGE) go build -o .bin/kapigen .
+	chmod +x bin/kapigen
 
 .PHONH: test
 test: DOCKER_ARGS=$(GO_ARGS)
