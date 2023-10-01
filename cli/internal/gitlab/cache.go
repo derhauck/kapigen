@@ -26,14 +26,14 @@ type CacheYaml struct {
 }
 
 type Cache struct {
-	Key       string                `yaml:"key"`
-	Paths     wrapper.Slice[string] `yaml:"paths"`
-	Unprotect bool                  `yaml:"unprotect"`
-	Policy    CachePolicyEnum       `yaml:"policy"`
+	Key       string              `yaml:"key"`
+	Paths     wrapper.StringSlice `yaml:"paths"`
+	Unprotect bool                `yaml:"unprotect"`
+	Policy    CachePolicyEnum     `yaml:"policy"`
 }
 
-func (c *Cache) getRenderedValue() CacheYaml {
-	return CacheYaml{
+func (c *Cache) getRenderedValue() *CacheYaml {
+	return &CacheYaml{
 		Key:       c.Key,
 		Paths:     c.Paths.Get(),
 		Unprotect: c.Unprotect,

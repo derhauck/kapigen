@@ -4,8 +4,10 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 	"kapigen.kateops.com/internal/cli"
+	"kapigen.kateops.com/internal/gitlab"
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/config"
+	"kapigen.kateops.com/internal/pipeline/types"
 	"os"
 )
 
@@ -21,20 +23,48 @@ var Cmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		var pipelineConfig config.PipelineConfig
+		var pipelineConfig types.PipelineConfig
 		err = yaml.Unmarshal(body, &pipelineConfig)
 		if err != nil {
 			return err
 		}
+
+		var pipelineJobs types.Jobs
+
 		for i := 0; i < len(pipelineConfig.Pipelines); i++ {
 			configuration := pipelineConfig.Pipelines[i]
-			err = configuration.Decode()
+			jobs, err := configuration.Decode(config.PipelineConfigTypes)
 			if err != nil {
 				return err
 			}
+			pipelineJobs = append(pipelineJobs, jobs.GetJobs()...)
+		}
+		logger.Info("pipeline created")
+		var ciPipeline = make(map[string]*gitlab.CiJobYaml)
+		logger.DebugAny(pipelineJobs)
+		var evaluatedJobs types.Jobs
+		for _, job := range pipelineJobs {
+			job.Render()
+			evaluatedJob, err := job.EvaluateName(pipelineJobs)
+			if err != nil {
+				return err
+			}
+			if evaluatedJob != nil {
+				evaluatedJobs = append(evaluatedJobs, evaluatedJob)
+			}
 		}
 
-		return nil
+		for _, job := range pipelineJobs {
+			ciPipeline[job.GetName()] = job.CiJob.Render()
+		}
+		logger.DebugAny(ciPipeline)
+		data, err := yaml.Marshal(ciPipeline)
+		if err != nil {
+			return err
+		}
+		err = os.WriteFile("pipeline.yaml", data, 0777)
+
+		return err
 	},
 }
 

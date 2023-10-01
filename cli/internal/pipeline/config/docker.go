@@ -1,8 +1,6 @@
 package config
 
 import (
-	"errors"
-	"kapigen.kateops.com/internal/gitlab"
 	"kapigen.kateops.com/internal/pipeline/types"
 )
 
@@ -19,24 +17,9 @@ func (d *Docker) Validate() types.PipelineConfigInterface {
 	return d
 }
 
-func (d *Docker) LoadPipeline(pipelineType types.PipelineType) types.PipelineBuilderWrapper {
+func (i *Docker) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 
-	return types.PipelineBuilderWrapper{
-		Builder: DockerBuilder{},
-		Config:  d,
-		Name:    []string{"Docker"},
-		Type:    pipelineType,
-	}
-}
+	var tmp types.Jobs
+	return &tmp, nil
 
-type DockerBuilder struct {
-	Type types.PipelineType
-}
-
-func (d DockerBuilder) Build(config types.PipelineConfigInterface) (*gitlab.CiJobs, error) {
-	if _, ok := config.(*Docker); ok {
-		var tmp gitlab.CiJobs
-		return &tmp, nil
-	}
-	return nil, errors.New("wrong pipeline config")
 }

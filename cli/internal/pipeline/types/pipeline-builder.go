@@ -3,25 +3,22 @@ package types
 import (
 	"errors"
 	"fmt"
-	"kapigen.kateops.com/internal/gitlab"
 )
 
 type PipelineBuilderInterface interface {
-	Build(config PipelineConfigInterface) (*gitlab.CiJobs, error)
+	Build(pipelineTypeConfig PipelineTypeConfig) (*Jobs, error)
 }
 
 type PipelineBuilderWrapper struct {
-	Builder PipelineBuilderInterface
-	Name    []string
-	Config  PipelineConfigInterface
-	Type    PipelineType
+	Builder            PipelineBuilderInterface
+	PipelineTypeConfig PipelineTypeConfig
 }
 
-func (p *PipelineBuilderWrapper) Build() (*gitlab.CiJobs, error) {
+func (p *PipelineBuilderWrapper) Build() (*Jobs, error) {
 
 	if p.Builder == nil {
-		return nil, errors.New(fmt.Sprintf("no Pipeline Builder set for type:%s", p.Type))
+		return nil, errors.New(fmt.Sprintf("no Pipeline Builder set for type:%s", p.PipelineTypeConfig.GetType()))
 	}
 
-	return p.Builder.Build(p.Config)
+	return p.Builder.Build(p.PipelineTypeConfig)
 }

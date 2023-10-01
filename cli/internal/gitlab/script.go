@@ -9,3 +9,9 @@ type Script struct {
 func (s *Script) getRenderedValue() []string {
 	return s.Value.Get()
 }
+
+func NewScript() Script {
+	return Script{
+		Value: wrapper.NewStringSlice(),
+	}
+}

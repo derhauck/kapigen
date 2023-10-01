@@ -1,10 +1,7 @@
 package config
 
 import (
-	"errors"
-	"fmt"
-	"kapigen.kateops.com/internal/gitlab"
-	"kapigen.kateops.com/internal/logger"
+	"kapigen.kateops.com/internal/pipeline/jobs/infrastructure"
 	"kapigen.kateops.com/internal/pipeline/types"
 )
 
@@ -24,25 +21,10 @@ func (i *Infrastructure) Validate() types.PipelineConfigInterface {
 	return i
 }
 
-func (i *Infrastructure) LoadPipeline(pipelineType types.PipelineType) types.PipelineBuilderWrapper {
-	logger.Debug(fmt.Sprintf("state: %s", i.State))
-	logger.Debug(fmt.Sprintf("S3: %s", i.S3))
-	return types.PipelineBuilderWrapper{
-		Builder: &InfrastructureBuilder{},
-		Config:  i,
-		Name:    []string{"Infrastructure"},
-		Type:    pipelineType,
-	}
-}
-
-type InfrastructureBuilder struct {
-}
-
-func (i *InfrastructureBuilder) Build(config types.PipelineConfigInterface) (*gitlab.CiJobs, error) {
-	if _, ok := config.(*Infrastructure); ok {
-		var tmp gitlab.CiJobs
-		return &tmp, nil
-	}
-
-	return nil, errors.New("wrong config type")
+func (i *Infrastructure) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
+	var init = infrastructure.NewTerraformInit(i.State, i.S3)
+	var plan = infrastructure.NewTerraformPlan(i.State, i.S3)
+	plan.AddNeed(init)
+	var tmp = types.Jobs{init, plan}
+	return &tmp, nil
 }

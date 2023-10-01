@@ -16,3 +16,9 @@ func (s *StringSlice) AddSeveral(script []string) *StringSlice {
 func (s *StringSlice) Get() []string {
 	return s.Value
 }
+
+func NewStringSlice() StringSlice {
+	return StringSlice{
+		Value: []string{},
+	}
+}
