@@ -41,23 +41,33 @@ var Cmd = &cobra.Command{
 		}
 		logger.Info("pipeline created")
 		var ciPipeline = make(map[string]*gitlab.CiJobYaml)
-		logger.DebugAny(pipelineJobs)
 		var evaluatedJobs types.Jobs
+		var jobsToEvaluate types.Jobs
+		jobsToEvaluate = append(jobsToEvaluate, pipelineJobs.GetJobs()...)
 		for _, job := range pipelineJobs {
-			job.Render()
-			evaluatedJob, err := job.EvaluateName(pipelineJobs)
+			evaluatedJob, err := job.EvaluateName(&jobsToEvaluate)
 			if err != nil {
 				return err
 			}
 			if evaluatedJob != nil {
 				evaluatedJobs = append(evaluatedJobs, evaluatedJob)
+			} else {
+				var resizedJobsToEvaluate types.Jobs
+				for i := range jobsToEvaluate {
+					if jobsToEvaluate[i] == job && i < len(jobsToEvaluate) {
+						var tmp = jobsToEvaluate[i+1:]
+						resizedJobsToEvaluate = append(jobsToEvaluate[:i], tmp...)
+					}
+				}
+				jobsToEvaluate = resizedJobsToEvaluate
 			}
-		}
 
-		for _, job := range pipelineJobs {
-			ciPipeline[job.GetName()] = job.CiJob.Render()
 		}
-		logger.DebugAny(ciPipeline)
+		for _, job := range evaluatedJobs {
+			job.RenderNeeds()
+			ciPipeline[job.GetName()] = job.CiJobYaml
+		}
+		//logger.DebugAny(ciPipeline)
 		data, err := yaml.Marshal(ciPipeline)
 		if err != nil {
 			return err

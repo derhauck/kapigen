@@ -1,14 +1,9 @@
 pipelines:
   - type: infrastructure
     config:
-      state: state-three
+      state: state-one
       s3: true
     id: one
-  - type: docker
-    id: two
-    config:
-      path: "cli"
-      context: "cli"
   - type: infrastructure
     config:
       state: state-three
@@ -21,6 +16,6 @@ pipelines:
     id: four
   - type: infrastructure
     config:
-      state: state-five
+      state: state-two
       s3: true
-    id: five
+    id: two

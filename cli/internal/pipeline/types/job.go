@@ -3,6 +3,7 @@ package types
 import (
 	"errors"
 	"fmt"
+	"kapigen.kateops.com/docker"
 	"kapigen.kateops.com/internal/gitlab"
 	"kapigen.kateops.com/internal/logger"
 )
@@ -10,18 +11,38 @@ import (
 type Job struct {
 	Names       []string
 	CiJob       *gitlab.CiJob
-	Need        Jobs
+	Needs       Needs
 	currentName int
-	fn          []func(job *Job)
+	fn          []func(job *gitlab.CiJob)
 	CiJobYaml   *gitlab.CiJobYaml
 }
 
 func (j *Job) AddNeed(job *Job) {
-	j.Need = append(j.Need, job)
+	j.Needs = append(j.Needs, NewNeed(job))
 }
 
-func (j *Job) AddNeeds(job *Jobs) {
-	j.Need = append(j.Need, job.GetJobs()...)
+func (j *Job) AddSeveralNeeds(needs *Needs) {
+	for _, need := range needs.GetNeeds() {
+		if !j.HasNeed(need) {
+			j.Needs = append(j.Needs, need)
+		}
+		//logger.DebugAny(j.Needs)
+	}
+}
+
+func (j *Job) HasNeed(need *Need) bool {
+	for _, availableNeed := range j.Needs {
+		if availableNeed == need {
+			return true
+		}
+	}
+	return false
+}
+
+func (j *Job) RenderNeeds() {
+	if j.Needs != nil {
+		j.CiJobYaml.Needs = j.Needs.NeedsYaml()
+	}
 }
 
 func (j *Job) GetName() string {
@@ -35,33 +56,34 @@ func (j *Job) GetName() string {
 func (j *Job) UniqueName() error {
 
 	if j.currentName+1 <= len(j.Names) {
-		logger.Info(fmt.Sprintf("added unique name for Job: %s", j.GetName()))
 		j.currentName++
+		logger.Info(fmt.Sprintf("added unique name for Job: %s", j.GetName()))
 		return nil
 	}
 	return errors.New(fmt.Sprintf("job '%s' can not be more unique", j.GetName()))
 }
-func (j *Job) EvaluateName(jobs Jobs) (*Job, error) {
-	for _, job := range jobs {
-		if j.compareConfiguration(job) {
-			return nil, nil
-		}
-		if j.compare(job) {
-			_, err := j.EvaluateName(jobs)
-			if err != nil {
-				logger.ErrorE(err)
-				return nil, err
+func (j *Job) EvaluateName(jobs *Jobs) (*Job, error) {
+	for _, job := range jobs.GetJobs() {
+		if j != job {
+			if j.compareConfiguration(job) {
+				job.AddSeveralNeeds(job.EvaluateNeeds(&j.Needs))
+				return nil, nil
+			}
+			if j.compare(job) {
+				_, err := j.EvaluateName(jobs)
+				if err != nil {
+					logger.ErrorE(err)
+					return nil, err
+				}
 			}
 		}
+
 	}
 
 	return j, nil
 }
 
 func (j *Job) compare(job *Job) bool {
-	if j == job {
-		return false
-	}
 	if j.GetName() == job.GetName() {
 		err := j.UniqueName()
 		if err != nil {
@@ -86,13 +108,13 @@ func (j *Job) AddName(name string) *Job {
 	return j
 }
 
-func NewJob(name string, fn func(job *Job)) *Job {
+func NewJob(name string, image docker.Image, fn func(job *gitlab.CiJob)) *Job {
 	var newJob = &Job{
 		Names:       []string{name},
-		CiJob:       gitlab.NewCiJob(),
+		CiJob:       gitlab.NewCiJob(image),
 		currentName: 0,
-		fn:          []func(job *Job){fn},
-		Need:        Jobs{},
+		fn:          []func(job *gitlab.CiJob){fn},
+		Needs:       Needs{},
 	}
 
 	return newJob
@@ -100,13 +122,29 @@ func NewJob(name string, fn func(job *Job)) *Job {
 
 func (j *Job) Render() {
 	for _, fn := range j.fn {
-		fn(j)
+		fn(j.CiJob)
 	}
-	j.CiJobYaml = j.CiJob.Render()
+	j.CiJobYaml = j.CiJob.Render(j.Needs.NeedsYaml())
 }
 
 type Jobs []*Job
 
 func (j *Jobs) GetJobs() []*Job {
 	return *j
+}
+
+func (j *Job) EvaluateNeeds(needs *Needs) *Needs {
+	var finalNeeds Needs
+	if needs != nil {
+		for _, need := range needs.GetNeeds() {
+			finalNeeds = append(finalNeeds, need)
+		}
+	}
+	var jobNeeds = j.Needs
+	if jobNeeds != nil {
+		var tmp Needs
+		tmp = append(jobNeeds.GetNeeds(), finalNeeds.GetNeeds()...)
+		return &tmp
+	}
+	return nil
 }

@@ -11,6 +11,7 @@ type PipelineTypeConfig struct {
 	Type       PipelineType `yaml:"type"`
 	Config     interface{}  `yaml:"config"`
 	PipelineId string       `yaml:"id"`
+	Path       string       `yaml:"path"`
 }
 
 func (p *PipelineTypeConfig) Decode(configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
@@ -30,10 +31,11 @@ func (p *PipelineTypeConfig) Decode(configTypes map[PipelineType]PipelineConfigI
 	}
 
 	for _, job := range jobs.GetJobs() {
-		job.AddName(string(p.Type))
 		if p.PipelineId != "" {
 			job.AddName(p.PipelineId)
 		}
+		job.AddName(string(p.Type))
+		job.Render()
 	}
 
 	return jobs, nil
