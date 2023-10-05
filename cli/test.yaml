@@ -4,18 +4,22 @@ pipelines:
       state: state-one
       s3: true
     id: one
+    path: one
   - type: infrastructure
     config:
       state: state-three
       s3: true
     id: three
+    path: three
   - type: infrastructure
     config:
       state: state-four
       s3: true
     id: four
+    path: four
   - type: infrastructure
     config:
       state: state-two
       s3: true
     id: two
+    path: two

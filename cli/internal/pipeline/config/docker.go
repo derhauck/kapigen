@@ -13,11 +13,11 @@ func (d *Docker) New() types.PipelineConfigInterface {
 	return &Docker{}
 }
 
-func (d *Docker) Validate() types.PipelineConfigInterface {
-	return d
+func (d *Docker) Validate() error {
+	return nil
 }
 
-func (i *Docker) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
+func (d *Docker) Build(path string, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 
 	var tmp types.Jobs
 	return &tmp, nil

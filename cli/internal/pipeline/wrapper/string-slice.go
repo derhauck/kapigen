@@ -17,8 +17,8 @@ func (s *StringSlice) Get() []string {
 	return s.Value
 }
 
-func NewStringSlice() StringSlice {
-	return StringSlice{
+func NewStringSlice() *StringSlice {
+	return &StringSlice{
 		Value: []string{},
 	}
 }

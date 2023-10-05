@@ -12,6 +12,6 @@ func (s *Script) getRenderedValue() []string {
 
 func NewScript() Script {
 	return Script{
-		Value: wrapper.NewStringSlice(),
+		Value: *wrapper.NewStringSlice(),
 	}
 }

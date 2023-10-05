@@ -3,6 +3,7 @@ package gitlab
 import (
 	"gopkg.in/yaml.v3"
 	"kapigen.kateops.com/docker"
+	"kapigen.kateops.com/internal/gitlab/rules"
 	"kapigen.kateops.com/internal/logger"
 )
 
@@ -14,6 +15,7 @@ type CiJob struct {
 	Cache        Cache             `yaml:"cache"`
 	Variables    map[string]string `yaml:"variables"`
 	Image        Image
+	Rules        rules.Rules
 }
 
 func NewCiJob(imageName docker.Image) *CiJob {
@@ -42,6 +44,7 @@ type CiJobYaml struct {
 	Needs        *NeedsYaml        `yaml:"needs"`
 	Variables    map[string]string `yaml:"variables"`
 	Image        *ImageYaml        `yaml:"image"`
+	Rules        *rules.RulesYaml  `yaml:"rules"`
 }
 
 func (c *CiJobYaml) String() string {
@@ -62,6 +65,7 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml) *CiJobYaml {
 		Needs:        needs,
 		Variables:    job.Variables,
 		Image:        job.Image.GetRenderedValue(),
+		Rules:        job.Rules.GetRenderedValue(),
 	}
 }
 

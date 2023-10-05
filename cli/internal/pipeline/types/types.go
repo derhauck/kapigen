@@ -4,6 +4,6 @@ type PipelineType string
 
 type PipelineConfigInterface interface {
 	New() PipelineConfigInterface
-	Validate() PipelineConfigInterface
-	Build(pipelineType PipelineType, Id string) (*Jobs, error)
+	Validate() error
+	Build(path string, pipelineType PipelineType, Id string) (*Jobs, error)
 }

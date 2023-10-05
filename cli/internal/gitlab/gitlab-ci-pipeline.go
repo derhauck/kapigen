@@ -1,6 +1,9 @@
 package gitlab
 
-import "kapigen.kateops.com/internal/pipeline/wrapper"
+import (
+	"kapigen.kateops.com/internal/gitlab/rules"
+	"kapigen.kateops.com/internal/pipeline/wrapper"
+)
 
 type CiPipelineDefault struct {
 	AfterScript  AfterScript
@@ -8,8 +11,8 @@ type CiPipelineDefault struct {
 }
 
 type CiPipelineWorkflow struct {
-	Name  string  `yaml:"name"`
-	Rules CiRules `yaml:"rules"`
+	Name  string       `yaml:"name"`
+	Rules *rules.Rules `yaml:"rules"`
 }
 
 type CiPipeline struct {
@@ -20,8 +23,8 @@ type CiPipeline struct {
 }
 
 type CiPipelineWorkflowYaml struct {
-	Name  string    `yaml:"name"`
-	Rules RulesYaml `yaml:"rules"`
+	Name  string           `yaml:"name"`
+	Rules *rules.RulesYaml `yaml:"rules"`
 }
 type CiPipelineDefaultYaml struct {
 	AfterScript  []string `yaml:"after_script"`

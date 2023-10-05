@@ -14,17 +14,19 @@ func (i *Infrastructure) New() types.PipelineConfigInterface {
 	return &Infrastructure{}
 }
 
-func (i *Infrastructure) Validate() types.PipelineConfigInterface {
+func (i *Infrastructure) Validate() error {
 	if i.State == "" {
 		i.State = "set-by-validation"
 	}
-	return i
+	return nil
 }
 
-func (i *Infrastructure) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
-	var init = infrastructure.NewTerraformInit(i.State, i.S3)
-	var plan = infrastructure.NewTerraformPlan(i.State, i.S3)
-	plan.AddNeed(init)
+func (i *Infrastructure) Build(path string, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
+	var init = infrastructure.
+		NewTerraformInit(path, i.State, i.S3)
+	var plan = infrastructure.
+		NewTerraformPlan(path, i.State, i.S3).
+		AddNeed(init)
 	var tmp = types.Jobs{init, plan}
 	return &tmp, nil
 }

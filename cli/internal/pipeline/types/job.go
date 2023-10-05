@@ -17,17 +17,18 @@ type Job struct {
 	CiJobYaml   *gitlab.CiJobYaml
 }
 
-func (j *Job) AddNeed(job *Job) {
+func (j *Job) AddNeed(job *Job) *Job {
 	j.Needs = append(j.Needs, NewNeed(job))
+	return j
 }
 
-func (j *Job) AddSeveralNeeds(needs *Needs) {
+func (j *Job) AddSeveralNeeds(needs *Needs) *Job {
 	for _, need := range needs.GetNeeds() {
 		if !j.HasNeed(need) {
 			j.Needs = append(j.Needs, need)
 		}
-		//logger.DebugAny(j.Needs)
 	}
+	return j
 }
 
 func (j *Job) HasNeed(need *Need) bool {
@@ -39,10 +40,11 @@ func (j *Job) HasNeed(need *Need) bool {
 	return false
 }
 
-func (j *Job) RenderNeeds() {
+func (j *Job) RenderNeeds() *Job {
 	if j.Needs != nil {
 		j.CiJobYaml.Needs = j.Needs.NeedsYaml()
 	}
+	return j
 }
 
 func (j *Job) GetName() string {
@@ -120,11 +122,12 @@ func NewJob(name string, image docker.Image, fn func(job *gitlab.CiJob)) *Job {
 	return newJob
 }
 
-func (j *Job) Render() {
+func (j *Job) Render() *Job {
 	for _, fn := range j.fn {
 		fn(j.CiJob)
 	}
 	j.CiJobYaml = j.CiJob.Render(j.Needs.NeedsYaml())
+	return j
 }
 
 type Jobs []*Job

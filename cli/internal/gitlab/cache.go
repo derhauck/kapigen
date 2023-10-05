@@ -7,7 +7,7 @@ type CachePolicyEnum int
 const (
 	CachePolicyEnumPull CachePolicyEnum = iota
 	CachePolicyEnumPush
-	CachePolicyPullPush
+	CachePolicyEnumPullPush
 )
 
 func (c CachePolicyEnum) Policy() string {

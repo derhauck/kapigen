@@ -24,8 +24,11 @@ func (p *PipelineTypeConfig) Decode(configTypes map[PipelineType]PipelineConfigI
 	if err != nil {
 		return nil, err
 	}
-	pipelineConfig.Validate()
-	jobs, err := pipelineConfig.Build(p.Type, p.PipelineId)
+	err = pipelineConfig.Validate()
+	if err != nil {
+		return nil, err
+	}
+	jobs, err := pipelineConfig.Build(p.Path, p.Type, p.PipelineId)
 	if err != nil {
 		return nil, err
 	}
