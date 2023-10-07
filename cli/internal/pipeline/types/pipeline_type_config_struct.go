@@ -11,7 +11,6 @@ type PipelineTypeConfig struct {
 	Type       PipelineType `yaml:"type"`
 	Config     interface{}  `yaml:"config"`
 	PipelineId string       `yaml:"id"`
-	Path       string       `yaml:"path"`
 }
 
 func (p *PipelineTypeConfig) Decode(configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
@@ -26,9 +25,14 @@ func (p *PipelineTypeConfig) Decode(configTypes map[PipelineType]PipelineConfigI
 	}
 	err = pipelineConfig.Validate()
 	if err != nil {
-		return nil, err
+		return nil, errors.New(fmt.Sprintf(
+			"Pipeline type: %s, id: %s, encountered error: %s",
+			p.Type,
+			p.PipelineId,
+			err.Error(),
+		))
 	}
-	jobs, err := pipelineConfig.Build(p.Path, p.Type, p.PipelineId)
+	jobs, err := pipelineConfig.Build(p.Type, p.PipelineId)
 	if err != nil {
 		return nil, err
 	}

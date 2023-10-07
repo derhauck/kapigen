@@ -1,6 +1,6 @@
 include ../Makefile
 GO_SRC_PATH=/app
-GO_ARGS=-it -e GOMODCACHE=/app/.pkg -e GOCACHE=/app/.cache -e ENVIRONMENT=DEV
+GO_ARGS=-it -e GOMODCACHE=/app/.pkg -e GOCACHE=/app/.cache -e ENVIRONMENT=DEV -e CI_PROJECT_ID=17 -e CI_MERGE_REQUEST_ID=10
 .PHONY: cli
 cli: DOCKER_ARGS=$(GO_ARGS)
 cli:
@@ -17,7 +17,11 @@ build:
 	$(DOCKER_RUN) -w $(GO_SRC_PATH) $(GO_IMAGE) go build -o .bin/kapigen .
 	chmod +x bin/kapigen
 
-.PHONH: test
+.PHONY: test
 test: DOCKER_ARGS=$(GO_ARGS)
 test:
-	$(DOCKER_RUN)  -w $(GO_SRC_PATH) $(GO_IMAGE) go test ./...
+	$(DOCKER_RUN)  -w $(GO_SRC_PATH) $(GO_IMAGE) go test ./... -coverpkg=./...
+
+.PHONY: pipeline
+pipeline:
+	$(MAKE) run ARGS="generate pipeline -v"

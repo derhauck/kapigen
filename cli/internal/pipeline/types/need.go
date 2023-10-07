@@ -13,6 +13,11 @@ func (n *Needs) GetNeeds() []*Need {
 	return *n
 }
 
+func (n *Need) NotOptional() *Need {
+	n.Optional = false
+	return n
+}
+
 func NewNeed(job *Job) *Need {
 	return &Need{
 		Optional: true,

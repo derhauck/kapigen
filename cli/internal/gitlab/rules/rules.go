@@ -5,7 +5,7 @@ import "kapigen.kateops.com/internal/pipeline/wrapper"
 type Rule struct {
 	If           string              `yaml:"if"`
 	Changes      wrapper.StringSlice `yaml:"changes"`
-	AllowFailure bool                `yaml:"allow_failure"`
+	AllowFailure wrapper.Bool        `yaml:"allow_failure"`
 	Variables    struct{}            `yaml:"variables"`
 	When         WhenWrapper         `yaml:"when"`
 }
@@ -63,16 +63,37 @@ func (c WhenEnumType) When() string {
 type RuleYaml struct {
 	If           string   `yaml:"if"`
 	Changes      []string `yaml:"changes,omitempty"`
-	AllowFailure bool     `yaml:"allow_failure"`
+	AllowFailure any      `yaml:"allow_failure,omitempty"`
 	Variables    struct{} `yaml:"variables,omitempty"`
 	When         string   `yaml:"when"`
 }
 
+type RuleWorkflowYaml []*RuleYaml
+
 type RulesYaml []*RuleYaml
 
+func (r *Rules) GetRenderedWorkflowValue() *RuleWorkflowYaml {
+	return NewRulesWorkflowYaml(*r)
+}
 func (r *Rules) GetRenderedValue() *RulesYaml {
 	return NewRulesYaml(*r)
 }
+func NewRulesWorkflowYaml(rules Rules) *RuleWorkflowYaml {
+	var rulesYaml = make(RuleWorkflowYaml, 0)
+	for i := 0; i < len(rules); i++ {
+		var currentRule = rules[i]
+		rulesYaml = append(rulesYaml, &RuleYaml{
+			If:           currentRule.If,
+			Changes:      currentRule.Changes.Get(),
+			Variables:    currentRule.Variables,
+			When:         currentRule.When.Get(),
+			AllowFailure: nil,
+		})
+	}
+
+	return &rulesYaml
+}
+
 func NewRulesYaml(rules Rules) *RulesYaml {
 	var rulesYaml = make(RulesYaml, 0)
 	for i := 0; i < len(rules); i++ {
@@ -80,7 +101,7 @@ func NewRulesYaml(rules Rules) *RulesYaml {
 		rulesYaml = append(rulesYaml, &RuleYaml{
 			If:           currentRule.If,
 			Changes:      currentRule.Changes.Get(),
-			AllowFailure: currentRule.AllowFailure,
+			AllowFailure: currentRule.AllowFailure.Get(),
 			Variables:    currentRule.Variables,
 			When:         currentRule.When.Get(),
 		})

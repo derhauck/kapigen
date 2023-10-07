@@ -7,6 +7,12 @@ pipelines:
     path: one
   - type: infrastructure
     config:
+      state: state-two
+      s3: true
+    id: two
+    path: two
+  - type: infrastructure
+    config:
       state: state-three
       s3: true
     id: three
@@ -17,9 +23,9 @@ pipelines:
       s3: true
     id: four
     path: four
-  - type: infrastructure
+  - type: docker
+    path: one
+    id: five
     config:
-      state: state-two
-      s3: true
-    id: two
-    path: two
+      destination: test
+      path: five

@@ -40,7 +40,7 @@ var Cmd = &cobra.Command{
 			pipelineJobs = append(pipelineJobs, jobs.GetJobs()...)
 		}
 		logger.Info("pipeline created")
-		var ciPipeline = make(map[string]*gitlab.CiJobYaml)
+		var ciPipeline = make(map[string]interface{})
 		var evaluatedJobs types.Jobs
 		var jobsToEvaluate types.Jobs
 		jobsToEvaluate = append(jobsToEvaluate, pipelineJobs.GetJobs()...)
@@ -67,6 +67,10 @@ var Cmd = &cobra.Command{
 			job.RenderNeeds()
 			ciPipeline[job.GetName()] = job.CiJobYaml
 		}
+		pipeline := gitlab.NewDefaultCiPipeline().Render()
+		ciPipeline["workflow"] = pipeline.Workflow
+		ciPipeline["stages"] = pipeline.Stages
+		ciPipeline["default"] = pipeline.Default
 		//logger.DebugAny(ciPipeline)
 		data, err := yaml.Marshal(ciPipeline)
 		if err != nil {

@@ -8,6 +8,7 @@ import (
 type Infrastructure struct {
 	State string `yaml:"state"`
 	S3    bool   `yaml:"s3"`
+	Path  string `yaml:"path"`
 }
 
 func (i *Infrastructure) New() types.PipelineConfigInterface {
@@ -21,12 +22,15 @@ func (i *Infrastructure) Validate() error {
 	return nil
 }
 
-func (i *Infrastructure) Build(path string, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
+func (i *Infrastructure) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var init = infrastructure.
-		NewTerraformInit(path, i.State, i.S3)
+		NewTerraformInit(i.Path, i.State, i.S3)
 	var plan = infrastructure.
-		NewTerraformPlan(path, i.State, i.S3).
+		NewTerraformPlan(i.Path, i.State, i.S3).
 		AddNeed(init)
 	var tmp = types.Jobs{init, plan}
+	for _, job := range tmp {
+		job.CiJob.Cache.SetDefaultCacheKey(i.Path, string(pipelineType))
+	}
 	return &tmp, nil
 }
