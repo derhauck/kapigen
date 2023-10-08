@@ -40,6 +40,10 @@ func NewDefaultCiPipeline() *CiPipeline {
 					If:   "$CI_MERGE_REQUEST_ID",
 					When: rules.NewWhen(rules.WhenEnumTypeAlways),
 				},
+				&rules.Rule{
+					If:   "$CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'",
+					When: rules.NewWhen(rules.WhenEnumTypeAlways),
+				},
 			},
 		},
 	}
