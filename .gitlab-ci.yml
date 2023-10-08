@@ -22,7 +22,7 @@ Build:
   before_script:
     - cd cli
   script:
-    - go build .
+    - go mod download
     - go run . generate pipeline -v
   artifacts:
     paths:
