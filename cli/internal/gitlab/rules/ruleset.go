@@ -9,7 +9,7 @@ func DefaultPipelineRules() *Rules {
 			When: NewWhen(WhenEnumTypeNever),
 		},
 		&Rule{
-			If:      "($CI_MERGE_REQUEST_IID || $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH) && $KTC_VERSION != \"0.0.0\"",
+			If:      "($CI_MERGE_REQUEST_IID || $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH)",
 			Changes: *wrapper.NewStringSlice().Add("${KTC_PATH}/**/*"),
 		},
 		&Rule{
