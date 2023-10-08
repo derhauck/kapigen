@@ -1,7 +1,7 @@
 package services
 
 import (
-	"kapigen.kateops.com/docker"
+	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 )
 

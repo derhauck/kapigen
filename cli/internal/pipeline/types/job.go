@@ -3,7 +3,7 @@ package types
 import (
 	"errors"
 	"fmt"
-	"kapigen.kateops.com/docker"
+	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/gitlab"
 	"kapigen.kateops.com/internal/logger"
 )

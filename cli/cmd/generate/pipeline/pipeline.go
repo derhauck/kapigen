@@ -18,7 +18,7 @@ var Cmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cli.NewPersistentConfig(cmd)
 		logger.Debug("activated verbose mode")
-		configPath := "test.yaml"
+		configPath := "config.kapigen.yaml"
 		body, err := os.ReadFile(configPath)
 		if err != nil {
 			return err

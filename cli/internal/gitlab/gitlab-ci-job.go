@@ -2,7 +2,7 @@ package gitlab
 
 import (
 	"gopkg.in/yaml.v3"
-	"kapigen.kateops.com/docker"
+	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/gitlab/rules"
 	"kapigen.kateops.com/internal/gitlab/services"
 	"kapigen.kateops.com/internal/gitlab/stages"

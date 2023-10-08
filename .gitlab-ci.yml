@@ -1,0 +1,36 @@
+workflow:
+  rules:
+    - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
+    - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train"
+    - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+    - when: never
+
+default:
+  tags:
+    - pressure::medium
+stages:
+  - build
+  - trigger
+
+Build:
+  stage: build
+  image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/go:golang:1.21rc3
+
+  before_script:
+    - cd cli
+  script:
+    - go run . generate pipeline -v
+  artifacts:
+    paths:
+      - cli/pipeline.yml
+
+Trigger:
+  stage: trigger
+  trigger:
+    strategy: depend
+    include:
+      - artifact: cli/pipeline.yml
+        job: Build

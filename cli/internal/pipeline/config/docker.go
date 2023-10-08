@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"kapigen.kateops.com/internal/pipeline/jobs/docker"
 	"kapigen.kateops.com/internal/pipeline/types"
 )
@@ -19,7 +20,7 @@ func (d *Docker) New() types.PipelineConfigInterface {
 
 func (d *Docker) Validate() error {
 	if d.Path == "" {
-		return errors.New("Need path set!")
+		return errors.New("need path set")
 	}
 
 	if d.Dockerfile == "" {
@@ -30,17 +31,28 @@ func (d *Docker) Validate() error {
 		d.Context = d.Path
 	}
 
+	if d.Name == "" {
+
+	}
+
 	return nil
 }
 
 func (d *Docker) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
-
 	var jobs = types.Jobs{docker.NewBuildkitBuild(
 		d.Path,
 		d.Context,
 		d.Dockerfile,
-		d.Name,
+		d.DefaultRegistry(),
 	)}
 	return &jobs, nil
+
+}
+
+func (d *Docker) DefaultRegistry() string {
+	if d.Name != "" {
+		return fmt.Sprintf("${CI_REGISTRY_IMAGE}/%s", d.Name)
+	}
+	return "${CI_REGISTRY_IMAGE}"
 
 }
