@@ -22,11 +22,11 @@ Build:
         - if: $KTC_STOP_PIPELINE != "false" && $DEBUG == null
           allow_failure: false
           when: never
-        - if: ($CI_MERGE_REQUEST_IID || $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH) && $KTC_VERSION != "0.0.0"
+        - if: ($CI_MERGE_REQUEST_IID || $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH)
           changes:
             - ${KTC_PATH}/**/*
           allow_failure: false
-          when: on_success
+          when: always
         - if: $KTC_TEST_PIPELINE
           allow_failure: false
           when: on_success
@@ -40,19 +40,23 @@ Build:
             - tcp://0.0.0.0:1234
             - --oci-worker-no-process-sandbox
           alias: buildkitd
+    tags:
+        - pressure::medium
 default:
     after_script: []
     before_script: []
 stages:
-    - lint
-    - init
     - build
     - test
     - release
     - dynamic
     - trigger
+    - lint
+    - init
 workflow:
     name: default
     rules:
         - if: $CI_MERGE_REQUEST_ID
+          when: always
+        - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
           when: always

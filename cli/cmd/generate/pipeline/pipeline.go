@@ -68,10 +68,10 @@ var Cmd = &cobra.Command{
 			ciPipeline[job.GetName()] = job.CiJobYaml
 		}
 		pipeline := gitlab.NewDefaultCiPipeline().Render()
-		ciPipeline["workflow"] = pipeline.Workflow
+		//ciPipeline["workflow"] = pipeline.Workflow
 		ciPipeline["stages"] = pipeline.Stages
-		ciPipeline["default"] = pipeline.Default
-		//logger.DebugAny(ciPipeline)
+		//ciPipeline["default"] = pipeline.Default
+		logger.DebugAny(ciPipeline)
 		data, err := yaml.Marshal(ciPipeline)
 		if err != nil {
 			return err

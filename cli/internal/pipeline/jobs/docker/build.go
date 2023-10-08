@@ -40,5 +40,6 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 		job.Script.Value.Add(command)
 		job.Rules = *rules.DefaultPipelineRules()
 		job.Variables["KTC_PATH"] = path
+		job.Tags.Add("pressure::medium")
 	})
 }

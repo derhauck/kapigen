@@ -35,3 +35,6 @@ Trigger:
     include:
       - artifact: cli/pipeline.yaml
         job: Build
+
+    forward:
+      pipeline_variables: true
