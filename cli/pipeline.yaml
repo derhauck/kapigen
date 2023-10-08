@@ -1,0 +1,58 @@
+Build:
+    after_script: []
+    allow_failure: false
+    before_script: []
+    script:
+        - |
+          buildctl build --frontend dockerfile.v0 --local context="cli" --local dockerfile="cli"  \
+          --progress plain --opt filename="Dockerfile" --export-cache type=inline  \
+          --import-cache type=registry,ref="${CI_REGISTRY_IMAGE}"  \
+          --output type=image,name="${CI_REGISTRY_IMAGE}",push=true  \
+    needs: []
+    variables:
+        BUILDKIT_HOST: tcp://buildkitd:1234
+        KTC_PATH: cli
+    image:
+        name: moby/buildkit:master
+        entrypoint:
+            - sh
+            - -c
+        pull_policy: always
+    rules:
+        - if: $KTC_STOP_PIPELINE != "false" && $DEBUG == null
+          allow_failure: false
+          when: never
+        - if: ($CI_MERGE_REQUEST_IID || $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH) && $KTC_VERSION != "0.0.0"
+          changes:
+            - ${KTC_PATH}/**/*
+          allow_failure: false
+          when: on_success
+        - if: $KTC_TEST_PIPELINE
+          allow_failure: false
+          when: on_success
+    stage: dynamic
+    services:
+        - name: moby/buildkit:master-rootless
+          command:
+            - --addr
+            - unix:///run/user/1000/buildkit/buildkitd.sock
+            - --addr
+            - tcp://0.0.0.0:1234
+            - --oci-worker-no-process-sandbox
+          alias: buildkitd
+default:
+    after_script: []
+    before_script: []
+stages:
+    - lint
+    - init
+    - build
+    - test
+    - release
+    - dynamic
+    - trigger
+workflow:
+    name: default
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
+          when: always
