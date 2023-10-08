@@ -26,12 +26,12 @@ Build:
     - go run . generate pipeline -v
   artifacts:
     paths:
-      - cli/pipeline.yml
+      - cli/pipeline.yaml
 
 Trigger:
   stage: trigger
   trigger:
     strategy: depend
     include:
-      - artifact: cli/pipeline.yml
+      - artifact: cli/pipeline.yaml
         job: Build
