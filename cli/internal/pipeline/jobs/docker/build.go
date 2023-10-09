@@ -62,7 +62,8 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 		)
 		job.BeforeScript.Value.
 			Add("touch .status.init").
-			Add("while [ ! -f $CI_PROJECT_DIR/.status.auth ]; do echo 'wait for auth'; sleep 1; done")
+			Add("while [ ! -f $CI_PROJECT_DIR/.status.auth ]; do echo 'wait for auth'; sleep 1; done").
+			Add("cat config.json")
 		job.Script.Value.
 			Add(command)
 		job.Rules = *rules.DefaultPipelineRules()
