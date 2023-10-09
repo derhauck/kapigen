@@ -56,7 +56,6 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 			Add("touch .status.init").
 			Add("while [ ! -f $CI_PROJECT_DIR/.status.auth ]; do echo 'wait for auth'; sleep 1; done")
 		job.Script.Value.
-			Add("sleep 300").
 			Add(command)
 		job.Rules = *rules.DefaultPipelineRules()
 		job.Variables["KTC_PATH"] = path
