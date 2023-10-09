@@ -31,8 +31,10 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 			Add("sh").
 			Add("-c")
 		auth.Command().
+			Add("while [ ! -f $CI_PROJECT_DIR/.status.init ]; do echo 'wait for init'; sleep 1; done").
 			Add("crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}").
-			Add("crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com")
+			Add("crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com").
+			Add("touch $CI_PROJECT_DIR/.status.auth")
 		auth.AddVariable("DOCKER_CONFIG", "$CI_PROJECT_DIR")
 		job.Services.Add(auth)
 
@@ -50,6 +52,9 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 			cache,
 			push,
 		)
+		job.BeforeScript.Value.
+			Add("touch .status.init").
+			Add("while [ ! -f $CI_PROJECT_DIR/.status.auth ]; do echo 'wait for auth'; sleep 1; done")
 		job.Script.Value.
 			Add("sleep 300").
 			Add(command)
