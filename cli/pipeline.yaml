@@ -49,7 +49,7 @@ Build:
             - crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com
           alias: crane
           variables:
-            DOCKER_CONFIG: ${CI_BUILDS_DIR}
+            DOCKER_CONFIG: $CI_PROJECT_DIR
     tags:
         - pressure::medium
 stages:

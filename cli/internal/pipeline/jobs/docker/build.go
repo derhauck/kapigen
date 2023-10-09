@@ -30,7 +30,7 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 		auth.Command().
 			Add("crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}").
 			Add("crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com")
-		auth.AddVariable("DOCKER_CONFIG", "${CI_BUILDS_DIR}")
+		auth.AddVariable("DOCKER_CONFIG", "$CI_PROJECT_DIR")
 		job.Services.Add(auth)
 
 		cmd := fmt.Sprintf(`buildctl build --frontend dockerfile.v0 --local context="%s" --local dockerfile="%s" `, context, path)
@@ -50,7 +50,7 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 		job.Script.Value.Add(command)
 		job.Rules = *rules.DefaultPipelineRules()
 		job.Variables["KTC_PATH"] = path
-		job.Variables["DOCKER_CONFIG"] = "${CI_BUILDS_DIR}"
+		job.Variables["DOCKER_CONFIG"] = "$CI_PROJECT_DIR"
 		job.Tags.Add("pressure::medium")
 	})
 }
