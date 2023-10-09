@@ -5,9 +5,3 @@ pipelines:
     config:
       destination: test
       path: cli
-  - type: infrastructure
-    config:
-      state: state-four
-      s3: true
-    id: four
-    path: four
