@@ -42,21 +42,13 @@ Build:
           alias: buildkitd
     tags:
         - pressure::medium
-default:
-    after_script: []
-    before_script: []
 stages:
-    - build
     - test
     - release
     - dynamic
     - trigger
     - lint
     - init
-workflow:
-    name: default
-    rules:
-        - if: $CI_MERGE_REQUEST_ID
-          when: always
-        - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
-          when: always
+    - build
+variables:
+    KTC_STOP_PIPELINE: "false"

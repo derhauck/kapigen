@@ -71,7 +71,8 @@ var Cmd = &cobra.Command{
 		//ciPipeline["workflow"] = pipeline.Workflow
 		ciPipeline["stages"] = pipeline.Stages
 		//ciPipeline["default"] = pipeline.Default
-		logger.DebugAny(ciPipeline)
+		ciPipeline["variables"] = pipeline.Variables
+		//logger.DebugAny(ciPipeline)
 		data, err := yaml.Marshal(ciPipeline)
 		if err != nil {
 			return err

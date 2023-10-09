@@ -21,6 +21,7 @@ type CiPipeline struct {
 	Workflow     CiPipelineWorkflow   `yaml:"workflow,omitempty"`
 	AllowFailure AllowFailure         `yaml:"allow_failure,omitempty"`
 	Default      CiPipelineDefault    `yaml:"default,omitempty"`
+	Variables    map[string]string    `yaml:"variables,omitempty"`
 }
 
 func (c *CiPipeline) Render() *CiPipelineYaml {
@@ -46,6 +47,9 @@ func NewDefaultCiPipeline() *CiPipeline {
 				},
 			},
 		},
+		Variables: map[string]string{
+			"KTC_STOP_PIPELINE": "false",
+		},
 	}
 }
 
@@ -58,9 +62,10 @@ type CiPipelineDefaultYaml struct {
 	BeforeScript []string `yaml:"before_script"`
 }
 type CiPipelineYaml struct {
-	Default  CiPipelineDefaultYaml  `yaml:"default"`
-	Workflow CiPipelineWorkflowYaml `yaml:"workflow"`
-	Stages   []string               `yaml:"stages"`
+	Default   CiPipelineDefaultYaml  `yaml:"default"`
+	Workflow  CiPipelineWorkflowYaml `yaml:"workflow"`
+	Stages    []string               `yaml:"stages"`
+	Variables map[string]string      `yaml:"variables"`
 }
 
 func NewCiPipelineYaml(pipeline *CiPipeline) *CiPipelineYaml {
@@ -73,6 +78,7 @@ func NewCiPipelineYaml(pipeline *CiPipeline) *CiPipelineYaml {
 			Name:  pipeline.Workflow.Name,
 			Rules: pipeline.Workflow.Rules.GetRenderedWorkflowValue(),
 		},
-		Stages: pipeline.Stages.Get(),
+		Stages:    pipeline.Stages.Get(),
+		Variables: pipeline.Variables,
 	}
 }
