@@ -47,7 +47,9 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 			cache,
 			push,
 		)
-		job.Script.Value.Add(command)
+		job.Script.Value.
+			Add("sleep 300").
+			Add(command)
 		job.Rules = *rules.DefaultPipelineRules()
 		job.Variables["KTC_PATH"] = path
 		job.Variables["DOCKER_CONFIG"] = "$CI_PROJECT_DIR"
