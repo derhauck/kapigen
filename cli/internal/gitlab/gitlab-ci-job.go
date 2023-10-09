@@ -6,18 +6,18 @@ import (
 	"kapigen.kateops.com/internal/gitlab/rules"
 	"kapigen.kateops.com/internal/gitlab/services"
 	"kapigen.kateops.com/internal/gitlab/stages"
+	"kapigen.kateops.com/internal/gitlab/tags"
 	"kapigen.kateops.com/internal/logger"
-	"kapigen.kateops.com/internal/pipeline/wrapper"
 )
 
 type CiJob struct {
-	AfterScript  AfterScript         `yaml:"after_script"`
-	BeforeScript BeforeScript        `yaml:"before_script"`
-	Script       Script              `yaml:"script"`
-	AllowFailure AllowFailure        `yaml:"allow_failure"`
-	Cache        Cache               `yaml:"cache"`
-	Variables    map[string]string   `yaml:"variables"`
-	Tags         wrapper.StringSlice `yaml:"tags"`
+	AfterScript  AfterScript       `yaml:"after_script"`
+	BeforeScript BeforeScript      `yaml:"before_script"`
+	Script       Script            `yaml:"script"`
+	AllowFailure AllowFailure      `yaml:"allow_failure"`
+	Cache        Cache             `yaml:"cache"`
+	Variables    map[string]string `yaml:"variables"`
+	Tags         tags.Cis          `yaml:"tags"`
 	Image        Image
 	Rules        rules.Rules
 	Stage        stages.Stage `yaml:"stage"`
@@ -45,7 +45,6 @@ func NewCiJob(imageName docker.Image) *CiJob {
 			PullPolicy: ImagePullPolicyAlways,
 		},
 		Stage: stages.NewStage(),
-		Tags:  *wrapper.NewStringSlice(),
 	}
 }
 
@@ -91,7 +90,7 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml) *CiJobYaml {
 		Rules:        job.Rules.GetRenderedValue(),
 		Stage:        job.Stage.Name(),
 		Services:     job.Services.Render(),
-		Tags:         job.Tags.Get(),
+		Tags:         job.Tags.Render(),
 	}
 }
 

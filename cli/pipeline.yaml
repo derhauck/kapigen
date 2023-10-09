@@ -11,10 +11,10 @@ Build:
     needs: []
     variables:
         BUILDKIT_HOST: tcp://buildkitd:1234
-        DOCKER_CONFIG: ${CI_BUILDS_DIR}
+        DOCKER_CONFIG: $CI_PROJECT_DIR
         KTC_PATH: cli
     image:
-        name: moby/buildkit:master
+        name: gitlab.kateops.com/infrastructure/dependency_proxy/containers/moby/buildkit:master
         entrypoint:
             - sh
             - -c
@@ -33,7 +33,7 @@ Build:
           when: on_success
     stage: dynamic
     services:
-        - name: moby/buildkit:master-rootless
+        - name: gitlab.kateops.com/infrastructure/dependency_proxy/containers/moby/buildkit:master-rootless
           command:
             - --addr
             - unix:///run/user/1000/buildkit/buildkitd.sock
@@ -43,7 +43,8 @@ Build:
           alias: buildkitd
         - name: gcr.io/go-containerregistry/crane:debug
           entrypoint:
-            - ""
+            - sh
+            - -c
           command:
             - crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}
             - crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com
@@ -52,13 +53,91 @@ Build:
             DOCKER_CONFIG: $CI_PROJECT_DIR
     tags:
         - pressure::medium
+Init:
+    after_script: []
+    allow_failure: false
+    before_script:
+        - echo "credentials \\"${CI_SERVER_HOST}\\" {\n  token = \\"${CI_PIPELINE_TOKEN}\\"\n}" > gitlab.tfrc
+        - export TF_CLI_CONFIG_FILE=${PWD}/gitlab.tfrc
+    cache:
+        key: 10--infrastructure
+        paths: []
+        unprotect: true
+        policy: pull-push
+    script:
+        - |-
+          terraform init \
+           -backend-config="region=eu-central-1" \
+           -backend-config="access_key=${TF_STATE_ACCESS_KEY}" \
+           -backend-config="secret_key=${TF_STATE_SECRET_KEY}" \
+           -backend-config="bucket=${TF_STATE_BUCKET}" \
+           -backend-config="key=${TF_STATE_BUCKET}/states/17/state-four/terraform.tfstate"
+    needs: []
+    variables:
+        TF_STATE_PROJECT: "17"
+    image:
+        name: hub.kateops.com/base/terraform:latest
+        pull_policy: always
+    rules:
+        - if: $KTC_STOP_PIPELINE != "false" && $DEBUG == null
+          allow_failure: false
+          when: never
+        - if: ($CI_MERGE_REQUEST_IID || $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH)
+          changes:
+            - ${KTC_PATH}/**/*
+          allow_failure: false
+          when: always
+        - if: $KTC_TEST_PIPELINE
+          allow_failure: false
+          when: on_success
+    stage: init
+    services: []
+    tags:
+        - pressure::medium
+Plan:
+    after_script: []
+    allow_failure: false
+    before_script: []
+    cache:
+        key: 10--infrastructure
+        paths:
+            - /.terraform
+        unprotect: true
+        policy: pull
+    script:
+        - echo "state-four"
+        - terraform plan
+    needs:
+        - optional: true
+          job: Init
+    variables:
+        TF_STATE_PROJECT: "17"
+    image:
+        name: hub.kateops.com/base/terraform:latest
+        pull_policy: always
+    rules:
+        - if: $KTC_STOP_PIPELINE != "false" && $DEBUG == null
+          allow_failure: false
+          when: on_success
+        - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+          changes:
+            - ${KTC_PATH}/**/*
+          allow_failure: false
+          when: always
+        - if: $KTC_TEST_PIPELINE
+          allow_failure: false
+          when: on_success
+    stage: build
+    services: []
+    tags:
+        - pressure::medium
 stages:
+    - build
+    - test
     - release
     - dynamic
     - trigger
     - lint
     - init
-    - build
-    - test
 variables:
     KTC_STOP_PIPELINE: "false"
