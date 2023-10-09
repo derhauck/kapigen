@@ -8,6 +8,7 @@ const (
 	Terraform_Base
 	Buildkit
 	BUILDKITD
+	CRANE_DEBUG
 )
 
 var values = map[Image]string{
@@ -16,6 +17,7 @@ var values = map[Image]string{
 	Terraform_Base: "hub.kateops.com/base/terraform:latest",
 	Buildkit:       "moby/buildkit:master",
 	BUILDKITD:      "moby/buildkit:master-rootless",
+	CRANE_DEBUG:    "gcr.io/go-containerregistry/crane:debug",
 }
 
 func (c Image) Image() string {

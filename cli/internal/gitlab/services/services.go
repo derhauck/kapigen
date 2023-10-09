@@ -23,6 +23,9 @@ func (c *Ci) Command() *wrapper.StringSlice {
 }
 
 func (c *Ci) AddVariable(key string, value string) *Ci {
+	if c.variables == nil {
+		c.variables = map[string]string{}
+	}
 	c.variables[key] = value
 	return c
 }

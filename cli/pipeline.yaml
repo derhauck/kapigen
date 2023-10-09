@@ -11,6 +11,7 @@ Build:
     needs: []
     variables:
         BUILDKIT_HOST: tcp://buildkitd:1234
+        DOCKER_CONFIG: ${CI_BUILDS_DIR}
         KTC_PATH: cli
     image:
         name: moby/buildkit:master
@@ -40,15 +41,24 @@ Build:
             - tcp://0.0.0.0:1234
             - --oci-worker-no-process-sandbox
           alias: buildkitd
+        - name: gcr.io/go-containerregistry/crane:debug
+          entrypoint:
+            - ""
+          command:
+            - crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}
+            - crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com
+          alias: crane
+          variables:
+            DOCKER_CONFIG: ${CI_BUILDS_DIR}
     tags:
         - pressure::medium
 stages:
-    - test
     - release
     - dynamic
     - trigger
     - lint
     - init
     - build
+    - test
 variables:
     KTC_STOP_PIPELINE: "false"
