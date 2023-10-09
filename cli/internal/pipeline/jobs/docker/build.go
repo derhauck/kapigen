@@ -40,6 +40,7 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 			Add("-c")
 		auth.Command().
 			Add("while [ ! -f $CI_PROJECT_DIR/.status.init ]; do echo 'wait for init'; sleep 1; done; " +
+				"export $(cat $CI_PROJECT_DIR/.env); " +
 				"crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}; " +
 				"crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com; " +
 				"touch $CI_PROJECT_DIR/.status.auth")
@@ -61,9 +62,10 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 			push,
 		)
 		job.BeforeScript.Value.
+			Add(`echo "REGISTRY_PUSH_USER=$REGISTRY_PUSH_USER" > .env`).
+			Add(`echo "REGISTRY_PUSH_TOKEN=$REGISTRY_PUSH_TOKEN" >> .env`).
 			Add("touch .status.init").
-			Add("while [ ! -f $CI_PROJECT_DIR/.status.auth ]; do echo 'wait for auth'; sleep 1; done").
-			Add("cat config.json")
+			Add("while [ ! -f $CI_PROJECT_DIR/.status.auth ]; do echo 'wait for auth'; sleep 1; done")
 		job.Script.Value.
 			Add(command)
 		job.Rules = *rules.DefaultPipelineRules()
