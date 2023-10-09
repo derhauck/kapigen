@@ -26,7 +26,9 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 		job.Services.Add(daemon)
 
 		auth := services.New(docker.CRANE_DEBUG, "crane", 5000)
-		auth.Entrypoint().Add("")
+		auth.Entrypoint().
+			Add("sh").
+			Add("-c")
 		auth.Command().
 			Add("crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}").
 			Add("crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com")
@@ -48,7 +50,6 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 			push,
 		)
 		job.Script.Value.
-			Add("sleep 300").
 			Add(command)
 		job.Rules = *rules.DefaultPipelineRules()
 		job.Variables["KTC_PATH"] = path
