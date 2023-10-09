@@ -1,7 +1,9 @@
 Build:
     after_script: []
     allow_failure: false
-    before_script: []
+    before_script:
+        - touch .status.init
+        - while [ ! -f $CI_PROJECT_DIR/.status.auth ]; do echo 'wait for auth'; sleep 1; done
     script:
         - |
           buildctl build --frontend dockerfile.v0 --local context="cli" --local dockerfile="cli"  \
@@ -41,103 +43,31 @@ Build:
             - tcp://0.0.0.0:1234
             - --oci-worker-no-process-sandbox
           alias: buildkitd
+        - name: gitlab.kateops.com/infrastructure/dependency_proxy/containers/alpine:3.18
+          entrypoint:
+            - sh
+            - -c
+          command:
+            - sleep 300; touch $CI_PROJECT_DIR/.status.auth
+          alias: crane
         - name: gcr.io/go-containerregistry/crane:debug
           entrypoint:
             - sh
             - -c
           command:
-            - crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}
-            - crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com
+            - while [ ! -f $CI_PROJECT_DIR/.status.init ]; do echo 'wait for init'; sleep 1; done; crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}; crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com; touch $CI_PROJECT_DIR/.status.auth
           alias: crane
           variables:
             DOCKER_CONFIG: $CI_PROJECT_DIR
     tags:
         - pressure::medium
-Init:
-    after_script: []
-    allow_failure: false
-    before_script:
-        - echo "credentials \\"${CI_SERVER_HOST}\\" {\n  token = \\"${CI_PIPELINE_TOKEN}\\"\n}" > gitlab.tfrc
-        - export TF_CLI_CONFIG_FILE=${PWD}/gitlab.tfrc
-    cache:
-        key: 10--infrastructure
-        paths: []
-        unprotect: true
-        policy: pull-push
-    script:
-        - |-
-          terraform init \
-           -backend-config="region=eu-central-1" \
-           -backend-config="access_key=${TF_STATE_ACCESS_KEY}" \
-           -backend-config="secret_key=${TF_STATE_SECRET_KEY}" \
-           -backend-config="bucket=${TF_STATE_BUCKET}" \
-           -backend-config="key=${TF_STATE_BUCKET}/states/17/state-four/terraform.tfstate"
-    needs: []
-    variables:
-        TF_STATE_PROJECT: "17"
-    image:
-        name: hub.kateops.com/base/terraform:latest
-        pull_policy: always
-    rules:
-        - if: $KTC_STOP_PIPELINE != "false" && $DEBUG == null
-          allow_failure: false
-          when: never
-        - if: ($CI_MERGE_REQUEST_IID || $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH)
-          changes:
-            - ${KTC_PATH}/**/*
-          allow_failure: false
-          when: always
-        - if: $KTC_TEST_PIPELINE
-          allow_failure: false
-          when: on_success
-    stage: init
-    services: []
-    tags:
-        - pressure::medium
-Plan:
-    after_script: []
-    allow_failure: false
-    before_script: []
-    cache:
-        key: 10--infrastructure
-        paths:
-            - /.terraform
-        unprotect: true
-        policy: pull
-    script:
-        - echo "state-four"
-        - terraform plan
-    needs:
-        - optional: true
-          job: Init
-    variables:
-        TF_STATE_PROJECT: "17"
-    image:
-        name: hub.kateops.com/base/terraform:latest
-        pull_policy: always
-    rules:
-        - if: $KTC_STOP_PIPELINE != "false" && $DEBUG == null
-          allow_failure: false
-          when: on_success
-        - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
-          changes:
-            - ${KTC_PATH}/**/*
-          allow_failure: false
-          when: always
-        - if: $KTC_TEST_PIPELINE
-          allow_failure: false
-          when: on_success
-    stage: build
-    services: []
-    tags:
-        - pressure::medium
 stages:
-    - build
     - test
     - release
     - dynamic
     - trigger
     - lint
     - init
+    - build
 variables:
     KTC_STOP_PIPELINE: "false"

@@ -26,15 +26,23 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 			Add("--oci-worker-no-process-sandbox")
 		job.Services.Add(daemon)
 
+		timeout := services.New(docker.Alpine_3_18, "failover", 5000)
+		timeout.Entrypoint().
+			Add("sh").
+			Add("-c")
+		timeout.Command().
+			Add("sleep 300; touch $CI_PROJECT_DIR/.status.auth")
+		job.Services.Add(timeout)
+
 		auth := services.New(docker.CRANE_DEBUG, "crane", 5000)
 		auth.Entrypoint().
 			Add("sh").
 			Add("-c")
 		auth.Command().
-			Add("while [ ! -f $CI_PROJECT_DIR/.status.init ]; do echo 'wait for init'; sleep 1; done").
-			Add("crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}").
-			Add("crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com").
-			Add("touch $CI_PROJECT_DIR/.status.auth")
+			Add("while [ ! -f $CI_PROJECT_DIR/.status.init ]; do echo 'wait for init'; sleep 1; done; " +
+				"crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}; " +
+				"crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com; " +
+				"touch $CI_PROJECT_DIR/.status.auth")
 		auth.AddVariable("DOCKER_CONFIG", "$CI_PROJECT_DIR")
 		job.Services.Add(auth)
 
