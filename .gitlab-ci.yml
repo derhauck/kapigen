@@ -17,7 +17,7 @@ stages:
 
 Build:
   stage: build
-  image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21rc3
+  image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21
 
   before_script:
     - cd cli

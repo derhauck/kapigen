@@ -3,5 +3,5 @@ pipelines:
     path: one
     id: five
     config:
-      destination: test
       path: cli
+      name: cli
