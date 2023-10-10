@@ -7,13 +7,13 @@ ENV GOCACHE=/app/.cache
 COPY cmd /app/cmd
 COPY internal /app/internal
 COPY go.mod go.sum main.go /app/
-COPY .cache /app/.cache
-COPY .pkg /app/.pkg
+#COPY .cache /app/.cache
+#COPY .pkg /app/.pkg
 WORKDIR /app
 
-# Run   --mount=type=cache,target=/app/.cache \
-#    --mount=type=cache,target=/app/.pkg \
-RUN    go mod download && \
+RUN --mount=type=cache,target=/app/.cache \
+    --mount=type=cache,target=/app/.pkg \
+    go mod download && \
     go build -o kapigen
 #    go build -tags netgo -a -v -o kapigen
 FROM gitlab.kateops.com/infrastructure/dependency_proxy/containers/alpine:3.18.4
