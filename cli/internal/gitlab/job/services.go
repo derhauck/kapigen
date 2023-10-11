@@ -1,11 +1,11 @@
-package services
+package job
 
 import (
 	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 )
 
-type Ci struct {
+type Service struct {
 	name       docker.Image
 	alias      string
 	port       int32
@@ -14,15 +14,15 @@ type Ci struct {
 	command    wrapper.StringSlice
 }
 
-func (c *Ci) Entrypoint() *wrapper.StringSlice {
+func (c *Service) Entrypoint() *wrapper.StringSlice {
 	return &c.entrypoint
 }
 
-func (c *Ci) Command() *wrapper.StringSlice {
+func (c *Service) Command() *wrapper.StringSlice {
 	return &c.command
 }
 
-func (c *Ci) AddVariable(key string, value string) *Ci {
+func (c *Service) AddVariable(key string, value string) *Service {
 	if c.variables == nil {
 		c.variables = map[string]string{}
 	}
@@ -30,32 +30,32 @@ func (c *Ci) AddVariable(key string, value string) *Ci {
 	return c
 }
 
-func New(image docker.Image, alias string, port int32) *Ci {
-	return &Ci{
+func NewService(image docker.Image, alias string, port int32) *Service {
+	return &Service{
 		name:  image,
 		alias: alias,
 		port:  port,
 	}
 }
 
-type Cis struct {
-	Values *[]*Ci
+type Services struct {
+	Values *[]*Service
 }
 
-func (c *Cis) Get() []*Ci {
+func (c *Services) Get() []*Service {
 	if c.Values == nil {
-		c.Values = &[]*Ci{}
+		c.Values = &[]*Service{}
 	}
 	return *c.Values
 }
 
-func (c *Cis) Add(service *Ci) *Cis {
+func (c *Services) Add(service *Service) *Services {
 	values := append(c.Get(), service)
 	c.Values = &values
 	return c
 }
-func (c *Ci) Render() *Yaml {
-	return &Yaml{
+func (c *Service) Render() *ServiceYaml {
+	return &ServiceYaml{
 		Name:       c.name.Image(),
 		Entrypoint: c.entrypoint.Get(),
 		Command:    c.command.Get(),
@@ -64,9 +64,9 @@ func (c *Ci) Render() *Yaml {
 	}
 }
 
-func (c *Cis) Render() *Yamls {
+func (c *Services) Render() *ServiceYamls {
 	if c != nil {
-		var values = Yamls{}
+		var values = ServiceYamls{}
 		for _, ci := range c.Get() {
 			values = append(values, ci.Render())
 		}
@@ -75,7 +75,7 @@ func (c *Cis) Render() *Yamls {
 	return nil
 }
 
-type Yaml struct {
+type ServiceYaml struct {
 	Name       string            `yaml:"name"`
 	Entrypoint []string          `yaml:"entrypoint,omitempty"`
 	Command    []string          `yaml:"command,omitempty"`
@@ -83,4 +83,4 @@ type Yaml struct {
 	Variables  map[string]string `yaml:"variables,omitempty"`
 }
 
-type Yamls []*Yaml
+type ServiceYamls []*ServiceYaml

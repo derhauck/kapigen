@@ -55,7 +55,7 @@ func log(level string, msg ...string) {
 
 func logAny(level string, msg any) {
 	if escalate(level) {
-		fmt.Println(fmt.Sprintf("%s: %s", level, fmt.Sprint(msg)))
+		fmt.Println(fmt.Sprintf("%s:\t%s", level, fmt.Sprint(msg)))
 	}
 }
 

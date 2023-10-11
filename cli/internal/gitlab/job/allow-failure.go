@@ -1,4 +1,4 @@
-package gitlab
+package job
 
 import "kapigen.kateops.com/internal/pipeline/wrapper"
 

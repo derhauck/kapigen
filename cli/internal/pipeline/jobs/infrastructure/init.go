@@ -4,16 +4,17 @@ import (
 	"fmt"
 	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/gitlab"
+	"kapigen.kateops.com/internal/gitlab/cache"
 	"kapigen.kateops.com/internal/gitlab/environment"
-	"kapigen.kateops.com/internal/gitlab/rules"
+	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/types"
 )
 
 func NewTerraformInit(path string, state string, s3 bool) *types.Job {
-	return types.NewJob("Init", docker.Terraform_Base, func(job *gitlab.CiJob) {
-		job.BeforeScript.Value.AddSeveral([]string{
+	return types.NewJob("Init", docker.Terraform_Base, func(ciJob *gitlab.CiJob) {
+		ciJob.BeforeScript.Value.AddSeveral([]string{
 			"echo \"credentials \\\\\"${CI_SERVER_HOST}\\\\\" {\\n  token = \\\\\"${CI_PIPELINE_TOKEN}\\\\\"\\n}\" > gitlab.tfrc",
 			"export TF_CLI_CONFIG_FILE=${PWD}/gitlab.tfrc",
 		})
@@ -23,8 +24,8 @@ func NewTerraformInit(path string, state string, s3 bool) *types.Job {
 			project = "test"
 		}
 
-		job.Stage = stages.INIT
-		job.Script.Value.Add(
+		ciJob.Stage = stages.INIT
+		ciJob.Script.Value.Add(
 			"terraform init \\\n" +
 				" -backend-config=\"region=eu-central-1\" \\\n" +
 				" -backend-config=\"access_key=${TF_STATE_ACCESS_KEY}\" \\\n" +
@@ -33,11 +34,11 @@ func NewTerraformInit(path string, state string, s3 bool) *types.Job {
 				fmt.Sprintf(` -backend-config="key=${TF_STATE_BUCKET}/states/%s/%s/terraform.tfstate"`, project, state),
 		)
 
-		job.Variables = map[string]string{}
-		job.Variables["TF_STATE_PROJECT"] = project
+		ciJob.Variables = map[string]string{}
+		ciJob.Variables["TF_STATE_PROJECT"] = project
 		//job.AllowFailure.Failure = true
-		job.Rules = *rules.DefaultPipelineRules()
-		job.Cache.SetPolicy(gitlab.CachePolicyEnumPullPush).
+		ciJob.Rules = *job.DefaultPipelineRules()
+		ciJob.Cache.SetPolicy(cache.PullPush).
 			SetActive()
 	})
 }

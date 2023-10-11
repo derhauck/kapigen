@@ -1,6 +1,7 @@
-package rules
+package job
 
 import (
+	"kapigen.kateops.com/internal/when"
 	"reflect"
 	"testing"
 )
@@ -25,14 +26,14 @@ func TestNewRulesYaml(t *testing.T) {
 func TestWhenEnumType_When(t *testing.T) {
 	t.Run("Can create When from type", func(t *testing.T) {
 		t.Parallel()
-		result := NewWhen(WhenEnumTypeOnSuccess)
+		result := NewWhen(when.Always)
 		if reflect.ValueOf(result.Get()).Kind() != reflect.String {
 			t.Error("NewWhen does not create a string")
 		}
 	})
 	t.Run("Can get Default from Empty", func(t *testing.T) {
 		t.Parallel()
-		expectation := NewWhen(WhenEnumTypeOnSuccess)
+		expectation := NewWhen(when.OnSuccess)
 		expectation.Get()
 		test := WhenWrapper{}
 		if test.Get() != expectation.Get() {

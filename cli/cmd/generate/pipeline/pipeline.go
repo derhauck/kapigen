@@ -18,7 +18,14 @@ var Cmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cli.NewPersistentConfig(cmd)
 		logger.Debug("activated verbose mode")
-		configPath := "config.kapigen.yaml"
+		configPath, err := cmd.Flags().GetString("config")
+		if err != nil {
+			return err
+		}
+		pipelineFile, err := cmd.Flags().GetString("file")
+		if err != nil {
+			return err
+		}
 		body, err := os.ReadFile(configPath)
 		if err != nil {
 			return err
@@ -77,14 +84,14 @@ var Cmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		err = os.WriteFile("pipeline.yaml", data, 0777)
+		err = os.WriteFile(pipelineFile, data, 0777)
 
 		return err
 	},
 }
 
 func init() {
-	Cmd.Flags().Bool("file", false, "output file")
-	Cmd.Flags().Bool("config", false, "config to use")
+	Cmd.Flags().String("file", "pipeline.yaml", "output file")
+	Cmd.Flags().String("config", "config.kapigen.yaml", "config to use")
 
 }

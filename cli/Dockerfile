@@ -19,3 +19,4 @@ RUN --mount=type=cache,target=/app/.cache \
 FROM gitlab.kateops.com/infrastructure/dependency_proxy/containers/alpine:3.18.4
 RUN apk add --no-cache libc6-compat
 COPY --from=builder /app/kapigen /usr/bin/kapigen
+ENTRYPOINT ["/usr/bin/kapigen"]

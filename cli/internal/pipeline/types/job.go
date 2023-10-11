@@ -110,7 +110,7 @@ func (j *Job) AddName(name string) *Job {
 	return j
 }
 
-func NewJob(name string, image docker.Image, fn func(job *gitlab.CiJob)) *Job {
+func NewJob(name string, image docker.Image, fn func(ciJob *gitlab.CiJob)) *Job {
 	var newJob = &Job{
 		Names:       []string{name},
 		CiJob:       gitlab.NewCiJob(image),

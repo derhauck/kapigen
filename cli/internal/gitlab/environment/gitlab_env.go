@@ -3,6 +3,7 @@ package environment
 import (
 	"errors"
 	"fmt"
+	"kapigen.kateops.com/internal/logger"
 	"os"
 )
 
@@ -18,11 +19,11 @@ var values = map[Variable]string{
 	CI_MERGE_REQUEST_ID: "CI_MERGE_REQUEST_ID",
 }
 
-func (v Variable) name() string {
-	val, ok := values[v]
-	if ok {
-		return val
+func (v Variable) String() string {
+	if v, ok := values[v]; ok {
+		return v
 	}
+	logger.Error(fmt.Sprintf("not found env var for id: '%d'", v))
 	return ""
 }
 

@@ -1,25 +1,26 @@
 package gitlab
 
 import (
-	"kapigen.kateops.com/internal/gitlab/rules"
+	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
+	"kapigen.kateops.com/internal/when"
 )
 
 type CiPipelineDefault struct {
-	AfterScript  AfterScript
-	BeforeScript BeforeScript
+	AfterScript  job.AfterScript
+	BeforeScript job.BeforeScript
 }
 
 type CiPipelineWorkflow struct {
-	Name  string       `yaml:"name"`
-	Rules *rules.Rules `yaml:"rules"`
+	Name  string     `yaml:"name"`
+	Rules *job.Rules `yaml:"rules"`
 }
 
 type CiPipeline struct {
 	Stages       *wrapper.StringSlice `yaml:"stages"`
 	Workflow     CiPipelineWorkflow   `yaml:"workflow,omitempty"`
-	AllowFailure AllowFailure         `yaml:"allow_failure,omitempty"`
+	AllowFailure job.AllowFailure     `yaml:"allow_failure,omitempty"`
 	Default      CiPipelineDefault    `yaml:"default,omitempty"`
 	Variables    map[string]string    `yaml:"variables,omitempty"`
 }
@@ -29,21 +30,21 @@ func (c *CiPipeline) Render() *CiPipelineYaml {
 }
 func NewDefaultCiPipeline() *CiPipeline {
 	return &CiPipeline{
-		Stages: wrapper.NewStringSlice().AddSeveral(stages.GetStages()),
+		Stages: wrapper.NewStringSlice().AddSeveral(stages.GetAllStages()),
 		Default: CiPipelineDefault{
-			AfterScript:  AfterScript{},
-			BeforeScript: BeforeScript{},
+			AfterScript:  job.NewAfterScript(),
+			BeforeScript: job.NewBeforeScript(),
 		},
 		Workflow: CiPipelineWorkflow{
 			Name: "default",
-			Rules: &rules.Rules{
-				&rules.Rule{
+			Rules: &job.Rules{
+				&job.Rule{
 					If:   "$CI_MERGE_REQUEST_ID",
-					When: rules.NewWhen(rules.WhenEnumTypeAlways),
+					When: job.NewWhen(when.OnSuccess),
 				},
-				&rules.Rule{
+				&job.Rule{
 					If:   "$CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'",
-					When: rules.NewWhen(rules.WhenEnumTypeAlways),
+					When: job.NewWhen(when.OnSuccess),
 				},
 			},
 		},
@@ -54,8 +55,8 @@ func NewDefaultCiPipeline() *CiPipeline {
 }
 
 type CiPipelineWorkflowYaml struct {
-	Name  string                  `yaml:"name"`
-	Rules *rules.RuleWorkflowYaml `yaml:"rules"`
+	Name  string                `yaml:"name"`
+	Rules *job.RuleWorkflowYaml `yaml:"rules"`
 }
 type CiPipelineDefaultYaml struct {
 	AfterScript  []string `yaml:"after_script"`

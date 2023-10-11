@@ -83,7 +83,7 @@ func TestValue(t *testing.T) {
 	t.Run("Can not get test var", func(t *testing.T) {
 		t.Parallel()
 		var test Variable = UNREACHABLE
-		if test.name() == "test" {
+		if test.String() == "test" {
 			t.Error("No Variable for 'test' should exist")
 		}
 	})
@@ -94,7 +94,7 @@ func TestValue(t *testing.T) {
 			CI_PROJECT_ID,
 		}
 		for index, value := range varsToCheck {
-			if value.name() == "" {
+			if value.String() == "" {
 				t.Errorf("CI variable for number '%v' should exist varsToCheck number '%v'", value, index)
 			}
 		}

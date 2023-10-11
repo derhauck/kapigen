@@ -31,15 +31,15 @@ func NewStage() Stage {
 	return DYNAMIC
 }
 
-func (s Stage) Name() string {
+func (s Stage) String() string {
 	if value, ok := values[s]; ok {
 		return value
 	}
-	logger.Error(fmt.Sprintf("Stage not found for id: '%v'", s))
+	logger.Error(fmt.Sprintf("Stage not found for id: '%d'", s))
 	return values[DYNAMIC]
 }
 
-func GetStages() []string {
+func GetAllStages() []string {
 	var stages []string
 	for _, value := range values {
 		stages = append(stages, value)

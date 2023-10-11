@@ -1,11 +1,10 @@
-package artifacts
+package job
 
 import (
-	"kapigen.kateops.com/internal/gitlab/rules"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 )
 
-type Ci struct {
+type Artifact struct {
 	Paths     wrapper.StringSlice
 	exclude   wrapper.StringSlice
 	ExpireIn  string
@@ -13,10 +12,10 @@ type Ci struct {
 	Name      string
 	Reports   interface{}
 	Untracked bool
-	When      rules.WhenWrapper
+	When      WhenWrapper
 }
 
-func (a *Ci) Render() *Yaml {
+func (a *Artifact) Render() *Yaml {
 	return NewArtifactsYaml(a)
 }
 
@@ -31,7 +30,7 @@ type Yaml struct {
 	When      string      `yaml:"when"`
 }
 
-func NewArtifactsYaml(artifacts *Ci) *Yaml {
+func NewArtifactsYaml(artifacts *Artifact) *Yaml {
 	return &Yaml{
 		Paths:     artifacts.Paths.Get(),
 		exclude:   artifacts.exclude.Get(),

@@ -1,20 +1,20 @@
-package artifacts
+package job
 
 import (
-	"kapigen.kateops.com/internal/gitlab/rules"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
+	"kapigen.kateops.com/internal/when"
 	"testing"
 )
 
 func TestArtifactsSerialization(t *testing.T) {
 	// Create an instance of the Ci struct
-	artifacts := &Ci{
+	artifacts := &Artifact{
 		Paths:     *(wrapper.NewStringSlice().AddSeveral([]string{"path1", "path2"})),
 		ExpireIn:  "7 days",
 		ExposeAs:  "public",
 		Name:      "my-artifacts",
 		Untracked: true,
-		When:      rules.NewWhen(rules.WhenEnumTypeOnSuccess),
+		When:      NewWhen(when.OnSuccess),
 	}
 
 	artifactsYaml := NewArtifactsYaml(artifacts)

@@ -4,37 +4,36 @@ import (
 	"fmt"
 	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/gitlab"
-	"kapigen.kateops.com/internal/gitlab/rules"
-	"kapigen.kateops.com/internal/gitlab/services"
+	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/tags"
 	"kapigen.kateops.com/internal/pipeline/types"
 )
 
 func NewBuildkitBuild(path string, context string, dockerfile string, destination string) *types.Job {
-	return types.NewJob("Build", docker.BUILDKIT, func(job *gitlab.CiJob) {
-		job.Image.Entrypoint.
+	return types.NewJob("Build", docker.BUILDKIT, func(ciJob *gitlab.CiJob) {
+		ciJob.Image.Entrypoint.
 			Add("sh").
 			Add("-c")
-		job.AddVariable("BUILDKIT_HOST", "tcp://buildkitd:1234")
+		ciJob.AddVariable("BUILDKIT_HOST", "tcp://buildkitd:1234")
 
-		daemon := services.New(docker.BUILDKIT_DAEMON, "buildkitd", 1234)
+		daemon := job.NewService(docker.BUILDKIT_DAEMON, "buildkitd", 1234)
 		daemon.Command().
 			Add("--addr").
 			Add("unix:///run/user/1000/buildkit/buildkitd.sock").
 			Add("--addr").
 			Add("tcp://0.0.0.0:1234").
 			Add("--oci-worker-no-process-sandbox")
-		job.Services.Add(daemon)
+		ciJob.Services.Add(daemon)
 
-		timeout := services.New(docker.Alpine_3_18, "failover", 5000)
+		timeout := job.NewService(docker.Alpine_3_18, "failover", 5000)
 		timeout.Entrypoint().
 			Add("sh").
 			Add("-c")
 		timeout.Command().
 			Add("sleep 300; touch $CI_PROJECT_DIR/.status.auth")
-		job.Services.Add(timeout)
+		ciJob.Services.Add(timeout)
 
-		auth := services.New(docker.CRANE_DEBUG, "crane", 5000)
+		auth := job.NewService(docker.CRANE_DEBUG, "crane", 5000)
 		auth.Entrypoint().
 			Add("sh").
 			Add("-c")
@@ -45,7 +44,7 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 				"crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com; " +
 				"touch $CI_PROJECT_DIR/.status.auth")
 		auth.AddVariable("DOCKER_CONFIG", "$CI_PROJECT_DIR")
-		job.Services.Add(auth)
+		ciJob.Services.Add(auth)
 
 		cmd := fmt.Sprintf(`buildctl build --frontend dockerfile.v0 --local context="%s" --local dockerfile="%s" `, context, path)
 		parameters := fmt.Sprintf(`--progress plain --opt filename="%s" --export-cache type=inline `, dockerfile)
@@ -61,16 +60,16 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 			cache,
 			push,
 		)
-		job.BeforeScript.Value.
+		ciJob.BeforeScript.Value.
 			Add(`echo "REGISTRY_PUSH_USER=$REGISTRY_PUSH_USER" > .env`).
 			Add(`echo "REGISTRY_PUSH_TOKEN=$REGISTRY_PUSH_TOKEN" >> .env`).
 			Add("touch .status.init").
 			Add("while [ ! -f $CI_PROJECT_DIR/.status.auth ]; do echo 'wait for auth'; sleep 1; done")
-		job.Script.Value.
+		ciJob.Script.Value.
 			Add(command)
-		job.Rules = *rules.DefaultPipelineRules()
-		job.Variables["KTC_PATH"] = path
-		job.Variables["DOCKER_CONFIG"] = "$CI_PROJECT_DIR"
-		job.Tags.Add(tags.PRESSURE_BUILDKIT)
+		ciJob.Rules = *job.DefaultPipelineRules()
+		ciJob.Variables["KTC_PATH"] = path
+		ciJob.Variables["DOCKER_CONFIG"] = "$CI_PROJECT_DIR"
+		ciJob.Tags.Add(tags.PRESSURE_BUILDKIT)
 	})
 }

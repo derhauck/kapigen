@@ -1,6 +1,9 @@
-package rules
+package job
 
-import "kapigen.kateops.com/internal/pipeline/wrapper"
+import (
+	"kapigen.kateops.com/internal/pipeline/wrapper"
+	"kapigen.kateops.com/internal/when"
+)
 
 type Rule struct {
 	If           string              `yaml:"if"`
@@ -11,17 +14,17 @@ type Rule struct {
 }
 
 type WhenWrapper struct {
-	Value *WhenEnumType
+	Value *when.When
 }
 
 func (w *WhenWrapper) Get() string {
 	if w.Value == nil {
-		return WhenEnumTypeOnSuccess.When()
+		return when.OnSuccess.String()
 	}
-	return w.Value.When()
+	return w.Value.String()
 }
 
-func NewWhen(when WhenEnumType) WhenWrapper {
+func NewWhen(when when.When) WhenWrapper {
 	return WhenWrapper{
 		Value: &when,
 	}
@@ -40,24 +43,6 @@ func (r *Rules) AddPathToChanges(path string) *Rules {
 
 func (r *Rules) Get() []*Rule {
 	return *r
-}
-
-type WhenEnumType int
-
-const (
-	WhenEnumTypeOnSuccess WhenEnumType = iota
-	WhenEnumTypeOnFailure
-	WhenEnumTypeAlways
-	WhenEnumTypeNever
-)
-
-func (c WhenEnumType) When() string {
-	return []string{
-		"on_success",
-		"on_failure",
-		"always",
-		"never",
-	}[c]
 }
 
 type RuleYaml struct {
