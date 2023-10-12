@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mitchellh/mapstructure"
+	"gopkg.in/yaml.v3"
 	"kapigen.kateops.com/internal/logger"
+	"os"
 )
 
 type PipelineTypeConfig struct {
@@ -54,4 +56,41 @@ func (p *PipelineTypeConfig) GetType() PipelineType {
 
 type PipelineConfig struct {
 	Pipelines []PipelineTypeConfig `yaml:"pipelines"`
+}
+
+func LoadJobsFromPipelineConfig(configPath string, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
+	body, err := os.ReadFile(configPath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var pipelineConfig PipelineConfig
+	err = yaml.Unmarshal(body, &pipelineConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	jobs, err := pipelineConfig.Decode(configTypes)
+	if err != nil {
+		return nil, err
+	}
+
+	return jobs, nil
+}
+
+func (p *PipelineConfig) Decode(configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
+
+	var pipelineJobs Jobs
+
+	for i := 0; i < len(p.Pipelines); i++ {
+		configuration := p.Pipelines[i]
+		jobs, err := configuration.Decode(configTypes)
+		if err != nil {
+			return nil, err
+		}
+		pipelineJobs = append(pipelineJobs, jobs.GetJobs()...)
+	}
+
+	return &pipelineJobs, nil
 }

@@ -39,20 +39,24 @@ func (d *Docker) Validate() error {
 }
 
 func (d *Docker) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
+	tag := "0.0.0"
 	var jobs = types.Jobs{docker.NewBuildkitBuild(
 		d.Path,
 		d.Context,
 		d.Dockerfile,
-		d.DefaultRegistry(),
+		d.DefaultRegistry(tag),
 	)}
 	return &jobs, nil
 
 }
 
-func (d *Docker) DefaultRegistry() string {
-	if d.Name != "" {
-		return fmt.Sprintf("${CI_REGISTRY_IMAGE}/%s", d.Name)
+func (d *Docker) DefaultRegistry(tag string) string {
+	if tag == "" {
+		tag = "latest"
 	}
-	return "${CI_REGISTRY_IMAGE}"
+	if d.Name != "" {
+		return fmt.Sprintf("${CI_REGISTRY_IMAGE}/%s:%s", d.Name, tag)
+	}
+	return fmt.Sprintf("${CI_REGISTRY_IMAGE}:%s", tag)
 
 }

@@ -28,6 +28,7 @@ type CiPipeline struct {
 func (c *CiPipeline) Render() *CiPipelineYaml {
 	return NewCiPipelineYaml(c)
 }
+
 func NewDefaultCiPipeline() *CiPipeline {
 	return &CiPipeline{
 		Stages: wrapper.NewStringSlice().AddSeveral(stages.GetAllStages()),
@@ -59,14 +60,14 @@ type CiPipelineWorkflowYaml struct {
 	Rules *job.RuleWorkflowYaml `yaml:"rules"`
 }
 type CiPipelineDefaultYaml struct {
-	AfterScript  []string `yaml:"after_script"`
-	BeforeScript []string `yaml:"before_script"`
+	AfterScript  []string `yaml:"after_script,omitempty"`
+	BeforeScript []string `yaml:"before_script,omitempty"`
 }
 type CiPipelineYaml struct {
-	Default   CiPipelineDefaultYaml  `yaml:"default"`
-	Workflow  CiPipelineWorkflowYaml `yaml:"workflow"`
+	Default   CiPipelineDefaultYaml  `yaml:"default,omitempty"`
+	Workflow  CiPipelineWorkflowYaml `yaml:"workflow,omitempty"`
 	Stages    []string               `yaml:"stages"`
-	Variables map[string]string      `yaml:"variables"`
+	Variables map[string]string      `yaml:"variables,omitempty"`
 }
 
 func NewCiPipelineYaml(pipeline *CiPipeline) *CiPipelineYaml {
@@ -82,4 +83,10 @@ func NewCiPipelineYaml(pipeline *CiPipeline) *CiPipelineYaml {
 		Stages:    pipeline.Stages.Get(),
 		Variables: pipeline.Variables,
 	}
+}
+func (c *CiPipelineYaml) AddToMap(parentMap map[string]interface{}) {
+	parentMap["default"] = c.Default
+	parentMap["workflow"] = c.Workflow
+	parentMap["stages"] = c.Stages
+	parentMap["variables"] = c.Variables
 }

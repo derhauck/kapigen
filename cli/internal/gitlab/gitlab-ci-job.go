@@ -56,18 +56,18 @@ func (c *CiJob) Render(needs *NeedsYaml) *CiJobYaml {
 type CiJobs []*CiJob
 
 type CiJobYaml struct {
-	AfterScript  []string          `yaml:"after_script,omitempty"`
-	AllowFailure any               `yaml:"allow_failure,omitempty"`
-	BeforeScript []string          `yaml:"before_script,omitempty"`
-	Cache        *job.CacheYaml    `yaml:"cache,omitempty"`
-	Script       []string          `yaml:"script"`
-	Needs        *NeedsYaml        `yaml:"needs"`
-	Variables    map[string]string `yaml:"variables"`
-	Image        *job.ImageYaml    `yaml:"image"`
-	Rules        *job.RulesYaml    `yaml:"rules"`
-	Stage        string            `yaml:"stage"`
-	Services     *job.ServiceYamls `yaml:"services,omitempty"`
-	Tags         []string          `yaml:"tags"`
+	AfterScript  []string          `yaml:"after_script,omitempty" json:"after_script,omitempty"`
+	AllowFailure any               `yaml:"allow_failure,omitempty" json:"allow_failure,omitempty"`
+	BeforeScript []string          `yaml:"before_script,omitempty" json:"before_script,omitempty"`
+	Cache        *job.CacheYaml    `yaml:"cache,omitempty" json:"cache,omitempty"`
+	Script       []string          `yaml:"script" json:"script"`
+	Needs        *NeedsYaml        `yaml:"needs" json:"needs"`
+	Variables    map[string]string `yaml:"variables,omitempty" json:"variables,omitempty"`
+	Image        *job.ImageYaml    `yaml:"image" json:"image"`
+	Rules        *job.RulesYaml    `yaml:"rules" json:"rules"`
+	Stage        string            `yaml:"stage" json:"stage"`
+	Services     *job.ServiceYamls `yaml:"services,omitempty" json:"services,omitempty"`
+	Tags         []string          `yaml:"tags" json:"tags"`
 }
 
 func (c *CiJobYaml) String() string {

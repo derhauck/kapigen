@@ -151,3 +151,34 @@ func (j *Job) EvaluateNeeds(needs *Needs) *Needs {
 	}
 	return nil
 }
+
+func (j *Jobs) EvaluateJobs() (map[string]interface{}, error) {
+	var ciPipeline = make(map[string]interface{})
+	var evaluatedJobs Jobs
+	var jobsToEvaluate Jobs
+	jobsToEvaluate = append(jobsToEvaluate, j.GetJobs()...)
+	for _, job := range j.GetJobs() {
+		evaluatedJob, err := job.EvaluateName(&jobsToEvaluate)
+		if err != nil {
+			return nil, err
+		}
+		if evaluatedJob != nil {
+			evaluatedJobs = append(evaluatedJobs, evaluatedJob)
+		} else {
+			var resizedJobsToEvaluate Jobs
+			for i := range jobsToEvaluate {
+				if jobsToEvaluate[i] == job && i < len(jobsToEvaluate) {
+					var tmp = jobsToEvaluate[i+1:]
+					resizedJobsToEvaluate = append(jobsToEvaluate[:i], tmp...)
+				}
+			}
+			jobsToEvaluate = resizedJobsToEvaluate
+		}
+
+	}
+	for _, job := range evaluatedJobs {
+		job.RenderNeeds()
+		ciPipeline[job.GetName()] = job.CiJobYaml
+	}
+	return ciPipeline, nil
+}

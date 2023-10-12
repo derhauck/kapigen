@@ -18,6 +18,7 @@ var Cmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cli.NewPersistentConfig(cmd)
 		logger.Debug("activated verbose mode")
+
 		configPath, err := cmd.Flags().GetString("config")
 		if err != nil {
 			return err
@@ -26,65 +27,31 @@ var Cmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		body, err := os.ReadFile(configPath)
+
+		logger.Info("will read pipeline config from: " + configPath)
+		pipelineJobs, err := types.LoadJobsFromPipelineConfig(configPath, config.PipelineConfigTypes)
 		if err != nil {
 			return err
 		}
-		var pipelineConfig types.PipelineConfig
-		err = yaml.Unmarshal(body, &pipelineConfig)
+		logger.Info("ci jobs created")
+
+		ciPipeline, err := pipelineJobs.EvaluateJobs()
 		if err != nil {
 			return err
 		}
+		logger.Info("ci jobs evaluated")
 
-		var pipelineJobs types.Jobs
+		gitlab.NewDefaultCiPipeline().Render().AddToMap(ciPipeline)
+		logger.Info("ci jobs rendered")
 
-		for i := 0; i < len(pipelineConfig.Pipelines); i++ {
-			configuration := pipelineConfig.Pipelines[i]
-			jobs, err := configuration.Decode(config.PipelineConfigTypes)
-			if err != nil {
-				return err
-			}
-			pipelineJobs = append(pipelineJobs, jobs.GetJobs()...)
-		}
-		logger.Info("pipeline created")
-		var ciPipeline = make(map[string]interface{})
-		var evaluatedJobs types.Jobs
-		var jobsToEvaluate types.Jobs
-		jobsToEvaluate = append(jobsToEvaluate, pipelineJobs.GetJobs()...)
-		for _, job := range pipelineJobs {
-			evaluatedJob, err := job.EvaluateName(&jobsToEvaluate)
-			if err != nil {
-				return err
-			}
-			if evaluatedJob != nil {
-				evaluatedJobs = append(evaluatedJobs, evaluatedJob)
-			} else {
-				var resizedJobsToEvaluate types.Jobs
-				for i := range jobsToEvaluate {
-					if jobsToEvaluate[i] == job && i < len(jobsToEvaluate) {
-						var tmp = jobsToEvaluate[i+1:]
-						resizedJobsToEvaluate = append(jobsToEvaluate[:i], tmp...)
-					}
-				}
-				jobsToEvaluate = resizedJobsToEvaluate
-			}
-
-		}
-		for _, job := range evaluatedJobs {
-			job.RenderNeeds()
-			ciPipeline[job.GetName()] = job.CiJobYaml
-		}
-		pipeline := gitlab.NewDefaultCiPipeline().Render()
-		//ciPipeline["workflow"] = pipeline.Workflow
-		ciPipeline["stages"] = pipeline.Stages
-		//ciPipeline["default"] = pipeline.Default
-		ciPipeline["variables"] = pipeline.Variables
-		//logger.DebugAny(ciPipeline)
 		data, err := yaml.Marshal(ciPipeline)
 		if err != nil {
 			return err
 		}
+		logger.Info("converted pipeline to yaml")
+
 		err = os.WriteFile(pipelineFile, data, 0777)
+		logger.Info("wrote yaml to file: " + pipelineFile)
 
 		return err
 	},

@@ -3,6 +3,7 @@ package cli
 import (
 	"github.com/spf13/cobra"
 	"kapigen.kateops.com/internal/logger"
+	"kapigen.kateops.com/internal/logger/level"
 	"os"
 )
 
@@ -30,7 +31,7 @@ func preparePersistentFlags(cmd *cobra.Command) *PersistentConfig {
 		logger.ErrorE(err)
 	}
 	if verbose {
-		err := os.Setenv("LOGGER_LEVEL", logger.Level.Debug)
+		err := os.Setenv("LOGGER_LEVEL", level.Debug.String())
 		if err != nil {
 			logger.ErrorE(err)
 		}

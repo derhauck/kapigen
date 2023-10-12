@@ -28,13 +28,38 @@ Build:
     paths:
       - cli/pipeline.yaml
 
-Trigger:
+Tests:
+  stage: build
+  image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21
+
+  before_script:
+    - cd cli
+  script:
+    - go mod download
+    - go run . generate pipeline -v --config test.kapigen.yaml
+  artifacts:
+    paths:
+      - cli/pipeline.yaml
+
+
+Trigger Build:
   stage: trigger
   trigger:
     strategy: depend
     include:
       - artifact: cli/pipeline.yaml
         job: Build
+
+    forward:
+      pipeline_variables: true
+
+Trigger Tests:
+  stage: trigger
+  trigger:
+    strategy: depend
+    include:
+      - artifact: cli/pipeline.yaml
+        job: Tests
 
     forward:
       pipeline_variables: true
