@@ -1,6 +1,9 @@
 package job
 
 import (
+	"errors"
+	"fmt"
+	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 	"kapigen.kateops.com/internal/when"
 )
@@ -63,10 +66,29 @@ func (r *Rules) GetRenderedWorkflowValue() *RuleWorkflowYaml {
 func (r *Rules) GetRenderedValue() *RulesYaml {
 	return NewRulesYaml(*r)
 }
+
+func validateWorkflowRule(rule *Rule) error {
+	if rule.If == "" {
+		return errors.New("if is required")
+	}
+
+	if rule.When.Value != nil {
+		whenValue := *rule.When.Value
+		if whenValue.String() != when.Always.String() && whenValue.String() != when.Never.String() {
+			return errors.New(fmt.Sprintf("when is not supported: %s", whenValue.String()))
+		}
+	}
+
+	return nil
+}
 func NewRulesWorkflowYaml(rules Rules) *RuleWorkflowYaml {
 	var rulesYaml = make(RuleWorkflowYaml, 0)
 	for i := 0; i < len(rules); i++ {
 		var currentRule = rules[i]
+		if err := validateWorkflowRule(currentRule); err != nil {
+			logger.Error(err.Error())
+			continue
+		}
 		rulesYaml = append(rulesYaml, &RuleYaml{
 			If:           currentRule.If,
 			Changes:      currentRule.Changes.Get(),

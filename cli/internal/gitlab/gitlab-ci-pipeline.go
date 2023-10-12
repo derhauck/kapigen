@@ -41,11 +41,11 @@ func NewDefaultCiPipeline() *CiPipeline {
 			Rules: &job.Rules{
 				&job.Rule{
 					If:   "$CI_MERGE_REQUEST_ID",
-					When: job.NewWhen(when.OnSuccess),
+					When: job.NewWhen(when.Always),
 				},
 				&job.Rule{
 					If:   "$CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'",
-					When: job.NewWhen(when.OnSuccess),
+					When: job.NewWhen(when.Always),
 				},
 			},
 		},

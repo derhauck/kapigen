@@ -128,19 +128,17 @@ Build - five:
         - pressure::medium
 default: {}
 stages:
-    - test
     - release
     - dynamic
     - trigger
     - lint
     - init
     - build
+    - test
 variables:
     KTC_STOP_PIPELINE: "false"
 workflow:
     name: default
     rules:
-        - if: $CI_MERGE_REQUEST_ID
-          when: on_success
         - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
-          when: on_success
+          when: always
