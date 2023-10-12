@@ -1,0 +1,20 @@
+pipelines:
+  - type: docker
+    path: two
+    id: five
+    config:
+      path: cli
+      name: test-cli
+  - type: docker
+    path: one
+    id: five
+    config:
+      path: cli
+      name: test-cli
+  - type: docker
+    path: one
+    id: five
+    config:
+      path: cli
+      name: test-cli
+      context: test
