@@ -7,7 +7,7 @@ Build:
         - while [ ! -f $CI_PROJECT_DIR/.status.auth ]; do echo 'wait for auth'; sleep 1; done
     script:
         - |
-          buildctl build --frontend dockerfile.v0 --local context="test" --local dockerfile="cli"  \
+          buildctl build --frontend dockerfile.v0 --local context="cli/tests/docker" --local dockerfile="cli/tests/docker"  \
           --progress plain --opt filename="Dockerfile" --export-cache type=inline  \
           --import-cache type=registry,ref="${CI_REGISTRY_IMAGE}/test-cli:0.0.0-feature-test"  \
           --output type=image,name="${CI_REGISTRY_IMAGE}/test-cli:0.0.0-feature-test",push=true  \
@@ -15,7 +15,7 @@ Build:
     variables:
         BUILDKIT_HOST: tcp://buildkitd:1234
         DOCKER_CONFIG: $CI_PROJECT_DIR
-        KTC_PATH: cli
+        KTC_PATH: cli/tests/docker
     image:
         name: gitlab.kateops.com/infrastructure/dependency_proxy/containers/moby/buildkit:master
         entrypoint:
@@ -71,15 +71,15 @@ Build - docker:
         - while [ ! -f $CI_PROJECT_DIR/.status.auth ]; do echo 'wait for auth'; sleep 1; done
     script:
         - |
-          buildctl build --frontend dockerfile.v0 --local context="cli" --local dockerfile="cli"  \
+          buildctl build --frontend dockerfile.v0 --local context="cli/tests/docker" --local dockerfile="cli/tests/docker"  \
           --progress plain --opt filename="Dockerfile" --export-cache type=inline  \
-          --import-cache type=registry,ref="${CI_REGISTRY_IMAGE}/test-cli:0.0.0-feature-test"  \
-          --output type=image,name="${CI_REGISTRY_IMAGE}/test-cli:0.0.0-feature-test",push=true  \
+          --import-cache type=registry,ref="${CI_REGISTRY_IMAGE}/test-file:0.0.0-feature-test"  \
+          --output type=image,name="${CI_REGISTRY_IMAGE}/test-file:0.0.0-feature-test",push=true  \
     needs: []
     variables:
         BUILDKIT_HOST: tcp://buildkitd:1234
         DOCKER_CONFIG: $CI_PROJECT_DIR
-        KTC_PATH: cli
+        KTC_PATH: cli/tests/docker
     image:
         name: gitlab.kateops.com/infrastructure/dependency_proxy/containers/moby/buildkit:master
         entrypoint:

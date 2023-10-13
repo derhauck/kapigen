@@ -1,0 +1,1 @@
+FROM gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21.3-alpine3.18

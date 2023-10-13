@@ -1,17 +1,17 @@
 pipelines:
   - type: docker
-    id: five
+    id: test-cli
     config:
-      path: cli
+      path: cli/tests/docker
       name: test-cli
   - type: docker
-    id: five
+    id: test-file
     config:
-      path: cli
-      name: test-cli
+      path: cli/tests/docker
+      name: test-file
   - type: docker
-    id: five
+    id: duplicate-test
     config:
-      path: cli
+      path: cli/tests/docker
+      dockerfile: Dockerfile
       name: test-cli
-      context: test
