@@ -10,12 +10,12 @@ import (
 )
 
 func GetVersion(project string, path string) string {
-
+	var defaultVersion = "0.0.0"
 	req, err := http.NewRequest("GET",
 		fmt.Sprintf("https://los.kateops.com/v1/projects/%s/versions/latest?path=%s", project, path),
 		nil)
 	client := &http.Client{}
-	req.Header.Set("AUTH", environment.LOS_AUTH.Get())
+	req.Header.Set("AUTH", environment.LOS_AUTH_TOKEN.Get())
 	resp, err := client.Do(req)
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
@@ -25,13 +25,18 @@ func GetVersion(project string, path string) string {
 	}(resp.Body)
 
 	if resp.StatusCode == 404 {
-		return "0.0.0"
+		return defaultVersion
+	}
+
+	if resp.StatusCode > 399 {
+		logger.Error(resp.Status)
+		return defaultVersion
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		logger.ErrorE(err)
-		return "0.0.0"
+		return defaultVersion
 	}
 	var versionResponse ProjectVersion
 	err = json.Unmarshal(body, &versionResponse)

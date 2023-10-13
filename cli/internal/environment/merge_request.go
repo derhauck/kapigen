@@ -19,8 +19,8 @@ func getVersionIncrease() string {
 			}
 		}
 	}
-
-	return "major"
+	logger.Error("no version increase found")
+	return "patch"
 }
 
 func GetNewVersion(version string) string {

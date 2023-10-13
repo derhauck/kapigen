@@ -16,7 +16,7 @@ const (
 	KAPIGEN_VERSION
 	CI_MERGE_REQUEST_LABELS
 	CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-	LOS_AUTH
+	LOS_AUTH_TOKEN
 )
 
 var values = map[Variable]string{
@@ -26,7 +26,7 @@ var values = map[Variable]string{
 	CI_MERGE_REQUEST_LABELS:             "CI_MERGE_REQUEST_LABELS",
 	CI_MERGE_REQUEST_SOURCE_BRANCH_NAME: "CI_MERGE_REQUEST_SOURCE_BRANCH_NAME",
 	KAPIGEN_VERSION:                     "KAPIGEN_VERSION",
-	LOS_AUTH:                            "LOS_AUTH",
+	LOS_AUTH_TOKEN:                      "LOS_AUTH_TOKEN",
 }
 
 func (v Variable) String() string {

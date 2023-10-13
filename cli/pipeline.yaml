@@ -128,13 +128,13 @@ Build - docker:
         - pressure::medium
 default: {}
 stages:
-    - trigger
     - lint
     - init
     - build
     - test
     - release
     - dynamic
+    - trigger
 variables:
     KTC_STOP_PIPELINE: "false"
 workflow:
