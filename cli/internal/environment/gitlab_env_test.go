@@ -15,7 +15,7 @@ func TestGet(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		result := Get(CI_PROJECT_ID)
+		result := CI_PROJECT_ID.Get()
 		if result != expectation {
 			t.Errorf("Can not get Project ID, expected: %s, received: %s", expectation, result)
 		}
@@ -27,7 +27,7 @@ func TestGet(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		result := Get(CI_MERGE_REQUEST_ID)
+		result := CI_MERGE_REQUEST_ID.Get()
 		if result != expectation {
 			t.Error()
 		}
@@ -43,7 +43,7 @@ func TestLookup(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		result, err := Lookup(CI_PROJECT_ID)
+		result, err := CI_PROJECT_ID.Lookup()
 		if err != nil {
 			t.Errorf("Can not get Project ID, err: %s", err.Error())
 		}
@@ -58,7 +58,7 @@ func TestLookup(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		result, err := Lookup(CI_MERGE_REQUEST_ID)
+		result, err := CI_MERGE_REQUEST_ID.Lookup()
 		if err != nil {
 			t.Errorf("Can not get Merge Request ID, err: %s", err.Error())
 		}
@@ -69,7 +69,7 @@ func TestLookup(t *testing.T) {
 	t.Run("Can not lookup test var", func(t *testing.T) {
 		t.Parallel()
 		var test Variable = UNREACHABLE
-		result, err := Lookup(test)
+		result, err := test.Lookup()
 		if err != nil && err.Error() != "env var '' is not set" {
 			t.Errorf("Unexpected error looking up test var: %s", err.Error())
 		}

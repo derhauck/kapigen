@@ -1,6 +1,5 @@
 pipelines:
   - type: docker
-    path: one
     id: five
     config:
       path: cli

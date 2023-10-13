@@ -3,9 +3,9 @@ package infrastructure
 import (
 	"fmt"
 	"kapigen.kateops.com/internal/docker"
+	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/gitlab"
 	"kapigen.kateops.com/internal/gitlab/cache"
-	"kapigen.kateops.com/internal/gitlab/environment"
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/logger"
@@ -18,7 +18,7 @@ func NewTerraformPlan(path string, state string, s3 bool) *types.Job {
 			Add(fmt.Sprintf("echo \"%s\"", state)).
 			Add("terraform plan")
 
-		project, err := environment.Lookup(environment.CI_PROJECT_ID)
+		project, err := environment.CI_PROJECT_ID.Lookup()
 		if err != nil {
 			logger.ErrorE(err)
 			project = "test"

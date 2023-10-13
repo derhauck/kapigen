@@ -3,9 +3,9 @@ package infrastructure
 import (
 	"fmt"
 	"kapigen.kateops.com/internal/docker"
+	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/gitlab"
 	"kapigen.kateops.com/internal/gitlab/cache"
-	"kapigen.kateops.com/internal/gitlab/environment"
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/logger"
@@ -18,7 +18,7 @@ func NewTerraformInit(path string, state string, s3 bool) *types.Job {
 			"echo \"credentials \\\\\"${CI_SERVER_HOST}\\\\\" {\\n  token = \\\\\"${CI_PIPELINE_TOKEN}\\\\\"\\n}\" > gitlab.tfrc",
 			"export TF_CLI_CONFIG_FILE=${PWD}/gitlab.tfrc",
 		})
-		project, err := environment.Lookup(environment.CI_PROJECT_ID)
+		project, err := environment.CI_PROJECT_ID.Lookup()
 		if err != nil {
 			logger.ErrorE(err)
 			project = "test"

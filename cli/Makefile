@@ -1,6 +1,6 @@
 include ../Makefile
 GO_SRC_PATH=/app
-GO_ARGS=-it -e GOMODCACHE=/app/.pkg -e GOCACHE=/app/.cache -e ENVIRONMENT=DEV -e CI_PROJECT_ID=17 -e CI_MERGE_REQUEST_ID=10
+GO_ARGS=-it -e GOMODCACHE=/app/.pkg -e GOCACHE=/app/.cache -e ENVIRONMENT=DEV --env-file .env
 .PHONY: cli
 cli: DOCKER_ARGS=$(GO_ARGS)
 cli:

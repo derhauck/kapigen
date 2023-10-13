@@ -9,8 +9,8 @@ Build:
         - |
           buildctl build --frontend dockerfile.v0 --local context="test" --local dockerfile="cli"  \
           --progress plain --opt filename="Dockerfile" --export-cache type=inline  \
-          --import-cache type=registry,ref="${CI_REGISTRY_IMAGE}/test-cli:0.0.0"  \
-          --output type=image,name="${CI_REGISTRY_IMAGE}/test-cli:0.0.0",push=true  \
+          --import-cache type=registry,ref="${CI_REGISTRY_IMAGE}/test-cli:0.0.0-feature-test"  \
+          --output type=image,name="${CI_REGISTRY_IMAGE}/test-cli:0.0.0-feature-test",push=true  \
     needs: []
     variables:
         BUILDKIT_HOST: tcp://buildkitd:1234
@@ -62,7 +62,7 @@ Build:
             DOCKER_CONFIG: $CI_PROJECT_DIR
     tags:
         - pressure::medium
-Build - five:
+Build - docker:
     allow_failure: false
     before_script:
         - echo "REGISTRY_PUSH_USER=$REGISTRY_PUSH_USER" > .env
@@ -73,8 +73,8 @@ Build - five:
         - |
           buildctl build --frontend dockerfile.v0 --local context="cli" --local dockerfile="cli"  \
           --progress plain --opt filename="Dockerfile" --export-cache type=inline  \
-          --import-cache type=registry,ref="${CI_REGISTRY_IMAGE}/test-cli:0.0.0"  \
-          --output type=image,name="${CI_REGISTRY_IMAGE}/test-cli:0.0.0",push=true  \
+          --import-cache type=registry,ref="${CI_REGISTRY_IMAGE}/test-cli:0.0.0-feature-test"  \
+          --output type=image,name="${CI_REGISTRY_IMAGE}/test-cli:0.0.0-feature-test",push=true  \
     needs: []
     variables:
         BUILDKIT_HOST: tcp://buildkitd:1234
@@ -128,17 +128,19 @@ Build - five:
         - pressure::medium
 default: {}
 stages:
-    - release
-    - dynamic
     - trigger
     - lint
     - init
     - build
     - test
+    - release
+    - dynamic
 variables:
     KTC_STOP_PIPELINE: "false"
 workflow:
     name: default
     rules:
+        - if: $CI_MERGE_REQUEST_ID
+          when: always
         - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
           when: always

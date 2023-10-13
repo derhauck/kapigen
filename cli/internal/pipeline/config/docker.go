@@ -3,6 +3,9 @@ package config
 import (
 	"errors"
 	"fmt"
+	"kapigen.kateops.com/internal/environment"
+	"kapigen.kateops.com/internal/logger"
+	"kapigen.kateops.com/internal/los"
 	"kapigen.kateops.com/internal/pipeline/jobs/docker"
 	"kapigen.kateops.com/internal/pipeline/types"
 )
@@ -39,14 +42,16 @@ func (d *Docker) Validate() error {
 }
 
 func (d *Docker) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
-	tag := "0.0.0"
-	var jobs = types.Jobs{docker.NewBuildkitBuild(
+	tag := los.GetVersion(environment.CI_PROJECT_ID.Get(), d.Path)
+	logger.DebugAny(environment.GetNewVersion(tag))
+	build := docker.NewBuildkitBuild(
 		d.Path,
 		d.Context,
 		d.Dockerfile,
-		d.DefaultRegistry(tag),
-	)}
-	return &jobs, nil
+		d.DefaultRegistry(environment.GetFeatureBranchVersion(tag)),
+	).AddName(pipelineType.String())
+
+	return &types.Jobs{build}, nil
 
 }
 

@@ -2,8 +2,8 @@ package job
 
 import (
 	"fmt"
+	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/gitlab/cache"
-	"kapigen.kateops.com/internal/gitlab/environment"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 )
 
@@ -32,7 +32,7 @@ func (c *Cache) SetPolicy(policy cache.Policy) *Cache {
 }
 
 func (c *Cache) SetDefaultCacheKey(path string, pipelineType string) {
-	c.Key = fmt.Sprintf("%s-%s-%s", environment.Get(environment.CI_MERGE_REQUEST_ID), path, pipelineType)
+	c.Key = fmt.Sprintf("%s-%s-%s", environment.CI_MERGE_REQUEST_ID, path, pipelineType)
 }
 func NewCache() Cache {
 	return Cache{
