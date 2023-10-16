@@ -1,6 +1,8 @@
 package types
 
-import "kapigen.kateops.com/internal/gitlab"
+import (
+	"kapigen.kateops.com/internal/gitlab/job"
+)
 
 type Need struct {
 	Optional bool
@@ -25,15 +27,15 @@ func NewNeed(job *Job) *Need {
 	}
 }
 
-func (n *Need) Render() *gitlab.NeedYaml {
-	return &gitlab.NeedYaml{
+func (n *Need) Render() *job.NeedYaml {
+	return &job.NeedYaml{
 		Optional: n.Optional,
 		Job:      n.Job.GetName(),
 	}
 }
 
-func (n *Needs) NeedsYaml() *gitlab.NeedsYaml {
-	var needsYaml gitlab.NeedsYaml
+func (n *Needs) NeedsYaml() *job.NeedsYaml {
+	var needsYaml job.NeedsYaml
 	for _, need := range n.GetNeeds() {
 		needsYaml = append(needsYaml, need.Render())
 	}

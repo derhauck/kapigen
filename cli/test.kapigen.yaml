@@ -15,3 +15,8 @@ pipelines:
       path: cli/tests/docker
       dockerfile: Dockerfile
       name: test-cli
+  - type: golang
+    id: test-go
+    config:
+      imageName: 'golang:1.10'
+      path: cli

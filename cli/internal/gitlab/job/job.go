@@ -1,26 +1,30 @@
-package gitlab
+package job
 
 import (
 	"gopkg.in/yaml.v3"
-	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/gitlab/images"
-	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/logger"
 )
 
 type CiJob struct {
-	AfterScript  job.AfterScript   `yaml:"after_script"`
-	BeforeScript job.BeforeScript  `yaml:"before_script"`
-	Script       job.Script        `yaml:"script"`
-	AllowFailure job.AllowFailure  `yaml:"allow_failure"`
-	Cache        job.Cache         `yaml:"cache"`
+	Artifact     Artifact          `yaml:"artifacts"`
+	AfterScript  AfterScript       `yaml:"after_script"`
+	BeforeScript BeforeScript      `yaml:"before_script"`
+	Script       Script            `yaml:"script"`
+	AllowFailure AllowFailure      `yaml:"allow_failure"`
+	Cache        Cache             `yaml:"cache"`
 	Variables    map[string]string `yaml:"variables"`
-	Tags         job.Tags          `yaml:"tags"`
-	Image        job.Image
-	Rules        job.Rules
+	Tags         Tags              `yaml:"tags"`
+	Image        Image
+	Rules        Rules
 	Stage        stages.Stage `yaml:"stage"`
-	Services     job.Services `yaml:"services"`
+	Services     Services     `yaml:"services"`
+}
+
+func (c *CiJob) AddArtifact(artifact Artifact) *CiJob {
+	c.Artifact = artifact
+	return c
 }
 
 func (c *CiJob) AddVariable(key string, value string) *CiJob {
@@ -31,42 +35,43 @@ func (c *CiJob) AddVariable(key string, value string) *CiJob {
 	return c
 }
 
-func (c *CiJob) AddService(service *job.Service) {
+func (c *CiJob) AddService(service *Service) {
 	c.Services.Add(service)
 }
 
-func NewCiJob(imageName docker.Image) *CiJob {
+func NewCiJob(imageName string) *CiJob {
 	return &CiJob{
-		Script: job.NewScript(),
-		Cache:  job.NewCache(),
-		Image: job.Image{
+		Script: NewScript(),
+		Cache:  NewCache(),
+		Image: Image{
 			Name:       imageName,
 			PullPolicy: images.Always,
 		},
 		Stage:        stages.NewStage(),
-		AfterScript:  job.NewAfterScript(),
-		BeforeScript: job.NewBeforeScript(),
+		AfterScript:  NewAfterScript(),
+		BeforeScript: NewBeforeScript(),
 	}
 }
 
-func (c *CiJob) Render(needs *NeedsYaml) *CiJobYaml {
+func (c *CiJob) Render(needs *NeedsYaml) (*CiJobYaml, error) {
 	return NewCiJobYaml(c, needs)
 }
 
 type CiJobs []*CiJob
 
 type CiJobYaml struct {
+	Artifact     *ArtifactYaml     `yaml:"artifacts,omitempty" json:"artifacts,omitempty"`
 	AfterScript  []string          `yaml:"after_script,omitempty" json:"after_script,omitempty"`
 	AllowFailure any               `yaml:"allow_failure,omitempty" json:"allow_failure,omitempty"`
 	BeforeScript []string          `yaml:"before_script,omitempty" json:"before_script,omitempty"`
-	Cache        *job.CacheYaml    `yaml:"cache,omitempty" json:"cache,omitempty"`
+	Cache        *CacheYaml        `yaml:"cache,omitempty" json:"cache,omitempty"`
 	Script       []string          `yaml:"script" json:"script"`
 	Needs        *NeedsYaml        `yaml:"needs" json:"needs"`
 	Variables    map[string]string `yaml:"variables,omitempty" json:"variables,omitempty"`
-	Image        *job.ImageYaml    `yaml:"image" json:"image"`
-	Rules        *job.RulesYaml    `yaml:"rules" json:"rules"`
+	Image        *ImageYaml        `yaml:"image" json:"image"`
+	Rules        *RulesYaml        `yaml:"rules" json:"rules"`
 	Stage        string            `yaml:"stage" json:"stage"`
-	Services     *job.ServiceYamls `yaml:"services,omitempty" json:"services,omitempty"`
+	Services     *ServiceYamls     `yaml:"services,omitempty" json:"services,omitempty"`
 	Tags         []string          `yaml:"tags" json:"tags"`
 }
 
@@ -78,12 +83,23 @@ func (c *CiJobYaml) String() string {
 	}
 	return string(data)
 }
-func NewCiJobYaml(job *CiJob, needs *NeedsYaml) *CiJobYaml {
+func NewCiJobYaml(job *CiJob, needs *NeedsYaml) (*CiJobYaml, error) {
+	var err error
+	artifact, err := job.Artifact.Render()
+	if err != nil {
+		return nil, err
+	}
+	cache, err := job.Cache.GetRenderedValue()
+	if err != nil {
+		return nil, err
+	}
+
 	return &CiJobYaml{
+		Artifact:     artifact,
 		AfterScript:  job.AfterScript.GetRenderedValue(),
 		AllowFailure: job.AllowFailure.Get(),
 		BeforeScript: job.BeforeScript.GetRenderedValue(),
-		Cache:        job.Cache.GetRenderedValue(),
+		Cache:        cache,
 		Script:       job.Script.GetRenderedValue(),
 		Needs:        needs,
 		Variables:    job.Variables,
@@ -92,7 +108,7 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml) *CiJobYaml {
 		Stage:        job.Stage.String(),
 		Services:     job.Services.Render(),
 		Tags:         job.Tags.Render(),
-	}
+	}, nil
 }
 
 type NeedYaml struct {

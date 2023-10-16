@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/environment"
-	"kapigen.kateops.com/internal/gitlab"
 	"kapigen.kateops.com/internal/gitlab/cache"
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/stages"
@@ -13,7 +12,7 @@ import (
 )
 
 func NewTerraformPlan(path string, state string, s3 bool) *types.Job {
-	return types.NewJob("Plan", docker.Terraform_Base, func(ciJob *gitlab.CiJob) {
+	return types.NewJob("Plan", docker.Terraform_Base.Image(), func(ciJob *job.CiJob) {
 		ciJob.Script.Value.
 			Add(fmt.Sprintf("echo \"%s\"", state)).
 			Add("terraform plan")

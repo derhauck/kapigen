@@ -30,6 +30,9 @@ func GetVersion(project string, path string) string {
 
 	if resp.StatusCode > 399 {
 		logger.Error(resp.Status)
+		var errResponse DefaultErrorResponse
+		_ = ReadBody(resp.Body, &errResponse)
+		logger.Error(errResponse.Message)
 		return defaultVersion
 	}
 
@@ -38,10 +41,27 @@ func GetVersion(project string, path string) string {
 		logger.ErrorE(err)
 		return defaultVersion
 	}
-	var versionResponse ProjectVersion
+	var versionResponse ProjectVersionResponse
 	err = json.Unmarshal(body, &versionResponse)
 	if err != nil {
 		logger.ErrorE(err)
 	}
 	return versionResponse.Version
+}
+
+func ReadBody(body io.ReadCloser, v any) error {
+	if body == nil {
+		return nil
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			logger.ErrorE(err)
+		}
+	}(body)
+	content, err := io.ReadAll(body)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(content, v)
 }

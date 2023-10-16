@@ -3,18 +3,17 @@ package types
 import (
 	"errors"
 	"fmt"
-	"kapigen.kateops.com/internal/docker"
-	"kapigen.kateops.com/internal/gitlab"
+	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/logger"
 )
 
 type Job struct {
 	Names       []string
-	CiJob       *gitlab.CiJob
+	CiJob       *job.CiJob
 	Needs       Needs
 	currentName int
-	fn          []func(job *gitlab.CiJob)
-	CiJobYaml   *gitlab.CiJobYaml
+	fn          []func(job *job.CiJob)
+	CiJobYaml   *job.CiJobYaml
 }
 
 func (j *Job) AddNeed(job *Job) *Job {
@@ -110,24 +109,28 @@ func (j *Job) AddName(name string) *Job {
 	return j
 }
 
-func NewJob(name string, image docker.Image, fn func(ciJob *gitlab.CiJob)) *Job {
+func NewJob(name string, image string, fn func(ciJob *job.CiJob)) *Job {
 	var newJob = &Job{
 		Names:       []string{name},
-		CiJob:       gitlab.NewCiJob(image),
+		CiJob:       job.NewCiJob(image),
 		currentName: 0,
-		fn:          []func(job *gitlab.CiJob){fn},
+		fn:          []func(job *job.CiJob){fn},
 		Needs:       Needs{},
 	}
 
 	return newJob
 }
 
-func (j *Job) Render() *Job {
+func (j *Job) Render() error {
 	for _, fn := range j.fn {
 		fn(j.CiJob)
 	}
-	j.CiJobYaml = j.CiJob.Render(j.Needs.NeedsYaml())
-	return j
+	var err error
+	j.CiJobYaml, err = j.CiJob.Render(j.Needs.NeedsYaml())
+	if err != nil {
+		return fmt.Errorf("job='%s'  can not be rendered: %w", j.Names, err)
+	}
+	return nil
 }
 
 type Jobs []*Job

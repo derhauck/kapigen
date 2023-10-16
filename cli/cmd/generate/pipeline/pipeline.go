@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 	"kapigen.kateops.com/internal/cli"
-	"kapigen.kateops.com/internal/gitlab"
+	"kapigen.kateops.com/internal/gitlab/pipeline"
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/config"
 	"kapigen.kateops.com/internal/pipeline/types"
@@ -41,7 +41,7 @@ var Cmd = &cobra.Command{
 		}
 		logger.Info("ci jobs evaluated")
 
-		gitlab.NewDefaultCiPipeline().Render().AddToMap(ciPipeline)
+		pipeline.NewDefaultCiPipeline().Render().AddToMap(ciPipeline)
 		logger.Info("ci jobs rendered")
 
 		data, err := yaml.Marshal(ciPipeline)

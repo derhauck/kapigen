@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/environment"
-	"kapigen.kateops.com/internal/gitlab"
 	"kapigen.kateops.com/internal/gitlab/cache"
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/stages"
@@ -13,7 +12,7 @@ import (
 )
 
 func NewTerraformInit(path string, state string, s3 bool) *types.Job {
-	return types.NewJob("Init", docker.Terraform_Base, func(ciJob *gitlab.CiJob) {
+	return types.NewJob("Init", docker.Terraform_Base.Image(), func(ciJob *job.CiJob) {
 		ciJob.BeforeScript.Value.AddSeveral([]string{
 			"echo \"credentials \\\\\"${CI_SERVER_HOST}\\\\\" {\\n  token = \\\\\"${CI_PIPELINE_TOKEN}\\\\\"\\n}\" > gitlab.tfrc",
 			"export TF_CLI_CONFIG_FILE=${PWD}/gitlab.tfrc",

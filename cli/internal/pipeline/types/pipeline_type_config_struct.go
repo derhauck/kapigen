@@ -44,7 +44,10 @@ func (p *PipelineTypeConfig) Decode(configTypes map[PipelineType]PipelineConfigI
 			job.AddName(p.PipelineId)
 		}
 		job.AddName(string(p.Type))
-		job.Render()
+		err = job.Render()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return jobs, nil

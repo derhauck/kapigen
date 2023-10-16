@@ -3,14 +3,13 @@ package docker
 import (
 	"fmt"
 	"kapigen.kateops.com/internal/docker"
-	"kapigen.kateops.com/internal/gitlab"
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/tags"
 	"kapigen.kateops.com/internal/pipeline/types"
 )
 
 func NewBuildkitBuild(path string, context string, dockerfile string, destination string) *types.Job {
-	return types.NewJob("Build", docker.BUILDKIT, func(ciJob *gitlab.CiJob) {
+	return types.NewJob("Build", docker.BUILDKIT.Image(), func(ciJob *job.CiJob) {
 		ciJob.Image.Entrypoint.
 			Add("sh").
 			Add("-c")

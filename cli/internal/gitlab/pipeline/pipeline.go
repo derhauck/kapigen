@@ -1,4 +1,4 @@
-package gitlab
+package pipeline
 
 import (
 	"kapigen.kateops.com/internal/gitlab/job"

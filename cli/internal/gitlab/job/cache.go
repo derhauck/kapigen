@@ -1,6 +1,7 @@
 package job
 
 import (
+	"errors"
 	"fmt"
 	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/gitlab/cache"
@@ -44,14 +45,18 @@ func NewCache() Cache {
 	}
 }
 
-func (c *Cache) GetRenderedValue() *CacheYaml {
+func (c *Cache) GetRenderedValue() (*CacheYaml, error) {
 	if c.Key == "" || c.Active == false {
-		return nil
+		return nil, nil
+	}
+
+	if c.Key == "" && len(c.Paths.Get()) > 0 {
+		return nil, errors.New("no cache key but active paths found")
 	}
 	return &CacheYaml{
 		Key:       c.Key,
 		Paths:     c.Paths.Get(),
 		Unprotect: c.Unprotect,
 		Policy:    c.Policy.String(),
-	}
+	}, nil
 }
