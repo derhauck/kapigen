@@ -9,7 +9,7 @@ import (
 func NewGolangTest(image string, path string) *types.Job {
 
 	return types.NewJob("Unit Test", image, func(ciJob *job.CiJob) {
-		ciJob.SetImageName("golang:1.16").
+		ciJob.SetImageName(image).
 			TagMediumPressure().
 			AddBeforeScript(fmt.Sprintf("cd %s", path)).
 			AddScript("go install github.com/jstemmer/go-junit-report/v2@latest").
