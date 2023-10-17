@@ -18,5 +18,5 @@ pipelines:
   - type: golang
     id: test-go
     config:
-      imageName: 'golang:1.10'
+      imageName: 'golang:1.21'
       path: cli
