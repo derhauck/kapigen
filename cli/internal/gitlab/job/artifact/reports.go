@@ -5,7 +5,7 @@ type Reports struct {
 }
 
 func (r *Reports) isValid() bool {
-	return false
+	return true
 }
 
 type ReportsYaml struct {
