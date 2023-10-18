@@ -49,7 +49,6 @@ func (d *Docker) Build(pipelineType types.PipelineType, Id string) (*types.Jobs,
 		d.Dockerfile,
 		d.DefaultRegistry(environment.GetFeatureBranchVersion(tag)),
 	)
-
 	return &types.Jobs{build}, nil
 
 }
