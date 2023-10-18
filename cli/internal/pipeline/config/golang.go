@@ -29,6 +29,9 @@ func (g Golang) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, 
 		if err != nil {
 			return nil, err
 		}
+		for _, job := range jobs.GetJobs() {
+			test.AddNeed(job)
+		}
 		allJobs = append(allJobs, jobs.GetJobs()...)
 
 	}

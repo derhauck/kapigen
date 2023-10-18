@@ -22,4 +22,4 @@ pipelines:
       path: cli
       docker:
         path:  cli/tests/docker
-        name: test-file
+        name: test-go
