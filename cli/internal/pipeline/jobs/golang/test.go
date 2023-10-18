@@ -30,6 +30,7 @@ func NewGolangTest(image string, path string) *types.Job {
 						Path:           reportPath,
 						CoverageFormat: reports.Cobertura,
 					},
+					Junit: artifact.NewJunitReport(reportPath),
 				},
 			})
 

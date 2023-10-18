@@ -1,7 +1,8 @@
 package artifact
 
 type Reports struct {
-	CoverageReport CoverageReport `yaml:"coverage_report"`
+	CoverageReport CoverageReport `yaml:"coverage_report,omitempty"`
+	Junit          JunitReport    `yaml:"junit,omitempty"`
 }
 
 func (r *Reports) isValid() bool {
@@ -10,6 +11,7 @@ func (r *Reports) isValid() bool {
 
 type ReportsYaml struct {
 	CoverageReport *CoverageReportYaml `yaml:"coverage_report,omitempty"`
+	Junit          string              `yaml:"junit,omitempty"`
 }
 
 func (r *Reports) Render() *ReportsYaml {
@@ -18,5 +20,6 @@ func (r *Reports) Render() *ReportsYaml {
 	}
 	return &ReportsYaml{
 		CoverageReport: r.CoverageReport.Render(),
+		Junit:          r.Junit.Render(),
 	}
 }
