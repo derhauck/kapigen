@@ -29,7 +29,7 @@ func NewUnitTest(image string, path string) (*types.Job, error) {
 			SetStage(stages.TEST).
 			AddBeforeScript(fmt.Sprintf("cd %s", path)).
 			AddScript("go install github.com/jstemmer/go-junit-report/v2@latest").
-			AddScript("go test -cover").
+			AddScript("go test -cover ./...").
 			AddScript("go test -json ./... 2>&1 | go-junit-report -parser gojson -iocopy -out report.xml").
 			AddVariable("KTC_PATH", path).
 			AddArtifact(job.Artifact{
@@ -39,7 +39,7 @@ func NewUnitTest(image string, path string) (*types.Job, error) {
 					SetCoverageReport(artifact.NewCoverageReport(reports.Cobertura, reportPath)).
 					SetJunit(artifact.NewJunitReport(reportPath)),
 			}).
-			SetCodeCoverage("/Code coverage: \\d+(?:\\.\\d+)?/")
+			SetCodeCoverage("/coverage: \\d+.\\d+% of statements/")
 
 		ciJob.Rules = *job.DefaultPipelineRules()
 	}), nil
