@@ -7,6 +7,13 @@ type CoverageReport struct {
 	Path           string
 }
 
+func NewCoverageReport(coverageFormat reports.CoverageFormat, path string) CoverageReport {
+	return CoverageReport{
+		CoverageFormat: coverageFormat,
+		Path:           path,
+	}
+}
+
 func (c *CoverageReport) Render() *CoverageReportYaml {
 	return NewCoverageReportYaml(c)
 }

@@ -2,7 +2,6 @@ package job
 
 import (
 	"gopkg.in/yaml.v3"
-	"kapigen.kateops.com/internal/gitlab/images"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/logger"
 )
@@ -20,37 +19,7 @@ type CiJob struct {
 	Rules        Rules
 	Stage        stages.Stage `yaml:"stage"`
 	Services     Services     `yaml:"services"`
-}
-
-func (c *CiJob) AddArtifact(artifact Artifact) *CiJob {
-	c.Artifact = artifact
-	return c
-}
-
-func (c *CiJob) AddVariable(key string, value string) *CiJob {
-	if c.Variables == nil {
-		c.Variables = map[string]string{}
-	}
-	c.Variables[key] = value
-	return c
-}
-
-func (c *CiJob) AddService(service *Service) {
-	c.Services.Add(service)
-}
-
-func NewCiJob(imageName string) *CiJob {
-	return &CiJob{
-		Script: NewScript(),
-		Cache:  NewCache(),
-		Image: Image{
-			Name:       imageName,
-			PullPolicy: images.Always,
-		},
-		Stage:        stages.NewStage(),
-		AfterScript:  NewAfterScript(),
-		BeforeScript: NewBeforeScript(),
-	}
+	Coverage     string       `yaml:"coverage"`
 }
 
 func (c *CiJob) Render(needs *NeedsYaml) (*CiJobYaml, error) {
@@ -73,6 +42,7 @@ type CiJobYaml struct {
 	Stage        string            `yaml:"stage" json:"stage"`
 	Services     *ServiceYamls     `yaml:"services,omitempty" json:"services,omitempty"`
 	Tags         []string          `yaml:"tags" json:"tags"`
+	Coverage     string            `yaml:"coverage,omitempty" json:"coverage"`
 }
 
 func (c *CiJobYaml) String() string {
@@ -94,6 +64,11 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml) (*CiJobYaml, error) {
 		return nil, err
 	}
 
+	stage := job.Stage
+	if stage < stages.DYNAMIC {
+		stage = stages.DYNAMIC
+	}
+
 	return &CiJobYaml{
 		Artifact:     artifact,
 		AfterScript:  job.AfterScript.GetRenderedValue(),
@@ -105,9 +80,10 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml) (*CiJobYaml, error) {
 		Variables:    job.Variables,
 		Image:        job.Image.GetRenderedValue(),
 		Rules:        job.Rules.GetRenderedValue(),
-		Stage:        job.Stage.String(),
+		Stage:        stage.String(),
 		Services:     job.Services.Render(),
 		Tags:         job.Tags.Render(),
+		Coverage:     job.Coverage,
 	}, nil
 }
 

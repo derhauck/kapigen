@@ -16,8 +16,12 @@ type Artifact struct {
 	When      WhenWrapper
 }
 
-func NewArtifact() Artifact {
-	return Artifact{}
+func NewArtifact(name string, paths []string) Artifact {
+	artifactPaths := wrapper.NewStringSlice().AddSeveral(paths)
+	return Artifact{
+		Name:  name,
+		Paths: *artifactPaths,
+	}
 }
 func (a *Artifact) validate() (bool, error) {
 	if len(a.Paths.Get()) == 0 {

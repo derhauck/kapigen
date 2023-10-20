@@ -56,7 +56,7 @@ func (c *Services) Add(service *Service) *Services {
 }
 func (c *Service) Render() *ServiceYaml {
 	return &ServiceYaml{
-		Name:       c.name.Image(),
+		Name:       c.name.String(),
 		Entrypoint: c.entrypoint.Get(),
 		Command:    c.command.Get(),
 		Alias:      c.alias,

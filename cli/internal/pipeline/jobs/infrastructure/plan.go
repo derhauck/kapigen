@@ -12,7 +12,7 @@ import (
 )
 
 func NewTerraformPlan(path string, state string, s3 bool) *types.Job {
-	return types.NewJob("Plan", docker.Terraform_Base.Image(), func(ciJob *job.CiJob) {
+	return types.NewJob("Plan", docker.Terraform_Base.String(), func(ciJob *job.CiJob) {
 		ciJob.Script.Value.
 			Add(fmt.Sprintf("echo \"%s\"", state)).
 			Add("terraform plan")

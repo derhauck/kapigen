@@ -16,7 +16,7 @@ type PipelineTypeConfig struct {
 }
 
 func (p *PipelineTypeConfig) Decode(configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
-	logger.Info(fmt.Sprintf("decoding pipeline type %s", p.Type))
+	logger.Info(fmt.Sprintf("decoding pipeline type %s, id: %s", p.Type, p.PipelineId))
 	var pipelineConfig = configTypes[p.Type].New()
 	if pipelineConfig == nil {
 		return nil, errors.New(fmt.Sprintf("no pipeline definition found for type: '%s'", p.Type))
@@ -102,6 +102,14 @@ func (p *PipelineConfig) Decode(configTypes map[PipelineType]PipelineConfigInter
 
 	for i := 0; i < len(p.Pipelines); i++ {
 		configuration := p.Pipelines[i]
+		if configuration.PipelineId == "" {
+			value, _ := yaml.Marshal(configuration)
+			return nil, errors.New(fmt.Sprintf("no pipeline id set for pipeline %v", string(value)))
+		}
+		if configuration.Type == "" {
+			value, _ := yaml.Marshal(configuration)
+			return nil, errors.New(fmt.Sprintf("no pipeline type set for pipeline %v", string(value)))
+		}
 		jobs, err := configuration.Decode(configTypes)
 		if err != nil {
 			return nil, err

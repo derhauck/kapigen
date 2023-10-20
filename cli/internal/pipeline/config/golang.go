@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"kapigen.kateops.com/internal/pipeline/jobs/golang"
 	"kapigen.kateops.com/internal/pipeline/types"
 )
@@ -16,13 +17,23 @@ func (g Golang) New() types.PipelineConfigInterface {
 }
 
 func (g Golang) Validate() error {
+	if g.ImageName == "" {
+		return errors.New("no imageName set, required")
+	}
+
+	if g.Path == "" {
+		return errors.New("no path set, required")
+	}
 
 	return nil
 }
 
 func (g Golang) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var allJobs = types.Jobs{}
-	test := golang.NewGolangTest(g.ImageName, g.Path)
+	test, err := golang.NewUnitTest(g.ImageName, g.Path)
+	if err != nil {
+		return nil, err
+	}
 	docker := g.Docker
 	if docker != nil {
 		jobs, err := types.GetPipelineJobs(docker, pipelineType, Id)
@@ -30,7 +41,7 @@ func (g Golang) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, 
 			return nil, err
 		}
 		for _, job := range jobs.GetJobs() {
-			test.AddNeed(job)
+			job.AddNeed(test)
 		}
 		allJobs = append(allJobs, jobs.GetJobs()...)
 

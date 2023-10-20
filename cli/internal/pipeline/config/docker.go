@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"kapigen.kateops.com/internal/environment"
+	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/los"
 	"kapigen.kateops.com/internal/pipeline/jobs/docker"
 	"kapigen.kateops.com/internal/pipeline/types"
@@ -22,7 +23,7 @@ func (d *Docker) New() types.PipelineConfigInterface {
 
 func (d *Docker) Validate() error {
 	if d.Path == "" {
-		return errors.New("need path set")
+		return errors.New("no path set, required")
 	}
 
 	if d.Dockerfile == "" {
@@ -30,19 +31,19 @@ func (d *Docker) Validate() error {
 	}
 
 	if d.Context == "" {
+		logger.Info("no context set, using path")
 		d.Context = d.Path
 	}
 
 	if d.Name == "" {
-
+		logger.Info("no name set, using container root registry")
 	}
 
 	return nil
 }
 
-func (d *Docker) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
+func (d *Docker) Build(_ types.PipelineType, _ string) (*types.Jobs, error) {
 	tag := los.GetVersion(environment.CI_PROJECT_ID.Get(), d.Path)
-	//environment.GetNewVersion(tag)
 	build := docker.NewBuildkitBuild(
 		d.Path,
 		d.Context,

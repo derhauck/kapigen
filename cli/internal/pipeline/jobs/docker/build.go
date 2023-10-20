@@ -9,7 +9,7 @@ import (
 )
 
 func NewBuildkitBuild(path string, context string, dockerfile string, destination string) *types.Job {
-	return types.NewJob("Build", docker.BUILDKIT.Image(), func(ciJob *job.CiJob) {
+	return types.NewJob("Build", docker.BUILDKIT.String(), func(ciJob *job.CiJob) {
 		ciJob.Image.Entrypoint.
 			Add("sh").
 			Add("-c")

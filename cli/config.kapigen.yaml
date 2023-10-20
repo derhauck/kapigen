@@ -1,6 +1,9 @@
 pipelines:
-  - type: docker
-    id: five
+  - type: golang
+    id: cli
     config:
       path: cli
       name: cli
+      imageName: 'golang:1.21'
+      docker:
+        path: cli

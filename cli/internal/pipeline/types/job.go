@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"kapigen.kateops.com/internal/gitlab/job"
+	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/logger"
 )
 
@@ -18,6 +19,13 @@ type Job struct {
 
 func (j *Job) AddNeed(job *Job) *Job {
 	j.Needs = append(j.Needs, NewNeed(job))
+	return j
+}
+
+func (j *Job) AddNeedByStage(job *Job, stage stages.Stage) *Job {
+	if job.CiJob.Stage <= stage {
+		j.AddNeed(job)
+	}
 	return j
 }
 
@@ -64,13 +72,13 @@ func (j *Job) UniqueName() error {
 	return errors.New(fmt.Sprintf("job '%s' can not be more unique", j.GetName()))
 }
 func (j *Job) EvaluateName(jobs *Jobs) (*Job, error) {
-	for _, job := range jobs.GetJobs() {
-		if j != job {
-			if j.compareConfiguration(job) {
-				job.AddSeveralNeeds(job.EvaluateNeeds(&j.Needs))
+	for _, jobToevaluate := range jobs.GetJobs() {
+		if j != jobToevaluate {
+			if j.compareConfiguration(jobToevaluate) {
+				jobToevaluate.AddSeveralNeeds(jobToevaluate.EvaluateNeeds(&j.Needs))
 				return nil, nil
 			}
-			if j.compare(job) {
+			if j.compare(jobToevaluate) {
 				_, err := j.EvaluateName(jobs)
 				if err != nil {
 					logger.ErrorE(err)
@@ -160,8 +168,8 @@ func (j *Jobs) EvaluateJobs() (map[string]interface{}, error) {
 	var evaluatedJobs Jobs
 	var jobsToEvaluate Jobs
 	jobsToEvaluate = append(jobsToEvaluate, j.GetJobs()...)
-	for _, job := range j.GetJobs() {
-		evaluatedJob, err := job.EvaluateName(&jobsToEvaluate)
+	for _, currentJob := range j.GetJobs() {
+		evaluatedJob, err := currentJob.EvaluateName(&jobsToEvaluate)
 		if err != nil {
 			return nil, err
 		}
@@ -170,7 +178,7 @@ func (j *Jobs) EvaluateJobs() (map[string]interface{}, error) {
 		} else {
 			var resizedJobsToEvaluate Jobs
 			for i := range jobsToEvaluate {
-				if jobsToEvaluate[i] == job && i < len(jobsToEvaluate) {
+				if jobsToEvaluate[i] == currentJob && i < len(jobsToEvaluate) {
 					var tmp = jobsToEvaluate[i+1:]
 					resizedJobsToEvaluate = append(jobsToEvaluate[:i], tmp...)
 				}
@@ -179,9 +187,9 @@ func (j *Jobs) EvaluateJobs() (map[string]interface{}, error) {
 		}
 
 	}
-	for _, job := range evaluatedJobs {
-		job.RenderNeeds()
-		ciPipeline[job.GetName()] = job.CiJobYaml
+	for _, evaluatedJob := range evaluatedJobs {
+		evaluatedJob.RenderNeeds()
+		ciPipeline[evaluatedJob.GetName()] = evaluatedJob.CiJobYaml
 	}
 	return ciPipeline, nil
 }
