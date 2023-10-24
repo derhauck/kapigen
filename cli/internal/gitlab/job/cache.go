@@ -33,7 +33,7 @@ func (c *Cache) SetPolicy(policy cache.Policy) *Cache {
 }
 
 func (c *Cache) SetDefaultCacheKey(path string, pipelineType string) {
-	c.Key = fmt.Sprintf("%s-%s-%s", environment.CI_MERGE_REQUEST_ID, path, pipelineType)
+	c.Key = fmt.Sprintf("%s-%s-%s", environment.CI_MERGE_REQUEST_ID.Get(), path, pipelineType)
 }
 func NewCache() Cache {
 	return Cache{

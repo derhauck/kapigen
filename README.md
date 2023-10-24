@@ -27,9 +27,7 @@ in the LOS (Logic Operator Server).
 It will also look up the version increase on the Merge Request and use it to increase the version in the LOS.
 The version increase will be set once the Merge Request is merged. Until then you can only see the would be new version.
 
->>>
-
-Merge Request -> current version + feature branch name \
-Main -> will release on success with new version and set LOS version to latest
-
->>>
+```
+Merge Request   ->  current version + feature branch name
+Main            ->  will release on success with new version and set LOS version to latest
+```

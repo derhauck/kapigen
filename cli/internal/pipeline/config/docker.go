@@ -43,7 +43,10 @@ func (d *Docker) Validate() error {
 }
 
 func (d *Docker) Build(_ types.PipelineType, _ string) (*types.Jobs, error) {
-	tag := los.GetVersion(environment.CI_PROJECT_ID.Get(), d.Path)
+	tag := los.GetLatestVersion(environment.CI_PROJECT_ID.Get(), d.Path)
+	if _, err := environment.CI_MERGE_REQUEST_ID.Lookup(); err != nil {
+		environment.GetNewVersion(tag)
+	}
 	build := docker.NewBuildkitBuild(
 		d.Path,
 		d.Context,
