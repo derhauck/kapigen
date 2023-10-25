@@ -23,3 +23,11 @@ pipelines:
       docker:
         path:  cli/tests/docker
         name: test-go
+  - type: golang
+    id: go-duplicate
+    config:
+      imageName: 'golang:1.21'
+      path: cli
+      docker:
+        path:  cli/tests/docker
+        name: test-cli
