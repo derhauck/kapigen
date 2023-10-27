@@ -2,6 +2,7 @@ package types
 
 import (
 	"kapigen.kateops.com/internal/gitlab/job"
+	"strings"
 )
 
 type Need struct {
@@ -21,14 +22,9 @@ func (n *Need) HasJob(job *Job) bool {
 	return false
 }
 
-func (n *Needs) ReplaceJob(old *Need, new *Need) *Needs {
-	for _, need := range n.GetNeeds() {
-		if need.HasJob(old.Job) {
-			n.RemoveNeed(need)
-			if !need.HasJob(new.Job) {
-				n.AddNeed(new)
-			}
-		}
+func (n *Needs) ReplaceJob(old *Job, new *Need) *Needs {
+	if n.RemoveJob(old) {
+		n.AddNeed(new)
 	}
 	return n
 }
@@ -46,6 +42,19 @@ func (n *Needs) GetNeed(job *Job) *Need {
 		}
 	}
 	return nil
+}
+
+func (n *Needs) HasNeed(need *Need) bool {
+	if n.HasJob(need.Job) {
+		return true
+	}
+	for _, availableNeed := range n.GetNeeds() {
+		if availableNeed == need {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (n *Needs) HasJob(job *Job) bool {
@@ -76,6 +85,18 @@ func (n *Needs) RemoveNeed(need *Need) bool {
 	return false
 }
 
+func (n *Needs) RemoveJob(job *Job) bool {
+	need := n.GetNeed(job)
+	if need == nil {
+		return false
+	}
+	for need != nil {
+		n.RemoveNeed(need)
+		need = n.GetNeed(job)
+	}
+	return true
+}
+
 func NewNeed(job *Job) *Need {
 	return &Need{
 		Optional: true,
@@ -86,7 +107,7 @@ func NewNeed(job *Job) *Need {
 func (n *Need) Render() *job.NeedYaml {
 	return &job.NeedYaml{
 		Optional: n.Optional,
-		Job:      n.Job.GetName(),
+		Job:      n.Job.GetName() + strings.Join(n.Job.Names, ","),
 	}
 }
 

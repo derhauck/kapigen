@@ -37,9 +37,11 @@ Tests:
   script:
     - go mod download
     - go run . generate pipeline -v --config test.kapigen.yaml
+    - go run . generate pipeline -v --config test.kapigen.yaml --no-merge --file pipeline-no-merge.yaml
   artifacts:
     paths:
       - cli/pipeline.yaml
+      - cli/pipeline-no-merge.yaml
 
 
 Trigger Build:
@@ -59,6 +61,17 @@ Trigger Tests:
     strategy: depend
     include:
       - artifact: cli/pipeline.yaml
+        job: Tests
+
+    forward:
+      pipeline_variables: true
+
+Trigger No-Merge Tests:
+  stage: trigger
+  trigger:
+    strategy: depend
+    include:
+      - artifact: cli/pipeline-no-merge.yaml
         job: Tests
 
     forward:

@@ -47,3 +47,38 @@ func TestNeeds_RemoveNeed(t *testing.T) {
 		}
 	})
 }
+
+func TestNeeds_HasJob(t *testing.T) {
+	t.Parallel()
+	t.Run("Can find Need", func(t *testing.T) {
+		job := &Job{}
+		job2 := &Job{}
+		expectedNeed := &Need{
+			Job:      job,
+			Optional: true,
+		}
+		anotherExpectedNeed := &Need{
+			Job:      job2,
+			Optional: false,
+		}
+		needs := Needs{
+			&Need{
+				Job:      nil,
+				Optional: true,
+			},
+			expectedNeed,
+			anotherExpectedNeed,
+		}
+		if !needs.HasJob(job) {
+			t.Error("should be able to find job")
+		}
+
+		if !needs.HasJob(job2) {
+			t.Error("should be able to find job2")
+		}
+		if !needs.HasJob(nil) {
+			t.Error("should be able to find nil job")
+		}
+
+	})
+}

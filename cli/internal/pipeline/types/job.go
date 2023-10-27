@@ -20,16 +20,7 @@ type Job struct {
 }
 
 func (j *Job) AddJobAsNeed(job *Job) *Job {
-	j.Needs = append(j.Needs, NewNeed(job))
-	return j
-}
-
-func (j *Job) AddNeed(need *Need) *Job {
-	j.Needs.AddNeed(need)
-	return j
-}
-func (j *Job) ReplaceNeed(old *Need, new *Need) *Job {
-	j.Needs.ReplaceJob(old, new)
+	j.Needs.AddNeed(NewNeed(job))
 	return j
 }
 
@@ -45,20 +36,11 @@ func (j *Job) AddNeedByStage(job *Job, stage stages.Stage) *Job {
 
 func (j *Job) AddSeveralNeeds(needs *Needs) *Job {
 	for _, need := range needs.GetNeeds() {
-		if !j.HasNeed(need) {
-			j.Needs = append(j.Needs, need)
+		if !j.Needs.HasNeed(need) {
+			j.Needs.AddNeed(need)
 		}
 	}
 	return j
-}
-
-func (j *Job) HasNeed(need *Need) bool {
-	for _, availableNeed := range j.Needs {
-		if availableNeed == need {
-			return true
-		}
-	}
-	return false
 }
 
 func (j *Job) RenderNeeds() *Job {
@@ -90,16 +72,9 @@ func (j *Job) DynamicMerge(jobs *Jobs) (*Job, error) {
 	for _, jobEvaluate := range jobs.GetJobs() {
 		if j != jobEvaluate {
 			if j.compareConfiguration(jobEvaluate) {
-				jobEvaluate.AddSeveralNeeds(jobEvaluate.EvaluateNeeds(&j.Needs))
+				jobEvaluate.AddSeveralNeeds(&j.Needs)
 				for _, jobRemoveNeed := range jobs.GetJobs() {
-					for _, need := range jobRemoveNeed.Needs.GetNeeds() {
-						if need.Job == j {
-							oldNeed := jobRemoveNeed.Needs.GetNeed(j)
-							if oldNeed != nil {
-								jobRemoveNeed.ReplaceNeed(oldNeed, NewNeed(jobEvaluate))
-							}
-						}
-					}
+					jobRemoveNeed.Needs.ReplaceJob(j, NewNeed(jobEvaluate))
 				}
 				return nil, nil
 			}
@@ -184,20 +159,13 @@ func (j *Jobs) GetJobs() []*Job {
 	return *j
 }
 
-func (j *Job) EvaluateNeeds(needs *Needs) *Needs {
-	var finalNeeds Needs
+func (j *Job) EvaluateNeeds(needs *Needs) {
 	if needs != nil {
 		for _, need := range needs.GetNeeds() {
-			finalNeeds = append(finalNeeds, need)
+			j.Needs.AddNeed(need)
 		}
 	}
-	var jobNeeds = j.Needs
-	if jobNeeds != nil {
-		var tmp Needs
-		tmp = append(jobNeeds.GetNeeds(), finalNeeds.GetNeeds()...)
-		return &tmp
-	}
-	return nil
+
 }
 
 func (j *Jobs) DynamicMerge() (*Jobs, error) {
