@@ -22,12 +22,12 @@ func (i *Infrastructure) Validate() error {
 	return nil
 }
 
-func (i *Infrastructure) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
+func (i *Infrastructure) Build(pipelineType types.PipelineType, _ string) (*types.Jobs, error) {
 	var init = infrastructure.
 		NewTerraformInit(i.Path, i.State, i.S3)
 	var plan = infrastructure.
 		NewTerraformPlan(i.Path, i.State, i.S3).
-		AddNeed(init)
+		AddJobAsNeed(init)
 	var tmp = types.Jobs{init, plan}
 	for _, job := range tmp {
 		job.CiJob.Cache.SetDefaultCacheKey(i.Path, string(pipelineType))

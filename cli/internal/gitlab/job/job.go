@@ -46,7 +46,9 @@ type CiJobYaml struct {
 }
 
 func (c *CiJobYaml) String() string {
-	data, err := yaml.Marshal(c)
+	tmp := *c
+	tmp.Needs = nil
+	data, err := yaml.Marshal(tmp)
 	if err != nil {
 		logger.ErrorE(err)
 		return ""
@@ -96,12 +98,4 @@ type NeedsYaml []*NeedYaml
 
 func (n *NeedsYaml) GetNeeds() []*NeedYaml {
 	return *n
-}
-
-func NewNeedsYaml(needs []*NeedYaml) *NeedsYaml {
-	var newNeeds NeedsYaml
-	for _, need := range needs {
-		newNeeds = append(newNeeds, need)
-	}
-	return &newNeeds
 }

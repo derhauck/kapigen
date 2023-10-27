@@ -22,4 +22,52 @@ pipelines:
       path: cli
       docker:
         path:  cli/tests/docker
-        name: test-go
+        name: test-file
+  - type: docker
+    id: test-cli2
+    config:
+      path: cli/tests/docker
+      name: test-cli
+  - type: docker
+    id: test-file2
+    config:
+      path: cli/tests/docker
+      name: test-file
+  - type: docker
+    id: duplicate-test2
+    config:
+      path: cli/tests/docker
+      dockerfile: Dockerfile
+      name: test-cli
+  - type: golang
+    id: test-go2
+    config:
+      imageName: 'golang:1.21'
+      path: cli
+      docker:
+        path:  cli/tests/docker
+        name: test-file
+  - type: docker
+    id: test-cli3
+    config:
+      path: cli/tests/docker
+      name: test-cli
+  - type: docker
+    id: test-file3
+    config:
+      path: cli/tests/docker
+      name: test-file
+  - type: docker
+    id: duplicate-test3
+    config:
+      path: cli/tests/docker
+      dockerfile: Dockerfile
+      name: test-cli
+  - type: golang
+    id: test-go3
+    config:
+      imageName: 'golang:1.21'
+      path: cli
+      docker:
+        path:  cli/tests/docker
+        name: test-file

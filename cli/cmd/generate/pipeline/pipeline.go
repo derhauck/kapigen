@@ -34,13 +34,26 @@ var Cmd = &cobra.Command{
 			return err
 		}
 		logger.Info("ci jobs created")
-
-		ciPipeline, err := pipelineJobs.EvaluateJobs()
+		merge, err := cmd.Flags().GetBool("no-merge")
 		if err != nil {
 			return err
 		}
-		logger.Info("ci jobs evaluated")
+		var ciPipeline map[string]interface{}
+		if merge == false {
+			pipelineJobs, err = pipelineJobs.DynamicMerge()
+			if err != nil {
+				return err
+			}
+			logger.Info("ci jobs dynamically merged")
+		}
 
+		pipelineJobs, err = pipelineJobs.EvaluateNames()
+		if err != nil {
+			return err
+		}
+		logger.Info("ci jobs named to be unique")
+		ciPipeline = types.JobsToMap(pipelineJobs)
+		logger.Info("ci job list converted to map")
 		pipeline.NewDefaultCiPipeline().Render().AddToMap(ciPipeline)
 		logger.Info("ci jobs rendered")
 
@@ -60,5 +73,6 @@ var Cmd = &cobra.Command{
 func init() {
 	Cmd.Flags().String("file", "pipeline.yaml", "output file")
 	Cmd.Flags().String("config", "config.kapigen.yaml", "config to use")
+	Cmd.Flags().Bool("no-merge", false, "use dynamic job merge")
 
 }

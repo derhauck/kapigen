@@ -3,9 +3,11 @@ package types
 import (
 	"errors"
 	"fmt"
+	"github.com/kylelemons/godebug/diff"
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/logger"
+	"os"
 )
 
 type Job struct {
@@ -17,14 +19,26 @@ type Job struct {
 	CiJobYaml   *job.CiJobYaml
 }
 
-func (j *Job) AddNeed(job *Job) *Job {
+func (j *Job) AddJobAsNeed(job *Job) *Job {
 	j.Needs = append(j.Needs, NewNeed(job))
 	return j
 }
 
+func (j *Job) AddNeed(need *Need) *Job {
+	j.Needs.AddNeed(need)
+	return j
+}
+func (j *Job) ReplaceNeed(old *Need, new *Need) *Job {
+	j.Needs.ReplaceJob(old, new)
+	return j
+}
+
+func (j *Job) RemoveNeed(need *Need) bool {
+	return j.Needs.RemoveNeed(need)
+}
 func (j *Job) AddNeedByStage(job *Job, stage stages.Stage) *Job {
 	if job.CiJob.Stage <= stage {
-		j.AddNeed(job)
+		j.AddJobAsNeed(job)
 	}
 	return j
 }
@@ -71,14 +85,33 @@ func (j *Job) UniqueName() error {
 	}
 	return errors.New(fmt.Sprintf("job '%s' can not be more unique", j.GetName()))
 }
-func (j *Job) EvaluateName(jobs *Jobs) (*Job, error) {
-	for _, jobToevaluate := range jobs.GetJobs() {
-		if j != jobToevaluate {
-			if j.compareConfiguration(jobToevaluate) {
-				jobToevaluate.AddSeveralNeeds(jobToevaluate.EvaluateNeeds(&j.Needs))
+
+func (j *Job) DynamicMerge(jobs *Jobs) (*Job, error) {
+	for _, jobEvaluate := range jobs.GetJobs() {
+		if j != jobEvaluate {
+			if j.compareConfiguration(jobEvaluate) {
+				jobEvaluate.AddSeveralNeeds(jobEvaluate.EvaluateNeeds(&j.Needs))
+				for _, jobRemoveNeed := range jobs.GetJobs() {
+					for _, need := range jobRemoveNeed.Needs.GetNeeds() {
+						if need.Job == j {
+							oldNeed := jobRemoveNeed.Needs.GetNeed(j)
+							if oldNeed != nil {
+								jobRemoveNeed.ReplaceNeed(oldNeed, NewNeed(jobEvaluate))
+							}
+						}
+					}
+				}
 				return nil, nil
 			}
-			if j.compare(jobToevaluate) {
+		}
+	}
+	return j, nil
+}
+
+func (j *Job) EvaluateName(jobs *Jobs) (*Job, error) {
+	for _, jobEvaluate := range jobs.GetJobs() {
+		if j != jobEvaluate {
+			if j.compare(jobEvaluate) {
 				_, err := j.EvaluateName(jobs)
 				if err != nil {
 					logger.ErrorE(err)
@@ -109,6 +142,10 @@ func (j *Job) compareConfiguration(job *Job) bool {
 	if j.CiJobYaml.String() == job.CiJobYaml.String() {
 		return true
 	}
+	if os.Getenv("DEBUG_DIFF") != "" {
+		logger.DebugAny(diff.Diff(j.CiJobYaml.String(), job.CiJobYaml.String()))
+	}
+
 	return false
 }
 
@@ -163,8 +200,33 @@ func (j *Job) EvaluateNeeds(needs *Needs) *Needs {
 	return nil
 }
 
-func (j *Jobs) EvaluateJobs() (map[string]interface{}, error) {
-	var ciPipeline = make(map[string]interface{})
+func (j *Jobs) DynamicMerge() (*Jobs, error) {
+	var evaluatedJobs Jobs
+	var jobsToEvaluate Jobs
+	jobsToEvaluate = append(jobsToEvaluate, j.GetJobs()...)
+	for _, currentJob := range j.GetJobs() {
+		evaluatedJob, err := currentJob.DynamicMerge(&jobsToEvaluate)
+		if err != nil {
+			return nil, err
+		}
+		if evaluatedJob != nil {
+			evaluatedJobs = append(evaluatedJobs, evaluatedJob)
+		} else {
+			var resizedJobsToEvaluate Jobs
+			for i := range jobsToEvaluate {
+				if jobsToEvaluate[i] == currentJob && i < len(jobsToEvaluate) {
+					var tmp = jobsToEvaluate[i+1:]
+					resizedJobsToEvaluate = append(jobsToEvaluate[:i], tmp...)
+				}
+			}
+			jobsToEvaluate = resizedJobsToEvaluate
+		}
+
+	}
+	return &evaluatedJobs, nil
+}
+
+func (j *Jobs) EvaluateNames() (*Jobs, error) {
 	var evaluatedJobs Jobs
 	var jobsToEvaluate Jobs
 	jobsToEvaluate = append(jobsToEvaluate, j.GetJobs()...)
@@ -187,9 +249,13 @@ func (j *Jobs) EvaluateJobs() (map[string]interface{}, error) {
 		}
 
 	}
-	for _, evaluatedJob := range evaluatedJobs {
+	return &evaluatedJobs, nil
+}
+func JobsToMap(jobs *Jobs) map[string]interface{} {
+	var ciPipeline = make(map[string]interface{})
+	for _, evaluatedJob := range *jobs {
 		evaluatedJob.RenderNeeds()
 		ciPipeline[evaluatedJob.GetName()] = evaluatedJob.CiJobYaml
 	}
-	return ciPipeline, nil
+	return ciPipeline
 }
