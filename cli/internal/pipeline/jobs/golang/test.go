@@ -40,7 +40,7 @@ func NewUnitTest(image string, path string) (*types.Job, error) {
 					SetCoverageReport(artifact.NewCoverageReport(reports.Cobertura, reportPath)).
 					SetJunit(artifact.NewJunitReport(reportPath)),
 			}).
-			SetCodeCoverage("\\(statements\\)(?:\\s+)?(\\d+(?:\\.\\d+)?%)")
+			SetCodeCoverage(`/\(statements\)(?:\s+)?(\d+(?:\.\d+)?%)/`)
 
 		ciJob.Rules = *job.DefaultPipelineRules()
 	}), nil
