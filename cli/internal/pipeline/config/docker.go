@@ -3,9 +3,9 @@ package config
 import (
 	"errors"
 	"fmt"
+	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/logger"
-	"kapigen.kateops.com/internal/los"
 	"kapigen.kateops.com/internal/pipeline/jobs/docker"
 	"kapigen.kateops.com/internal/pipeline/types"
 )
@@ -42,8 +42,9 @@ func (d *Docker) Validate() error {
 	return nil
 }
 
-func (d *Docker) Build(_ types.PipelineType, _ string) (*types.Jobs, error) {
-	tag := los.GetLatestVersion(environment.CI_PROJECT_ID.Get(), d.Path)
+func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ string) (*types.Jobs, error) {
+	client := factory.GetClients().GetLosClient()
+	tag := client.GetLatestVersion(environment.CI_PROJECT_ID.Get(), d.Path)
 	if _, err := environment.CI_MERGE_REQUEST_ID.Lookup(); err != nil {
 		environment.GetNewVersion(tag)
 	}

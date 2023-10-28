@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/pipeline/jobs/golang"
 	"kapigen.kateops.com/internal/pipeline/types"
 )
@@ -28,7 +29,7 @@ func (g Golang) Validate() error {
 	return nil
 }
 
-func (g Golang) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
+func (g Golang) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var allJobs = types.Jobs{}
 	test, err := golang.NewUnitTest(g.ImageName, g.Path)
 	if err != nil {
@@ -36,7 +37,7 @@ func (g Golang) Build(pipelineType types.PipelineType, Id string) (*types.Jobs, 
 	}
 	docker := g.Docker
 	if docker != nil {
-		jobs, err := types.GetPipelineJobs(docker, pipelineType, Id)
+		jobs, err := types.GetPipelineJobs(factory, docker, pipelineType, Id)
 		if err != nil {
 			return nil, err
 		}

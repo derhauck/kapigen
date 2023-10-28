@@ -37,3 +37,24 @@ func DefaultReleasePipelineRules() *Rules {
 		},
 	}
 }
+
+type DefaultPipelineRule struct {
+	Changes wrapper.StringSlice
+	Rules   *Rules
+}
+
+func (d *DefaultPipelineRule) GetChanges() wrapper.StringSlice {
+	return d.Changes
+}
+
+func (d *DefaultPipelineRule) Get() *Rules {
+	rules := *d.Rules
+	for _, rule := range rules.Get() {
+		if len(rule.Changes.Get()) > 0 {
+			for _, change := range d.Changes.Get() {
+				rule.AddChange(change)
+			}
+		}
+	}
+	return &rules
+}

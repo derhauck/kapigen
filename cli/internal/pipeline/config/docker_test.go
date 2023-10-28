@@ -1,6 +1,9 @@
 package config
 
-import "testing"
+import (
+	"kapigen.kateops.com/factory"
+	"testing"
+)
 
 func TestDocker_New(t *testing.T) {
 	t.Run("Can create new Docker", func(t *testing.T) {
@@ -24,7 +27,7 @@ func TestDocker_Build(t *testing.T) {
 			Path:    "test",
 			Context: "not set",
 		}
-		jobs, err := docker.Build(DockerPipeline, "testId")
+		jobs, err := docker.Build(factory.New(), DockerPipeline, "testId")
 		if err != nil {
 			t.Errorf("Build failed with: %s", err.Error())
 		}

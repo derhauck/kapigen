@@ -68,6 +68,17 @@ Trigger Tests:
 
 Trigger No-Merge Tests:
   stage: trigger
+  when: manual
+  allow_failure: true
+  parallel:
+    matrix:
+      - load:
+          - pip1
+          - pip2
+          - pip3
+          - pip4
+          - pip5
+          - pip6
   trigger:
     strategy: depend
     include:

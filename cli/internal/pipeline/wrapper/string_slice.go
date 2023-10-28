@@ -17,6 +17,15 @@ func (s *StringSlice) Get() []string {
 	return s.Value
 }
 
+func (s *StringSlice) Has(script string) bool {
+	for _, value := range s.Value {
+		if value == script {
+			return true
+		}
+	}
+	return false
+}
+
 func NewStringSlice() *StringSlice {
 	return &StringSlice{
 		Value: []string{},

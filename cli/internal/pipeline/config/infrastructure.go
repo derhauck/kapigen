@@ -1,6 +1,7 @@
 package config
 
 import (
+	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/pipeline/jobs/infrastructure"
 	"kapigen.kateops.com/internal/pipeline/types"
 )
@@ -22,7 +23,7 @@ func (i *Infrastructure) Validate() error {
 	return nil
 }
 
-func (i *Infrastructure) Build(pipelineType types.PipelineType, _ string) (*types.Jobs, error) {
+func (i *Infrastructure) Build(_ *factory.MainFactory, pipelineType types.PipelineType, _ string) (*types.Jobs, error) {
 	var init = infrastructure.
 		NewTerraformInit(i.Path, i.State, i.S3)
 	var plan = infrastructure.

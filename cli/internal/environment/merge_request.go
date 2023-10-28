@@ -3,6 +3,7 @@ package environment
 import (
 	"fmt"
 	"github.com/Masterminds/semver/v3"
+	"github.com/xanzy/go-gitlab"
 	"kapigen.kateops.com/internal/logger"
 	"regexp"
 	"strings"
@@ -20,7 +21,18 @@ func getVersionIncrease() string {
 		}
 	}
 	logger.Error("no version increase found")
-	return "patch"
+	return "none"
+}
+
+func GetTagFromGitlab(client *gitlab.Client) string {
+	oderBy := "updated"
+	tags, _, err := client.Tags.ListTags(CI_PROJECT_ID.Get(), &gitlab.ListTagsOptions{OrderBy: &oderBy})
+	if err != nil {
+		logger.ErrorE(err)
+		return "0.0.0"
+	}
+	logger.DebugAny(tags)
+	return tags[0].Name
 }
 
 func GetNewVersion(version string) string {

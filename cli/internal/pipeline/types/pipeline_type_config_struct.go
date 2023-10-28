@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v3"
+	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/logger"
 	"os"
 )
@@ -13,6 +14,7 @@ type PipelineTypeConfig struct {
 	Type       PipelineType `yaml:"type"`
 	Config     interface{}  `yaml:"config"`
 	PipelineId string       `yaml:"id"`
+	Need       []string     `yaml:"need"`
 }
 
 func (p *PipelineTypeConfig) Decode(configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
@@ -26,7 +28,7 @@ func (p *PipelineTypeConfig) Decode(configTypes map[PipelineType]PipelineConfigI
 		return nil, err
 	}
 
-	jobs, err := GetPipelineJobs(pipelineConfig, p.Type, p.PipelineId)
+	jobs, err := GetPipelineJobs(factory.New(), pipelineConfig, p.Type, p.PipelineId)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +54,7 @@ type PipelineConfig struct {
 	Pipelines []PipelineTypeConfig `yaml:"pipelines"`
 }
 
-func GetPipelineJobs(config PipelineConfigInterface, pipelineType PipelineType, pipelineId string) (*Jobs, error) {
+func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterface, pipelineType PipelineType, pipelineId string) (*Jobs, error) {
 	err := config.Validate()
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf(
@@ -63,7 +65,7 @@ func GetPipelineJobs(config PipelineConfigInterface, pipelineType PipelineType, 
 		))
 	}
 
-	jobs, err := config.Build(pipelineType, pipelineId)
+	jobs, err := config.Build(factory, pipelineType, pipelineId)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf(
 			"Pipeline type: %s, id: %s, encountered build error: %s",

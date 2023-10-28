@@ -16,6 +16,14 @@ type Rule struct {
 	When         WhenWrapper         `yaml:"when"`
 }
 
+func (r *Rule) AddChange(path string) *Rule {
+	if !r.Changes.Has(path) {
+		r.Changes.Add(path)
+	}
+
+	return r
+}
+
 type WhenWrapper struct {
 	Value *when.When
 }
@@ -38,7 +46,7 @@ type Rules []*Rule
 func (r *Rules) AddPathToChanges(path string) *Rules {
 	for _, rule := range r.Get() {
 		if len(rule.Changes.Get()) > 0 {
-			rule.Changes.Add(path)
+			rule.AddChange(path)
 		}
 	}
 	return r

@@ -4,21 +4,33 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/logger"
 	"net/http"
 )
 
 const LosHostName = "los.kateops.com"
 
-func GetLatestVersion(projectId string, path string) string {
+type Client struct {
+	client   *http.Client
+	Hostname string
+	Token    string
+}
+
+func NewClient(hostname string, token string) *Client {
+	return &Client{
+		client:   &http.Client{},
+		Hostname: hostname,
+		Token:    token,
+	}
+}
+
+func (c *Client) GetLatestVersion(projectId string, path string) string {
 	var defaultVersion = "0.0.0"
 	req, err := http.NewRequest("GET",
-		fmt.Sprintf("https://%s/v1/projects/%s/versions/latest?path=%s", LosHostName, projectId, path),
+		fmt.Sprintf("https://%s/v1/projects/%s/versions/latest?path=%s", c.Hostname, projectId, path),
 		nil)
-	client := &http.Client{}
-	req.Header.Set("AUTH", environment.LOS_AUTH_TOKEN.Get())
-	resp, err := client.Do(req)
+	req.Header.Set("AUTH", c.Token)
+	resp, err := c.client.Do(req)
 
 	if resp.StatusCode == 404 {
 		return defaultVersion
@@ -41,7 +53,7 @@ func GetLatestVersion(projectId string, path string) string {
 	return versionResponse.Version
 }
 
-func SetVersion(projectId string, version string, path string, tag string, latest bool) bool {
+func (c *Client) SetVersion(projectId string, version string, path string, tag string, latest bool) bool {
 	var versionEndpoint = "https://%s/v1/projects/%s/versions"
 	if latest {
 		versionEndpoint = "https://%s/v1/projects/%s/versions/latest"
@@ -56,14 +68,13 @@ func SetVersion(projectId string, version string, path string, tag string, lates
 		return false
 	}
 	req, err := http.NewRequest("POST",
-		fmt.Sprintf(versionEndpoint, LosHostName, projectId),
+		fmt.Sprintf(versionEndpoint, c.Hostname, projectId),
 		bytes.NewReader(body),
 	)
-	client := &http.Client{}
-	req.Header.Set("AUTH", environment.LOS_AUTH_TOKEN.Get())
+	req.Header.Set("AUTH", c.Token)
 	req.Header.Set("Content-Type", "application/json")
 
-	res, err := client.Do(req)
+	res, err := c.client.Do(req)
 	if err != nil {
 		logger.ErrorE(err)
 		return false
