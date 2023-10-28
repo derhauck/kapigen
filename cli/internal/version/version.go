@@ -89,14 +89,14 @@ func (c *Controller) Refresh() *Controller {
 	c.refresh = true
 	return c
 }
-func (c *Controller) getCurrentTag() string {
+func (c *Controller) getCurrentTag(path string) string {
 	if c.current == "" || c.refresh {
 		c.refresh = false
 		if c.mode == Gitlab {
 			c.current = c.getTagFromGitlab()
 		}
 		if c.mode == Los {
-
+			c.current = c.getTagFromLos(path)
 		}
 	}
 	return c.current
