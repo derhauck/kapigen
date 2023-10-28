@@ -6,6 +6,7 @@ ENV GOCACHE=/app/.cache
 
 COPY cmd /app/cmd
 COPY internal /app/internal
+COPY factory /app/factory
 COPY go.mod go.sum main.go /app/
 #COPY .cache /app/.cache
 #COPY .pkg /app/.pkg

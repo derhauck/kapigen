@@ -44,6 +44,7 @@ func (d *Docker) Validate() error {
 
 func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ string) (*types.Jobs, error) {
 	client := factory.GetClients().GetLosClient()
+	//controller := factory.GetVersion()
 	tag := client.GetLatestVersion(environment.CI_PROJECT_ID.Get(), d.Path)
 	if _, err := environment.CI_MERGE_REQUEST_ID.Lookup(); err != nil {
 		environment.GetNewVersion(tag)

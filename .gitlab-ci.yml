@@ -66,10 +66,17 @@ Trigger Tests:
     forward:
       pipeline_variables: true
 
-Trigger No-Merge Tests:
+
+Start Big Pipeline:
   stage: trigger
   when: manual
   allow_failure: true
+  image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21
+  script:
+    - echo "trigger big pipeline"
+
+Trigger No-Merge Tests:
+  stage: trigger
   parallel:
     matrix:
       - load:
@@ -84,6 +91,7 @@ Trigger No-Merge Tests:
     include:
       - artifact: cli/pipeline-no-merge.yaml
         job: Tests
-
     forward:
       pipeline_variables: true
+  needs:
+    - Start Big Pipeline
