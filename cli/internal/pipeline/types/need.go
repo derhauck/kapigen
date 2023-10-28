@@ -2,7 +2,6 @@ package types
 
 import (
 	"kapigen.kateops.com/internal/gitlab/job"
-	"strings"
 )
 
 type Need struct {
@@ -107,7 +106,7 @@ func NewNeed(job *Job) *Need {
 func (n *Need) Render() *job.NeedYaml {
 	return &job.NeedYaml{
 		Optional: n.Optional,
-		Job:      n.Job.GetName() + strings.Join(n.Job.Names, ","),
+		Job:      n.Job.GetName(),
 	}
 }
 
