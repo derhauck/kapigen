@@ -31,7 +31,7 @@ func (c *CiPipeline) Render() *CiPipelineYaml {
 
 func NewDefaultCiPipeline() *CiPipeline {
 	return &CiPipeline{
-		Stages: wrapper.NewStringSlice().AddSeveral(stages.GetAllStages()),
+		Stages: wrapper.NewStringSlice().AddSlice(stages.GetAllStages()),
 		Default: CiPipelineDefault{
 			AfterScript:  job.NewAfterScript(),
 			BeforeScript: job.NewBeforeScript(),

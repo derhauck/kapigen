@@ -13,10 +13,10 @@ import (
 
 func NewTerraformInit(path string, state string, s3 bool) *types.Job {
 	return types.NewJob("Init", docker.Terraform_Base.String(), func(ciJob *job.CiJob) {
-		ciJob.BeforeScript.Value.AddSeveral([]string{
+		ciJob.BeforeScript.Value.AddSeveral(
 			"echo \"credentials \\\\\"${CI_SERVER_HOST}\\\\\" {\\n  token = \\\\\"${CI_PIPELINE_TOKEN}\\\\\"\\n}\" > gitlab.tfrc",
 			"export TF_CLI_CONFIG_FILE=${PWD}/gitlab.tfrc",
-		})
+		)
 		project, err := environment.CI_PROJECT_ID.Lookup()
 		if err != nil {
 			logger.ErrorE(err)

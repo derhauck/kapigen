@@ -84,10 +84,11 @@ Trigger No-Merge Tests:
           - pip2
           - pip3
           - pip4
-          - pip5
-          - pip6
-          - pip7
-          - pip8
+# overkill, will not cause more load since karpenter limits runner
+#          - pip5
+#          - pip6
+#          - pip7
+#          - pip8
   trigger:
     strategy: depend
     include:

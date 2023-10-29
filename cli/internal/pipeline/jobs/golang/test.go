@@ -9,9 +9,10 @@ import (
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/pipeline/types"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
+	"strings"
 )
 
-func NewUnitTest(image string, path string) (*types.Job, error) {
+func NewUnitTest(image string, path string, packages []string) (*types.Job, error) {
 	if image == "" {
 		return nil, errors.New("no image set, required")
 	}
@@ -24,12 +25,14 @@ func NewUnitTest(image string, path string) (*types.Job, error) {
 		if path == "." {
 			reportPath = "report.xml"
 		}
+		coveragePkg := strings.Join(packages, ",")
+
 		ciJob.SetImageName(image).
 			TagMediumPressure().
 			SetStage(stages.TEST).
 			AddBeforeScript(fmt.Sprintf("cd %s", path)).
 			AddScript("go install github.com/jstemmer/go-junit-report/v2@latest").
-			AddScript("go test -cover ./... -coverpkg=./... -coverprofile=profile.cov").
+			AddScript(fmt.Sprintf("go test -cover ./... -coverpkg=%s -coverprofile=profile.cov", coveragePkg)).
 			AddScript("go tool cover -func profile.cov").
 			AddScript("go test -json ./... 2>&1 | go-junit-report -parser gojson -iocopy -out report.xml").
 			AddVariable("KTC_PATH", path).

@@ -17,7 +17,7 @@ type Artifact struct {
 }
 
 func NewArtifact(name string, paths []string) Artifact {
-	artifactPaths := wrapper.NewStringSlice().AddSeveral(paths)
+	artifactPaths := wrapper.NewStringSlice().AddSlice(paths)
 	return Artifact{
 		Name:  name,
 		Paths: *artifactPaths,

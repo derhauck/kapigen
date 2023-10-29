@@ -8,9 +8,13 @@ func (s *StringSlice) Add(script string) *StringSlice {
 	s.Value = append(s.Value, script)
 	return s
 }
-func (s *StringSlice) AddSeveral(script []string) *StringSlice {
+func (s *StringSlice) AddSeveral(script ...string) *StringSlice {
 	s.Value = append(s.Value, script...)
 	return s
+}
+
+func (s *StringSlice) AddSlice(script []string) *StringSlice {
+	return s.AddSeveral(script...)
 }
 
 func (s *StringSlice) Get() []string {
