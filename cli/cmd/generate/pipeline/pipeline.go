@@ -3,6 +3,7 @@ package pipeline
 import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
+	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/cli"
 	"kapigen.kateops.com/internal/gitlab/pipeline"
 	"kapigen.kateops.com/internal/logger"
@@ -29,7 +30,7 @@ var Cmd = &cobra.Command{
 		}
 
 		logger.Info("will read pipeline config from: " + configPath)
-		pipelineJobs, err := types.LoadJobsFromPipelineConfig(configPath, config.PipelineConfigTypes)
+		pipelineJobs, err := types.LoadJobsFromPipelineConfig(factory.New(), configPath, config.PipelineConfigTypes)
 		if err != nil {
 			return err
 		}

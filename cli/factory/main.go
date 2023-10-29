@@ -10,9 +10,13 @@ type MainFactory struct {
 func New() *MainFactory {
 	return &MainFactory{}
 }
-func (m *MainFactory) GetVersion() *version.Controller {
+func (m *MainFactory) GetVersionController() *version.Controller {
 	if m.version == nil {
-		m.version = m.newVersionController(version.Gitlab)
+		m.version = version.NewController(
+			version.Gitlab,
+			m.GetClients().GetGitlabClient(),
+			m.GetClients().GetLosClient(),
+		)
 	}
 	return m.version
 }

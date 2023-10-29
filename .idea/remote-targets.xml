@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteTargetsManager">
+    <option name="projectDefaultTargetUuid" value="07af83bb-4644-4807-b5b8-551be53710b2" />
+    <targets>
+      <target name="app" type="docker-compose" uuid="07af83bb-4644-4807-b5b8-551be53710b2">
+        <config>
+          <option name="targetPlatform">
+            <TargetPlatform />
+          </option>
+          <option name="configurationFiles">
+            <list>
+              <option value="$PROJECT_DIR$/cli/docker-compose.yml" />
+            </list>
+          </option>
+          <option name="envs">
+            <map>
+              <entry key="ENVIRONMENT" value="DEV" />
+              <entry key="GOCACHE" value="/app/.cache" />
+              <entry key="GOMODCACHE" value="/app/.pkg" />
+            </map>
+          </option>
+          <option name="serviceName" value="app" />
+        </config>
+        <ContributedStateBase type="GoLanguageRuntime">
+          <config>
+            <option name="goRoot" value="/usr/local/go/bin/go" />
+            <option name="goVersion" value="go1.21.3 linux/amd64" />
+          </config>
+        </ContributedStateBase>
+      </target>
+    </targets>
+  </component>
+</project>

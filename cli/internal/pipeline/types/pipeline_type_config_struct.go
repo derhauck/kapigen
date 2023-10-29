@@ -17,7 +17,7 @@ type PipelineTypeConfig struct {
 	Need       []string     `yaml:"need"`
 }
 
-func (p *PipelineTypeConfig) Decode(configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
+func (p *PipelineTypeConfig) Decode(factory *factory.MainFactory, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
 	logger.Info(fmt.Sprintf("decoding pipeline type %s, id: %s", p.Type, p.PipelineId))
 	var pipelineConfig = configTypes[p.Type].New()
 	if pipelineConfig == nil {
@@ -28,7 +28,7 @@ func (p *PipelineTypeConfig) Decode(configTypes map[PipelineType]PipelineConfigI
 		return nil, err
 	}
 
-	jobs, err := GetPipelineJobs(factory.New(), pipelineConfig, p.Type, p.PipelineId)
+	jobs, err := GetPipelineJobs(factory, pipelineConfig, p.Type, p.PipelineId)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 	return jobs, nil
 }
 
-func LoadJobsFromPipelineConfig(configPath string, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
+func LoadJobsFromPipelineConfig(factory *factory.MainFactory, configPath string, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
 	body, err := os.ReadFile(configPath)
 
 	if err != nil {
@@ -90,7 +90,7 @@ func LoadJobsFromPipelineConfig(configPath string, configTypes map[PipelineType]
 		return nil, err
 	}
 
-	jobs, err := pipelineConfig.Decode(configTypes)
+	jobs, err := pipelineConfig.Decode(factory, configTypes)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func LoadJobsFromPipelineConfig(configPath string, configTypes map[PipelineType]
 	return jobs, nil
 }
 
-func (p *PipelineConfig) Decode(configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
+func (p *PipelineConfig) Decode(factory *factory.MainFactory, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
 
 	var pipelineJobs Jobs
 
@@ -112,7 +112,7 @@ func (p *PipelineConfig) Decode(configTypes map[PipelineType]PipelineConfigInter
 			value, _ := yaml.Marshal(configuration)
 			return nil, errors.New(fmt.Sprintf("no pipeline type set for pipeline %v", string(value)))
 		}
-		jobs, err := configuration.Decode(configTypes)
+		jobs, err := configuration.Decode(factory, configTypes)
 		if err != nil {
 			return nil, err
 		}

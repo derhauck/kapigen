@@ -69,7 +69,7 @@ Trigger Tests:
 
 Start Big Pipeline:
   stage: trigger
-#  when: manual
+  when: manual
   allow_failure: true
   image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21
   script:

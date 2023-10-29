@@ -53,7 +53,7 @@ func (v Variable) Set(value string) {
 }
 
 func (v Variable) SetIfEmpty(value string) bool {
-	if v.Get() == "" {
+	if _, err := v.Lookup(); err != nil {
 		v.Set(value)
 		return true
 	}
