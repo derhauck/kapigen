@@ -27,7 +27,7 @@ func (c *Clients) GetLosClient() *los.Client {
 
 func (c *Clients) GetGitlabClient() *gitlab.Client {
 	if c.Gitlab == nil {
-		client, err := gitlab.NewJobClient(environment.CI_JOB_TOKEN.Get(), gitlab.WithBaseURL(GitlabUrl))
+		client, err := gitlab.NewClient(environment.CI_PIPELINE_TOKEN.Get(), gitlab.WithBaseURL(GitlabUrl))
 		if err != nil {
 			logger.Error("could not create gitlab client")
 			return nil
