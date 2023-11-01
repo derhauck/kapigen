@@ -10,8 +10,11 @@ func (p PipelineType) String() string {
 	return string(p)
 }
 
+type ConfigInterface interface {
+	Validate() error
+}
 type PipelineConfigInterface interface {
 	New() PipelineConfigInterface
-	Validate() error
+	ConfigInterface
 	Build(factory *factory.MainFactory, pipelineType PipelineType, Id string) (*Jobs, error)
 }

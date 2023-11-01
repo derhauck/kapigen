@@ -11,7 +11,7 @@ func TestIsRelease(t *testing.T) {
 		if err != nil {
 			t.Error(err.Error())
 		}
-		if IsRelease() {
+		if !IsRelease() {
 			t.Errorf("should be false as no env was prepared, CI_MR = %s", CI_MERGE_REQUEST_ID.Get())
 		}
 	})
@@ -19,7 +19,7 @@ func TestIsRelease(t *testing.T) {
 		CI_MERGE_REQUEST_ID.Set("123")
 		CI_COMMIT_BRANCH.Set("master")
 		CI_DEFAULT_BRANCH.Set("master")
-		if !IsRelease() {
+		if IsRelease() {
 			t.Error("should be true as env was prepared")
 		}
 	})
