@@ -7,11 +7,12 @@ import (
 
 func TestIsRelease(t *testing.T) {
 	t.Run("will be wrong without env", func(t *testing.T) {
+		SetLocalEnv()
 		err := os.Unsetenv(CI_MERGE_REQUEST_ID.Key())
 		if err != nil {
 			t.Error(err.Error())
 		}
-		if !IsRelease() {
+		if IsRelease() {
 			t.Errorf("should be false as no env was prepared, CI_MR = %s", CI_MERGE_REQUEST_ID.Get())
 		}
 	})

@@ -14,7 +14,7 @@ func DefaultPipelineRules() *Rules {
 		&Rule{
 			If:      "($CI_MERGE_REQUEST_IID || $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH)",
 			Changes: *wrapper.NewStringSlice().Add("${KTC_PATH}/**/*"),
-			When:    NewWhen(when.Always),
+			When:    NewWhen(when.OnSuccess),
 		},
 		&Rule{
 			If: "$KTC_TEST_PIPELINE",
@@ -30,7 +30,7 @@ func DefaultReleasePipelineRules() *Rules {
 		&Rule{
 			If:      "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
 			Changes: *wrapper.NewStringSlice().Add("${KTC_PATH}/**/*"),
-			When:    NewWhen(when.Always),
+			When:    NewWhen(when.OnSuccess),
 		},
 		&Rule{
 			If: "$KTC_TEST_PIPELINE",
