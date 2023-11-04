@@ -8,6 +8,7 @@ import (
 	"kapigen.kateops.com/internal/gitlab/pipeline"
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/config"
+	"kapigen.kateops.com/internal/pipeline/jobs"
 	"kapigen.kateops.com/internal/pipeline/types"
 	"os"
 )
@@ -30,11 +31,22 @@ var Cmd = &cobra.Command{
 		}
 
 		logger.Info("will read pipeline config from: " + configPath)
-		pipelineJobs, err := types.LoadJobsFromPipelineConfig(factory.New(), configPath, config.PipelineConfigTypes)
+		pipelineJobs, pipelineConfig, err := types.LoadJobsFromPipelineConfig(factory.New(), configPath, config.PipelineConfigTypes)
 		if err != nil {
 			return err
 		}
 		logger.Info("ci jobs created")
+
+		if pipelineConfig.Noop {
+			logger.Info("noop mode activated, will add \"Noop\" job to pipeline")
+			pipelineJobs.AddJob(jobs.NewNoop())
+		}
+
+		if pipelineConfig.Tag {
+			logger.Info("tag mode activated, will add \"Tag\" job to pipeline")
+			pipelineJobs.AddJob(jobs.NewTag())
+		}
+
 		merge, err := cmd.Flags().GetBool("no-merge")
 		if err != nil {
 			return err

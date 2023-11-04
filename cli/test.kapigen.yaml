@@ -1,3 +1,5 @@
+noop: true
+tag: true
 pipelines:
   - type: docker
     id: test-cli
