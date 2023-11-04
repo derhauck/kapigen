@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  app:
+    image: golang:1.21
+    command: go run . generate pipeline -v --config test.kapigen.yaml
+    env_file: .env
+    working_dir: /app
+    environment:
+      GOMODCACHE: /app/.pkg
+      GOCACHE: /app/.cache
+      ENVIRONMENT: DEV
+    volumes:
+      - .:/app

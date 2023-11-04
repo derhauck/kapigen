@@ -1,0 +1,75 @@
+Build:
+    after_script: []
+    allow_failure: false
+    before_script:
+        - echo "REGISTRY_PUSH_USER=$REGISTRY_PUSH_USER" > .env
+        - echo "REGISTRY_PUSH_TOKEN=$REGISTRY_PUSH_TOKEN" >> .env
+        - touch .status.init
+        - while [ ! -f $CI_PROJECT_DIR/.status.auth ]; do echo 'wait for auth'; sleep 1; done
+    script:
+        - |
+          buildctl build --frontend dockerfile.v0 --local context="cli" --local dockerfile="cli"  \
+          --progress plain --opt filename="Dockerfile" --export-cache type=inline  \
+          --import-cache type=registry,ref="${CI_REGISTRY_IMAGE}/cli"  \
+          --output type=image,name="${CI_REGISTRY_IMAGE}/cli",push=true  \
+    needs: []
+    variables:
+        BUILDKIT_HOST: tcp://buildkitd:1234
+        DOCKER_CONFIG: $CI_PROJECT_DIR
+        KTC_PATH: cli
+    image:
+        name: gitlab.kateops.com/infrastructure/dependency_proxy/containers/moby/buildkit:master
+        entrypoint:
+            - sh
+            - -c
+        pull_policy: always
+    rules:
+        - if: $KTC_STOP_PIPELINE != "false" && $DEBUG == null
+          allow_failure: false
+          when: never
+        - if: ($CI_MERGE_REQUEST_IID || $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH)
+          changes:
+            - ${KTC_PATH}/**/*
+          allow_failure: false
+          when: always
+        - if: $KTC_TEST_PIPELINE
+          allow_failure: false
+          when: on_success
+    stage: dynamic
+    services:
+        - name: gitlab.kateops.com/infrastructure/dependency_proxy/containers/moby/buildkit:master-rootless
+          command:
+            - --addr
+            - unix:///run/user/1000/buildkit/buildkitd.sock
+            - --addr
+            - tcp://0.0.0.0:1234
+            - --oci-worker-no-process-sandbox
+          alias: buildkitd
+        - name: gitlab.kateops.com/infrastructure/dependency_proxy/containers/alpine:3.18
+          entrypoint:
+            - sh
+            - -c
+          command:
+            - sleep 300; touch $CI_PROJECT_DIR/.status.auth
+          alias: failover
+        - name: gcr.io/go-containerregistry/crane:debug
+          entrypoint:
+            - sh
+            - -c
+          command:
+            - while [ ! -f $CI_PROJECT_DIR/.status.init ]; do echo 'wait for init'; sleep 1; done; export $(cat $CI_PROJECT_DIR/.env); crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}; crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} gitlab.kateops.com; touch $CI_PROJECT_DIR/.status.auth
+          alias: crane
+          variables:
+            DOCKER_CONFIG: $CI_PROJECT_DIR
+    tags:
+        - pressure::medium
+stages:
+    - build
+    - test
+    - release
+    - dynamic
+    - trigger
+    - lint
+    - init
+variables:
+    KTC_STOP_PIPELINE: "false"

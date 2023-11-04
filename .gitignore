@@ -1,0 +1,6 @@
+/**/.pkg
+/**/.cache
+/**/.bin
+/**/.env
+/**/pipeline.yaml
+/**/profile.cov

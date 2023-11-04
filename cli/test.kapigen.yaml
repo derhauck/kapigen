@@ -1,0 +1,76 @@
+pipelines:
+  - type: docker
+    id: test-cli
+    config:
+      path: cli
+      name: test-cli
+  - type: docker
+    id: test-file
+    config:
+      path: cli
+      name: test-file
+  - type: docker
+    id: duplicate-test
+    config:
+      path: cli
+      dockerfile: Dockerfile
+      name: test-cli
+  - type: golang
+    id: test-go
+    config:
+      imageName: 'gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21.3-alpine3.18'
+      path: cli
+      docker:
+        path: cli
+        name: test-file
+  - type: docker
+    id: test-cli2
+    config:
+      path: cli
+      name: test-cli
+  - type: docker
+    id: test-file2
+    config:
+      path: cli
+      name: test-file
+  - type: docker
+    id: duplicate-test2
+    config:
+      path: cli
+      dockerfile: Dockerfile
+      name: test-cli
+  - type: golang
+    id: test-go2
+    config:
+      imageName: 'gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21.3-alpine3.18'
+      path: cli
+      docker:
+        path: cli
+        name: test-file
+  - type: docker
+    id: test-cli3
+    config:
+      path: cli
+      name: test-cli
+  - type: docker
+    id: test-file3
+    config:
+      path: cli
+      name: test-file
+  - type: docker
+    id: duplicate-test3
+    config:
+      path: cli
+      dockerfile: Dockerfile
+      name: test-cli
+  - type: golang
+    id: test-go3
+    config:
+      imageName: 'gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21.3-alpine3.18'
+      path: cli
+      coverage:
+        packages:
+          - ./...
+      docker:
+        path: cli
+        name: test-file

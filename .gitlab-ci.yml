@@ -1,0 +1,100 @@
+workflow:
+  rules:
+    - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
+    - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train"
+    - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+    - when: never
+
+default:
+  tags:
+    - pressure::medium
+stages:
+  - build
+  - trigger
+
+Build:
+  stage: build
+  image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21
+
+  before_script:
+    - cd cli
+  script:
+    - go mod download
+    - go run . generate pipeline -v
+  artifacts:
+    paths:
+      - cli/pipeline.yaml
+
+Tests:
+  stage: build
+  image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21
+
+  before_script:
+    - cd cli
+  script:
+    - go mod download
+    - go run . generate pipeline -v --config test.kapigen.yaml
+    - go run . generate pipeline -v --config test.kapigen.yaml --no-merge --file pipeline-no-merge.yaml
+  artifacts:
+    paths:
+      - cli/pipeline.yaml
+      - cli/pipeline-no-merge.yaml
+
+
+Trigger Build:
+  stage: trigger
+  trigger:
+    strategy: depend
+    include:
+      - artifact: cli/pipeline.yaml
+        job: Build
+
+    forward:
+      pipeline_variables: true
+
+Trigger Tests:
+  stage: trigger
+  trigger:
+    strategy: depend
+    include:
+      - artifact: cli/pipeline.yaml
+        job: Tests
+
+    forward:
+      pipeline_variables: true
+
+
+Start Big Pipeline:
+  stage: trigger
+  when: manual
+  allow_failure: true
+  image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21
+  script:
+    - echo "trigger big pipeline"
+
+Trigger No-Merge Tests:
+  stage: trigger
+  parallel:
+    matrix:
+      - load:
+          - pip1
+          - pip2
+          - pip3
+          - pip4
+# overkill, will not cause more load since karpenter limits runner
+#          - pip5
+#          - pip6
+#          - pip7
+#          - pip8
+  trigger:
+    strategy: depend
+    include:
+      - artifact: cli/pipeline-no-merge.yaml
+        job: Tests
+    forward:
+      pipeline_variables: true
+  needs:
+    - Start Big Pipeline
