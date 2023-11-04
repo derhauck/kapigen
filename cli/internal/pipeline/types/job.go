@@ -44,6 +44,12 @@ func (j *Job) AddSeveralNeeds(needs *Needs) *Job {
 }
 
 func (j *Job) RenderNeeds() *Job {
+	if j.CiJobYaml == nil {
+		err := j.Render()
+		if err != nil {
+			return nil
+		}
+	}
 	if j.Needs != nil {
 		j.CiJobYaml.Needs = j.Needs.NeedsYaml()
 	}
