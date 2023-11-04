@@ -56,6 +56,12 @@ func (r *Rules) Get() []*Rule {
 	return *r
 }
 
+func (r *Rules) Add(rule *Rule) *Rules {
+	tmp := append(*r, rule)
+	*r = tmp
+	return r
+}
+
 type RuleYaml struct {
 	If           string   `yaml:"if"`
 	Changes      []string `yaml:"changes,omitempty"`

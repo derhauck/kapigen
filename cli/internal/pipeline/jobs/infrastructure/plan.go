@@ -25,7 +25,7 @@ func NewTerraformPlan(path string, state string, s3 bool) *types.Job {
 		ciJob.Variables = map[string]string{}
 		ciJob.Stage = stages.BUILD
 		ciJob.Variables["TF_STATE_PROJECT"] = project
-		ciJob.Rules = *job.DefaultReleasePipelineRules()
+		ciJob.Rules = *job.DefaultOnlyReleasePipelineRules()
 		ciJob.Cache.Paths.Add(fmt.Sprintf("%s/.terraform", path))
 		ciJob.Cache.SetActive().
 			SetPolicy(cache.Pull)
