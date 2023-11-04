@@ -101,3 +101,20 @@ func TestValue(t *testing.T) {
 	})
 
 }
+
+func TestVariable_Unset(t *testing.T) {
+	t.Run("Can unset CI vars", func(t *testing.T) {
+		t.Parallel()
+		var varsToCheck = []Variable{
+			CI_MERGE_REQUEST_ID,
+			CI_PROJECT_ID,
+		}
+		for _, value := range varsToCheck {
+			value.Set("123")
+			value.Unset()
+			if value.Get() != "" {
+				t.Errorf("CI variable for number '%v' should be unset", value)
+			}
+		}
+	})
+}

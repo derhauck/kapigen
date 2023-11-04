@@ -79,3 +79,10 @@ func (v Variable) Lookup() (string, error) {
 	}
 	return value, errors.New(fmt.Sprintf("env var '%s' is not set", v.Key()))
 }
+
+func (v Variable) Unset() {
+	err := os.Unsetenv(v.Key())
+	if err != nil {
+		logger.ErrorE(err)
+	}
+}

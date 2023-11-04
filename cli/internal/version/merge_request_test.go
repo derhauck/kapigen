@@ -47,3 +47,32 @@ func TestController_GetMrLabelsFromEnv(t *testing.T) {
 		}
 	})
 }
+
+func TestGetNewVersion(t *testing.T) {
+	t.Run("can get new version", func(t *testing.T) {
+
+		result := getNewVersion("1.0.0", "major")
+		if result != "2.0.0" {
+			t.Errorf("should be 2.0.0, got %s", result)
+		}
+
+		result = getNewVersion("1.0.0", "minor")
+		if result != "1.1.0" {
+			t.Errorf("should be 1.1.0, got %s", result)
+		}
+
+		result = getNewVersion("1.0.0", "patch")
+		if result != "1.0.1" {
+			t.Errorf("should be 1.0.1, got %s", result)
+		}
+	})
+}
+
+func TestGetFeatureBranchVersion(t *testing.T) {
+	t.Run("can get feature branch version", func(t *testing.T) {
+		result := GetFeatureBranchVersion("1.0.0", "feature/test")
+		if result != "1.0.0-feature-test" {
+			t.Errorf("should be 1.0.0-feature-test, got %s", result)
+		}
+	})
+}

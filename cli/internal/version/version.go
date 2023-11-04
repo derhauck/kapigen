@@ -118,7 +118,7 @@ func (c *Controller) GetCurrentPipelineTag(path string) string {
 		return c.GetNewTag(path)
 	}
 
-	return c.GetCurrentTag(path)
+	return c.GetIntermediateTag(path)
 }
 
 func (c *Controller) GetNewTag(path string) string {

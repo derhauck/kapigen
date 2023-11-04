@@ -8,8 +8,16 @@ import (
 )
 
 func IsRelease() bool {
-	_, err := CI_MERGE_REQUEST_ID.Lookup()
-	if err == nil || CI_COMMIT_BRANCH.Get() != CI_DEFAULT_BRANCH.Get() {
+	commit, errCommit := CI_COMMIT_BRANCH.Lookup()
+	def, errDefault := CI_DEFAULT_BRANCH.Lookup()
+	mr, errMr := CI_MERGE_REQUEST_ID.Lookup()
+	if errDefault != nil || errCommit != nil {
+		return false
+	}
+	if errMr == nil || mr != "" {
+		return false
+	}
+	if commit != def {
 		return false
 	}
 	return true

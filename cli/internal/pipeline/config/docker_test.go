@@ -37,3 +37,44 @@ func TestDocker_Build(t *testing.T) {
 
 	})
 }
+
+func TestDocker_Validate(t *testing.T) {
+	t.Parallel()
+	t.Run("Can validate valid Docker config", func(t *testing.T) {
+		docker := Docker{
+			Path:    "test",
+			Context: "context",
+		}
+		err := docker.Validate()
+		if err != nil {
+			t.Error(err)
+		}
+		if docker.Path != "test" {
+			t.Error("path should be test")
+		}
+		if docker.Context != "context" {
+			t.Error("context should be context")
+		}
+		if docker.Dockerfile != "Dockerfile" {
+			t.Error("dockerfile should be Dockerfile")
+		}
+	})
+	t.Run("Can validate valid Docker config", func(t *testing.T) {
+		docker := Docker{
+			Path: "test",
+		}
+		err := docker.Validate()
+		if err != nil {
+			t.Error(err)
+		}
+		if docker.Path != "test" {
+			t.Error("path should be test")
+		}
+		if docker.Context != docker.Path {
+			t.Error("context should be same as path")
+		}
+		if docker.Dockerfile != "Dockerfile" {
+			t.Error("dockerfile should be Dockerfile")
+		}
+	})
+}
