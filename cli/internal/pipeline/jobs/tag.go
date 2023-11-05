@@ -24,7 +24,7 @@ func NewTagKapigen() *types.Job {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
 		ciJob.BeforeScript.Value.Add("cd cli")
 		ciJob.Script.Value.Add("go mod download").
-			Add("go run . version")
+			Add("go run . version -v --mode gitlab")
 		ciJob.Rules.Add(&job.Rule{
 			If:   "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
 			When: job.NewWhen(when.OnSuccess),
