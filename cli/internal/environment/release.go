@@ -51,7 +51,7 @@ func getMergeRequestIdFromEnv() int {
 
 }
 func getMergeRequestIdFromCommit(message string) int {
-	reg := regexp.MustCompile("![0-9]*$")
+	reg := regexp.MustCompile("![0-9]+")
 	stringId := reg.FindString(message)
 	if stringId == "" {
 		logger.Error(fmt.Sprintf("no merge request id found in commit message: %s", message))
