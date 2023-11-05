@@ -31,6 +31,9 @@ Build:
 Tests:
   stage: build
   image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21
+  rules:
+    - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
+    - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
 
   before_script:
     - cd cli
@@ -57,6 +60,9 @@ Trigger Build:
 
 Trigger Tests:
   stage: trigger
+  rules:
+    - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
+    - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
   trigger:
     strategy: depend
     include:
@@ -77,6 +83,9 @@ Start Big Pipeline:
 
 Trigger No-Merge Tests:
   stage: trigger
+  rules:
+    - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
+    - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
   parallel:
     matrix:
       - load:
