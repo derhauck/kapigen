@@ -9,7 +9,7 @@ import (
 	"kapigen.kateops.com/internal/version"
 )
 
-var versionCmd = &cobra.Command{
+var NewCmd = &cobra.Command{
 	Use:              "new",
 	Short:            "Will create a new version",
 	TraverseChildren: true,
@@ -33,6 +33,6 @@ var versionCmd = &cobra.Command{
 }
 
 func init() {
-	versionCmd.Flags().String("mode", version.Gitlab.Name(), "mode used for versioning: los,gitlab")
-	versionCmd.Flags().String("path", "", "path for version (los mode only)")
+	NewCmd.Flags().String("mode", version.Gitlab.Name(), "mode used for versioning: los,gitlab")
+	NewCmd.Flags().String("path", "", "path for version (los mode only)")
 }
