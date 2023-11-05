@@ -87,6 +87,26 @@ func (c *Controller) getTagFromGitlab() string {
 	return tags[0].Name
 }
 
+func (c *Controller) createTagFromGitlab(version string) string {
+	ref := environment.CI_DEFAULT_BRANCH.Get()
+	msg := "Kapigen auto increment new tag"
+	if c.gitlabClient == nil {
+		logger.Error("no gitlab client configured")
+		return EmptyTag
+	}
+	tag, _, err := c.gitlabClient.Tags.CreateTag(environment.CI_PROJECT_ID.Get(), &gitlab.CreateTagOptions{
+		TagName: &version,
+		Ref:     &ref,
+		Message: &msg,
+	})
+	if err != nil {
+		logger.ErrorE(err)
+		return EmptyTag
+	}
+	logger.DebugAny(tag)
+	return tag.Name
+}
+
 func (c *Controller) getTagFromLos(path string) string {
 	if c.refresh == false && c.current != "" {
 		return c.current
@@ -157,6 +177,22 @@ func (c *Controller) GetIntermediateTag(path string) string {
 	}
 	c.refresh = false
 	return c.intermediate
+}
+
+func (c *Controller) SetNewVersion(path string) string {
+	if c.new == "" || c.refresh {
+		c.GetNewTag(path)
+	}
+	switch c.mode {
+	case Gitlab:
+		return c.createTagFromGitlab(c.new)
+	case Los:
+		return c.new
+	case None:
+		return c.new
+	default:
+		return c.new
+	}
 }
 
 func (c *Controller) getVersionIncrease(projectId string, mrId int) string {

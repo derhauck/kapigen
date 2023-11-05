@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"kapigen.kateops.com/cmd/generate"
-	"kapigen.kateops.com/cmd/version"
 	"os"
 )
 
@@ -14,8 +12,8 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(generate.Cmd)
-	rootCmd.AddCommand(version.Cmd)
+	rootCmd.AddCommand(generateCmd)
+	rootCmd.AddCommand(versionCmd)
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "will log verbose output")
 }
 

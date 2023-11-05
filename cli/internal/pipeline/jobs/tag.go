@@ -9,9 +9,9 @@ import (
 )
 
 func NewTag() *types.Job {
-	return types.NewJob("Tag", docker.Alpine_3_18.String(), func(ciJob *job.CiJob) {
+	return types.NewJob("Tag", docker.Kapigen_Latest.String(), func(ciJob *job.CiJob) {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
-		ciJob.Script.Value.Add("echo \"Hello World!\"")
+		ciJob.Script.Value.Add("kapigen version -v --mode gitlab")
 		ciJob.Rules.Add(&job.Rule{
 			If:   "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
 			When: job.NewWhen(when.OnSuccess),
@@ -27,9 +27,6 @@ func NewTagKapigen() *types.Job {
 			Add("go run . version -v --mode gitlab")
 		ciJob.Rules.Add(&job.Rule{
 			If:   "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
-			When: job.NewWhen(when.OnSuccess),
-		}).Add(&job.Rule{
-			If:   "$CI_MERGE_REQUEST_ID",
 			When: job.NewWhen(when.OnSuccess),
 		})
 		ciJob.Rules = *job.RulesKapigen(&ciJob.Rules)

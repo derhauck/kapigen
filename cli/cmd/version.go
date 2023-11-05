@@ -1,4 +1,4 @@
-package version
+package cmd
 
 import (
 	"github.com/spf13/cobra"
@@ -8,7 +8,7 @@ import (
 	"kapigen.kateops.com/internal/version"
 )
 
-var Cmd = &cobra.Command{
+var versionCmd = &cobra.Command{
 	Use:              "version",
 	Short:            "Will modify or create a version",
 	TraverseChildren: true,
@@ -19,11 +19,9 @@ var Cmd = &cobra.Command{
 			return err
 		}
 		logger.Info("will create settings")
-		logger.DebugAny(mode)
 		settings := cli.NewSettings(
 			cli.SetMode(version.GetModeFromString(mode)),
 		)
-		logger.DebugAny(settings)
 		factory := factory.New(settings)
 
 		controller := factory.GetVersionController()
@@ -33,5 +31,5 @@ var Cmd = &cobra.Command{
 }
 
 func init() {
-	Cmd.Flags().String("mode", version.Gitlab.Name(), "mode used for versioning: los,gitlab")
+	versionCmd.Flags().String("mode", version.Gitlab.Name(), "mode used for versioning: los,gitlab")
 }
