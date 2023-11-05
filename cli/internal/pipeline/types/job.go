@@ -44,6 +44,12 @@ func (j *Job) AddSeveralNeeds(needs *Needs) *Job {
 }
 
 func (j *Job) RenderNeeds() *Job {
+	if j.CiJobYaml == nil {
+		err := j.Render()
+		if err != nil {
+			return nil
+		}
+	}
 	if j.Needs != nil {
 		j.CiJobYaml.Needs = j.Needs.NeedsYaml()
 	}
@@ -113,8 +119,19 @@ func (j *Job) compare(job *Job) bool {
 	return false
 }
 
+func (j *Job) toYamlConfiguration() *job.CiJobYaml {
+	if j.CiJobYaml == nil {
+		err := j.Render()
+		if err != nil {
+			logger.ErrorE(err)
+			return nil
+		}
+	}
+	return j.CiJobYaml
+}
+
 func (j *Job) compareConfiguration(job *Job) bool {
-	if j.CiJobYaml.String() == job.CiJobYaml.String() {
+	if j.toYamlConfiguration().String() == job.toYamlConfiguration().String() {
 		return true
 	}
 	if os.Getenv("DEBUG_DIFF") != "" {
@@ -155,6 +172,10 @@ func (j *Job) Render() error {
 
 type Jobs []*Job
 
+func (j *Jobs) AddJob(job *Job) *Jobs {
+	*j = append(*j, job)
+	return j
+}
 func (j *Jobs) GetJobs() []*Job {
 	return *j
 }

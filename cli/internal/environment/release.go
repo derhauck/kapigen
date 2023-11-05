@@ -32,9 +32,9 @@ func GetBranchName() string {
 
 func GetMergeRequestId() int {
 	if IsRelease() {
-		return getMergeRequestIdFromEnv()
+		return getMergeRequestIdFromCommit()
 	}
-	return getMergeRequestIdFromCommit()
+	return getMergeRequestIdFromEnv()
 }
 
 func getMergeRequestIdFromEnv() int {

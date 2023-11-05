@@ -8,7 +8,9 @@ import (
 	"strings"
 )
 
-const emptyTag = "0.0.0"
+const EmptyTag = "0.0.0"
+
+const NoTag = "latest"
 
 type Mode int
 
@@ -31,9 +33,9 @@ func (m Mode) getTag() string {
 }
 
 var values = map[Mode]string{
-	Gitlab: "Gitlab",
-	Los:    "Logic Operator Server",
-	None:   "No versioning",
+	Gitlab: "gitlab",
+	Los:    "los",
+	None:   "none",
 }
 
 func (m Mode) Name() string {
@@ -41,8 +43,7 @@ func (m Mode) Name() string {
 		return value
 	}
 	logger.Error("no mode found, use default")
-	m = Gitlab
-	return values[m]
+	return values[Gitlab]
 }
 
 type Controller struct {
@@ -75,15 +76,35 @@ func (c *Controller) getTagFromGitlab() string {
 	sort := "desc"
 	if c.gitlabClient == nil {
 		logger.Error("no gitlab client configured")
-		return emptyTag
+		return EmptyTag
 	}
 	tags, _, err := c.gitlabClient.Tags.ListTags(environment.CI_PROJECT_ID.Get(), &gitlab.ListTagsOptions{OrderBy: &oderBy, Sort: &sort})
 	if err != nil {
 		logger.ErrorE(err)
-		return emptyTag
+		return EmptyTag
 	}
 	logger.DebugAny(tags)
 	return tags[0].Name
+}
+
+func (c *Controller) createTagFromGitlab(version string) string {
+	ref := environment.CI_DEFAULT_BRANCH.Get()
+	msg := "Kapigen auto increment new tag"
+	if c.gitlabClient == nil {
+		logger.Error("no gitlab client configured")
+		return EmptyTag
+	}
+	tag, _, err := c.gitlabClient.Tags.CreateTag(environment.CI_PROJECT_ID.Get(), &gitlab.CreateTagOptions{
+		TagName: &version,
+		Ref:     &ref,
+		Message: &msg,
+	})
+	if err != nil {
+		logger.ErrorE(err)
+		return EmptyTag
+	}
+	logger.DebugAny(tag)
+	return tag.Name
 }
 
 func (c *Controller) getTagFromLos(path string) string {
@@ -91,7 +112,7 @@ func (c *Controller) getTagFromLos(path string) string {
 		return c.current
 	}
 	if c.losClient == nil {
-		return emptyTag
+		return EmptyTag
 	}
 	return c.losClient.GetLatestVersion(environment.CI_PROJECT_ID.Get(), path)
 }
@@ -101,11 +122,13 @@ func (c *Controller) Refresh() *Controller {
 }
 func (c *Controller) GetCurrentTag(path string) string {
 	if c.current == "" || c.refresh {
-		if c.mode == Gitlab {
+		switch c.mode {
+		case Gitlab:
 			c.current = c.getTagFromGitlab()
-		}
-		if c.mode == Los {
+		case Los:
 			c.current = c.getTagFromLos(path)
+		case None:
+			c.current = NoTag
 		}
 	}
 
@@ -123,17 +146,18 @@ func (c *Controller) GetCurrentPipelineTag(path string) string {
 
 func (c *Controller) GetNewTag(path string) string {
 	if c.new == "" || c.refresh {
-
-		if c.mode == Gitlab {
+		switch c.mode {
+		case Gitlab:
 			c.new = getNewVersion(
 				c.GetCurrentTag(path),
 				c.getVersionIncrease(environment.CI_PROJECT_ID.Get(), environment.GetMergeRequestId()),
 			)
-		}
-		if c.mode == Los {
-			c.current = "0.0.0"
-		}
+		case Los:
+			c.new = EmptyTag
+		case None:
+			c.new = NoTag
 
+		}
 	}
 	c.refresh = false
 	return c.new
@@ -141,15 +165,34 @@ func (c *Controller) GetNewTag(path string) string {
 
 func (c *Controller) GetIntermediateTag(path string) string {
 	if c.intermediate == "" || c.refresh {
-		if c.mode == Gitlab {
+		switch c.mode {
+		case Gitlab:
 			c.intermediate = GetFeatureBranchVersion(c.GetCurrentTag(path), environment.GetBranchName())
-		}
-		if c.mode == Los {
-			c.current = "0.0.0"
+		case Los:
+			c.intermediate = EmptyTag
+		case None:
+			c.intermediate = NoTag
+
 		}
 	}
 	c.refresh = false
 	return c.intermediate
+}
+
+func (c *Controller) SetNewVersion(path string) string {
+	if c.new == "" || c.refresh {
+		c.GetNewTag(path)
+	}
+	switch c.mode {
+	case Gitlab:
+		return c.createTagFromGitlab(c.new)
+	case Los:
+		return c.new
+	case None:
+		return c.new
+	default:
+		return c.new
+	}
 }
 
 func (c *Controller) getVersionIncrease(projectId string, mrId int) string {
@@ -168,4 +211,15 @@ func (c *Controller) getMrLabelsFromApi(projectId string, mrId int) string {
 		return "none"
 	}
 	return strings.Join(mr.Labels, ",")
+}
+
+func GetModeFromString(mode string) Mode {
+	switch mode {
+	case Gitlab.Name():
+		return Gitlab
+	case Los.Name():
+		return Los
+	default:
+		return None
+	}
 }

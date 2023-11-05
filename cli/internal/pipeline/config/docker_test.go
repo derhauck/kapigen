@@ -2,6 +2,8 @@ package config
 
 import (
 	"kapigen.kateops.com/factory"
+	"kapigen.kateops.com/internal/cli"
+	"kapigen.kateops.com/internal/version"
 	"testing"
 )
 
@@ -27,7 +29,7 @@ func TestDocker_Build(t *testing.T) {
 			Path:    "test",
 			Context: "not set",
 		}
-		jobs, err := docker.Build(factory.New(), DockerPipeline, "testId")
+		jobs, err := docker.Build(factory.New(cli.NewSettings(cli.SetMode(version.Gitlab))), DockerPipeline, "testId")
 		if err != nil {
 			t.Errorf("Build failed with: %s", err.Error())
 		}

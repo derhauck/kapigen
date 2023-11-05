@@ -26,15 +26,14 @@ func NewUnitTest(image string, path string, packages []string) (*types.Job, erro
 			reportPath = "report.xml"
 		}
 		coveragePkg := strings.Join(packages, ",")
-
+		testCmd := fmt.Sprintf("go test -json -cover ./... -coverpkg=%s -coverprofile=profile.cov", coveragePkg)
 		ciJob.SetImageName(image).
 			TagMediumPressure().
 			SetStage(stages.TEST).
 			AddBeforeScript(fmt.Sprintf("cd %s", path)).
 			AddScript("go install github.com/jstemmer/go-junit-report/v2@latest").
-			AddScript(fmt.Sprintf("go test -cover ./... -coverpkg=%s -coverprofile=profile.cov", coveragePkg)).
+			AddScript(fmt.Sprintf("%s 2>&1 | go-junit-report -parser gojson -iocopy -out report.xml", testCmd)).
 			AddScript("go tool cover -func profile.cov").
-			AddScript("go test -json ./... 2>&1 | go-junit-report -parser gojson -iocopy -out report.xml").
 			AddVariable("KTC_PATH", path).
 			AddArtifact(job.Artifact{
 				Name:  "report",

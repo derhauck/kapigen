@@ -1,22 +1,44 @@
 package factory
 
-import "kapigen.kateops.com/internal/version"
+import (
+	"kapigen.kateops.com/internal/cli"
+	"kapigen.kateops.com/internal/version"
+)
 
 type MainFactory struct {
-	clients *Clients
-	version *version.Controller
+	Settings *cli.Settings
+	clients  *Clients
+	version  *version.Controller
 }
 
-func New() *MainFactory {
-	return &MainFactory{}
+func New(settings *cli.Settings) *MainFactory {
+	return &MainFactory{
+		Settings: settings,
+	}
 }
 func (m *MainFactory) GetVersionController() *version.Controller {
 	if m.version == nil {
-		m.version = version.NewController(
-			version.Gitlab,
-			m.GetClients().GetGitlabClient(),
-			m.GetClients().GetLosClient(),
-		)
+		switch m.Settings.Mode {
+		case version.Gitlab:
+			m.version = version.NewController(
+				m.Settings.Mode,
+				m.GetClients().GetGitlabClient(),
+				nil,
+			)
+		case version.Los:
+			m.version = version.NewController(
+				m.Settings.Mode,
+				nil,
+				m.GetClients().GetLosClient(),
+			)
+		case version.None:
+			m.version = version.NewController(
+				m.Settings.Mode,
+				nil,
+				nil,
+			)
+		}
+
 	}
 	return m.version
 }

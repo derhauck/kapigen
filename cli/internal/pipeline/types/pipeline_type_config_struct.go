@@ -51,7 +51,9 @@ func (p *PipelineTypeConfig) GetType() PipelineType {
 }
 
 type PipelineConfig struct {
-	Pipelines []PipelineTypeConfig `yaml:"pipelines"`
+	Noop      bool                 `yaml:"noop,omitempty"`
+	Tag       bool                 `yaml:"tag,omitempty"`
+	Pipelines []PipelineTypeConfig `yaml:"pipelines" yaml:"pipelines"`
 }
 
 func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterface, pipelineType PipelineType, pipelineId string) (*Jobs, error) {
@@ -77,25 +79,25 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 	return jobs, nil
 }
 
-func LoadJobsFromPipelineConfig(factory *factory.MainFactory, configPath string, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
+func LoadJobsFromPipelineConfig(factory *factory.MainFactory, configPath string, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, *PipelineConfig, error) {
 	body, err := os.ReadFile(configPath)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var pipelineConfig PipelineConfig
 	err = yaml.Unmarshal(body, &pipelineConfig)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	jobs, err := pipelineConfig.Decode(factory, configTypes)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return jobs, nil
+	return jobs, &pipelineConfig, nil
 }
 
 func (p *PipelineConfig) Decode(factory *factory.MainFactory, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
