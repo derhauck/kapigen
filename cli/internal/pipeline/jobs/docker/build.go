@@ -6,6 +6,7 @@ import (
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/tags"
 	"kapigen.kateops.com/internal/pipeline/types"
+	"strings"
 )
 
 func NewBuildkitBuild(path string, context string, dockerfile string, destination []string) *types.Job {
@@ -48,10 +49,7 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 		cmd := fmt.Sprintf(`buildctl build --frontend dockerfile.v0 --local context="%s" --local dockerfile="%s" `, context, path)
 		parameters := fmt.Sprintf(`--progress plain --opt filename="%s" --export-cache type=inline `, dockerfile)
 		cache := fmt.Sprintf(`--import-cache type=registry,ref="%s" `, destination)
-		push := ""
-		for _, d := range destination {
-			push = fmt.Sprintf(`%s--output type=image,name="%s",push=true `, push, d)
-		}
+		push := fmt.Sprintf(`--output type=image,name="%s",push=true `, strings.Join(destination, ","))
 		command := fmt.Sprintf(
 			"%s \\\n"+
 				"%s \\\n"+
