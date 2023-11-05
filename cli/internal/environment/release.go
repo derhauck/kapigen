@@ -32,7 +32,7 @@ func GetBranchName() string {
 
 func GetMergeRequestId() int {
 	if IsRelease() {
-		return getMergeRequestIdFromCommit()
+		return getMergeRequestIdFromCommit(CI_COMMIT_MESSAGE.Get())
 	}
 	return getMergeRequestIdFromEnv()
 }
@@ -50,15 +50,14 @@ func getMergeRequestIdFromEnv() int {
 	return int(i)
 
 }
-func getMergeRequestIdFromCommit() int {
-	message := CI_COMMIT_MESSAGE.Get()
+func getMergeRequestIdFromCommit(message string) int {
 	reg := regexp.MustCompile("![0-9]*$")
 	stringId := reg.FindString(message)
 	if stringId == "" {
-		logger.Error("no merge request id found in commit message")
+		logger.Error(fmt.Sprintf("no merge request id found in commit message: %s", message))
 		return 0
 	}
-	intId, err := strconv.ParseInt(stringId, 10, 32)
+	intId, err := strconv.ParseInt(stringId[1:], 10, 32)
 	if err != nil {
 		logger.ErrorE(err)
 		return 0

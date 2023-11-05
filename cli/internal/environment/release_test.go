@@ -33,3 +33,13 @@ func TestIsRelease(t *testing.T) {
 		}
 	})
 }
+
+func TestGetMergeRequestId(t *testing.T) {
+	t.Run("Can get ID from commit message", func(t *testing.T) {
+		CI_COMMIT_MESSAGE.Set("add missing workflow rules\n\nSee merge request !3")
+		result := getMergeRequestIdFromCommit(CI_COMMIT_MESSAGE.Get())
+		if result != 3 {
+			t.Errorf("Can not get ID from commit message, expected: %s, received: %d", "3", result)
+		}
+	})
+}
