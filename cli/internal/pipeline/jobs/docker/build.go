@@ -48,7 +48,7 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 
 		cmd := fmt.Sprintf(`buildctl build --frontend dockerfile.v0 --local context="%s" --local dockerfile="%s" `, context, path)
 		parameters := fmt.Sprintf(`--progress plain --opt filename="%s" --export-cache type=inline `, dockerfile)
-		cache := fmt.Sprintf(`--import-cache type=registry,ref="%s" `, destination)
+		cache := fmt.Sprintf(`--import-cache type=registry,ref="%s" `, destination[0])
 		push := fmt.Sprintf(`--output type=image,name="%s",push=true `, strings.Join(destination, ","))
 		command := fmt.Sprintf(
 			"%s \\\n"+
