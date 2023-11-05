@@ -44,6 +44,10 @@ func NewDefaultCiPipeline() *CiPipeline {
 					When: job.NewWhen(when.Always),
 				},
 				&job.Rule{
+					If:   "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
+					When: job.NewWhen(when.Always),
+				},
+				&job.Rule{
 					If:   "$CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'",
 					When: job.NewWhen(when.Always),
 				},
