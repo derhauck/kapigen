@@ -11,7 +11,7 @@ import (
 func NewTag() *types.Job {
 	return types.NewJob("Tag", docker.Kapigen_Latest.String(), func(ciJob *job.CiJob) {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
-		ciJob.Script.Value.Add("kapigen version -v --mode gitlab")
+		ciJob.Script.Value.Add("kapigen version new -v --mode gitlab")
 		ciJob.Rules.Add(&job.Rule{
 			If:   "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
 			When: job.NewWhen(when.OnSuccess),
@@ -24,7 +24,7 @@ func NewTagKapigen() *types.Job {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
 		ciJob.BeforeScript.Value.Add("cd cli")
 		ciJob.Script.Value.Add("go mod download").
-			Add("go run . version -v --mode gitlab")
+			Add("go run . version new -v --mode gitlab")
 		ciJob.Rules.Add(&job.Rule{
 			If:   "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
 			When: job.NewWhen(when.OnSuccess),
