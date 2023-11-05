@@ -10,6 +10,7 @@ import (
 	"kapigen.kateops.com/internal/pipeline/config"
 	"kapigen.kateops.com/internal/pipeline/jobs"
 	"kapigen.kateops.com/internal/pipeline/types"
+	"kapigen.kateops.com/internal/version"
 	"os"
 )
 
@@ -29,9 +30,17 @@ var Cmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		mode, err := cmd.Flags().GetString("mode")
+		if err != nil {
+			return err
+		}
+		logger.Info("will create settings")
+		settings := cli.NewSettings(
+			cli.SetMode(version.GetModeFromString(mode)),
+		)
 
 		logger.Info("will read pipeline config from: " + configPath)
-		pipelineJobs, pipelineConfig, err := types.LoadJobsFromPipelineConfig(factory.New(), configPath, config.PipelineConfigTypes)
+		pipelineJobs, pipelineConfig, err := types.LoadJobsFromPipelineConfig(factory.New(settings), configPath, config.PipelineConfigTypes)
 		if err != nil {
 			return err
 		}
@@ -44,7 +53,8 @@ var Cmd = &cobra.Command{
 
 		if pipelineConfig.Tag {
 			logger.Info("tag mode activated, will add \"Tag\" job to pipeline")
-			pipelineJobs.AddJob(jobs.NewTag())
+			pipelineJobs.AddJob(jobs.NewTag()).
+				AddJob(jobs.NewTagKapigen())
 		}
 
 		merge, err := cmd.Flags().GetBool("no-merge")
@@ -87,5 +97,6 @@ func init() {
 	Cmd.Flags().String("file", "pipeline.yaml", "output file")
 	Cmd.Flags().String("config", "config.kapigen.yaml", "config to use")
 	Cmd.Flags().Bool("no-merge", false, "use dynamic job merge")
+	Cmd.Flags().String("mode", version.Gitlab.Name(), "mode used for versioning: los,gitlab")
 
 }

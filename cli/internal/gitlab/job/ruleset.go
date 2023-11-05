@@ -1,6 +1,7 @@
 package job
 
 import (
+	"fmt"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 	"kapigen.kateops.com/internal/when"
 )
@@ -41,6 +42,22 @@ func DefaultOnlyReleasePipelineRules() *Rules {
 			If: "$KTC_TEST_PIPELINE",
 		},
 	}
+}
+
+func RulesNotKapigen(rules *Rules) *Rules {
+	for _, rule := range rules.Get() {
+		rule.If = fmt.Sprintf("%s && %s", rule.If, "$CI_PROJECT_ID != \"125\"")
+	}
+
+	return rules
+}
+
+func RulesKapigen(rules *Rules) *Rules {
+	for _, rule := range rules.Get() {
+		rule.If = fmt.Sprintf("%s && %s", rule.If, "$CI_PROJECT_ID == \"125\"")
+	}
+
+	return rules
 }
 
 type DefaultPipelineRule struct {

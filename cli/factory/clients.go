@@ -34,6 +34,5 @@ func (c *Clients) GetGitlabClient() *gitlab.Client {
 		}
 		c.Gitlab = client
 	}
-
 	return c.Gitlab
 }
