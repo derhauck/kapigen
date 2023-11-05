@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	cmd "kapigen.kateops.com/cmd/version"
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/cli"
 	"kapigen.kateops.com/internal/logger"
@@ -32,4 +33,5 @@ var versionCmd = &cobra.Command{
 
 func init() {
 	versionCmd.Flags().String("mode", version.Gitlab.Name(), "mode used for versioning: los,gitlab")
+	versionCmd.AddCommand(cmd.NewCmd)
 }
