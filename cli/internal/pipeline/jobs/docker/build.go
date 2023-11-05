@@ -8,7 +8,7 @@ import (
 	"kapigen.kateops.com/internal/pipeline/types"
 )
 
-func NewBuildkitBuild(path string, context string, dockerfile string, destination string) *types.Job {
+func NewBuildkitBuild(path string, context string, dockerfile string, destination []string) *types.Job {
 	return types.NewJob("Build", docker.BUILDKIT.String(), func(ciJob *job.CiJob) {
 		ciJob.Image.Entrypoint.
 			Add("sh").
@@ -48,7 +48,10 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 		cmd := fmt.Sprintf(`buildctl build --frontend dockerfile.v0 --local context="%s" --local dockerfile="%s" `, context, path)
 		parameters := fmt.Sprintf(`--progress plain --opt filename="%s" --export-cache type=inline `, dockerfile)
 		cache := fmt.Sprintf(`--import-cache type=registry,ref="%s" `, destination)
-		push := fmt.Sprintf(`--output type=image,name="%s",push=true `, destination)
+		push := ""
+		for _, d := range destination {
+			push = fmt.Sprintf(`%s--output type=image,name="%s",push=true `, push, d)
+		}
 		command := fmt.Sprintf(
 			"%s \\\n"+
 				"%s \\\n"+
@@ -67,8 +70,8 @@ func NewBuildkitBuild(path string, context string, dockerfile string, destinatio
 		ciJob.Script.Value.
 			Add(command)
 		ciJob.Rules = *job.DefaultPipelineRules()
-		ciJob.Variables["KTC_PATH"] = path
-		ciJob.Variables["DOCKER_CONFIG"] = "$CI_PROJECT_DIR"
+		ciJob.AddVariable("KTC_PATH", path)
+		ciJob.AddVariable("DOCKER_CONFIG", "$CI_PROJECT_DIR")
 		ciJob.Tags.Add(tags.PRESSURE_BUILDKIT)
 	})
 }

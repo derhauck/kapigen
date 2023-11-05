@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"kapigen.kateops.com/factory"
+	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/jobs/docker"
 	"kapigen.kateops.com/internal/pipeline/types"
@@ -44,11 +45,18 @@ func (d *Docker) Validate() error {
 func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ string) (*types.Jobs, error) {
 	controller := factory.GetVersionController()
 	tag := controller.GetCurrentPipelineTag(d.Path)
+	var destination []string
+	destination = append(destination, d.DefaultRegistry(tag))
+
+	if environment.IsRelease() {
+		destination = append(destination, d.DefaultRegistry("latest"))
+	}
+
 	build := docker.NewBuildkitBuild(
 		d.Path,
 		d.Context,
 		d.Dockerfile,
-		d.DefaultRegistry(tag),
+		destination,
 	)
 	return &types.Jobs{build}, nil
 
