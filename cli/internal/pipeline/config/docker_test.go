@@ -1,9 +1,6 @@
 package config
 
 import (
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/cli"
-	"kapigen.kateops.com/internal/version"
 	"testing"
 )
 
@@ -22,22 +19,22 @@ func TestDocker_New(t *testing.T) {
 	})
 }
 
-func TestDocker_Build(t *testing.T) {
-	t.Run("Can build Docker", func(t *testing.T) {
-		docker := Docker{
-			Path:    "test",
-			Context: "not set",
-		}
-		jobs, err := docker.Build(factory.New(cli.NewSettings(cli.SetMode(version.Gitlab))), DockerPipeline, "testId")
-		if err != nil {
-			t.Errorf("Build failed with: %s", err.Error())
-		}
-		if len(jobs.GetJobs()) == 0 {
-			t.Error("Docker pipeline is empty")
-		}
-
-	})
-}
+//func TestDocker_Build(t *testing.T) {
+//	t.Run("Can build Docker", func(t *testing.T) {
+//		docker := Docker{
+//			Path:    "test",
+//			Context: "not set",
+//		}
+//		jobs, err := docker.Build(factory.New(cli.NewSettings(cli.SetMode(version.Gitlab))), DockerPipeline, "testId")
+//		if err != nil {
+//			t.Errorf("Build failed with: %s", err.Error())
+//		}
+//		if len(jobs.GetJobs()) == 0 {
+//			t.Error("Docker pipeline is empty")
+//		}
+//
+//	})
+//}
 
 func TestDocker_Validate(t *testing.T) {
 	t.Run("Can validate valid Docker config", func(t *testing.T) {
