@@ -15,6 +15,7 @@ type Docker struct {
 	Context    string `yaml:"context"`
 	Name       string `yaml:"name"`
 	Dockerfile string `yaml:"dockerfile"`
+	Release    *bool  `yaml:"release,omitempty"`
 }
 
 func (d *Docker) New() types.PipelineConfigInterface {
@@ -39,6 +40,12 @@ func (d *Docker) Validate() error {
 		logger.Info("no name set, using container root registry")
 	}
 
+	if d.Release == nil {
+		logger.Info("no release set, defaulting to false")
+		tmp := false
+		d.Release = &tmp
+	}
+
 	return nil
 }
 
@@ -47,8 +54,7 @@ func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ str
 	tag := controller.GetCurrentPipelineTag(d.Path)
 	var destination []string
 	destination = append(destination, d.DefaultRegistry(tag))
-
-	if environment.IsRelease() {
+	if environment.IsRelease() && *d.Release {
 		destination = append(destination, d.DefaultRegistry("latest"))
 	}
 

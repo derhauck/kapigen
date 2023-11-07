@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.argo/Infrastructure.iml" filepath="$PROJECT_DIR$/.argo/Infrastructure.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/kapigen.iml" filepath="$PROJECT_DIR$/.idea/kapigen.iml" />
     </modules>
   </component>

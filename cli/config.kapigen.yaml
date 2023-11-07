@@ -12,3 +12,4 @@ pipelines:
       imageName: 'gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21.3-alpine3.18'
       docker:
         path: cli
+        release: true
