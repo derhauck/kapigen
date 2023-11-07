@@ -24,7 +24,6 @@ func TestDocker_New(t *testing.T) {
 
 func TestDocker_Build(t *testing.T) {
 	t.Run("Can build Docker", func(t *testing.T) {
-		t.Parallel()
 		docker := Docker{
 			Path:    "test",
 			Context: "not set",
@@ -41,7 +40,6 @@ func TestDocker_Build(t *testing.T) {
 }
 
 func TestDocker_Validate(t *testing.T) {
-	t.Parallel()
 	t.Run("Can validate valid Docker config", func(t *testing.T) {
 		docker := Docker{
 			Path:    "test",
