@@ -16,7 +16,6 @@ type Mode int
 
 const (
 	Gitlab Mode = iota
-	Los
 	FILE
 	None
 )

@@ -1,7 +1,7 @@
 package factory
 
 import (
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/logger"
 )
