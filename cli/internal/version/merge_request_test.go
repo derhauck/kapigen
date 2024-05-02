@@ -1,15 +1,16 @@
 package version
 
 import (
-	"kapigen.kateops.com/internal/environment"
 	"testing"
+
+	"kapigen.kateops.com/internal/environment"
 )
 
 func TestController_GetMergeRequestId(t *testing.T) {
 	t.Run("can get version increase from env", func(t *testing.T) {
 		environment.CI_MERGE_REQUEST_ID.Set("13")
 		environment.CI_MERGE_REQUEST_LABELS.Set("none")
-		controller := NewController(Gitlab, nil, nil)
+		controller := NewController(Gitlab, nil)
 		result := controller.getVersionIncrease("13", 13)
 		if result != "none" {
 			t.Errorf("should be none, got %s", result)
@@ -19,7 +20,7 @@ func TestController_GetMergeRequestId(t *testing.T) {
 	t.Run("can get version increase from env", func(t *testing.T) {
 		environment.CI_MERGE_REQUEST_ID.Set("13")
 		environment.CI_MERGE_REQUEST_LABELS.Set("version::minor,text")
-		controller := NewController(Gitlab, nil, nil)
+		controller := NewController(Gitlab, nil)
 		result := controller.getVersionIncrease("13", 13)
 		if result != "minor" {
 			t.Errorf("should be minor, got %s", result)

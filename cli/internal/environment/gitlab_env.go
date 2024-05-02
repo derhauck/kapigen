@@ -3,8 +3,9 @@ package environment
 import (
 	"errors"
 	"fmt"
-	"kapigen.kateops.com/internal/logger"
 	"os"
+
+	"kapigen.kateops.com/internal/logger"
 )
 
 type Variable int
@@ -20,6 +21,7 @@ const (
 	CI_MERGE_REQUEST_LABELS
 	CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
 	CI_PIPELINE_TOKEN
+	CI_SERVER_HOST
 	GITLAB_TOKEN
 	LOS_AUTH_TOKEN
 	KAPIGEN_VERSION
@@ -39,6 +41,7 @@ var values = map[Variable]string{
 	KAPIGEN_VERSION:                     "KAPIGEN_VERSION",
 	GITLAB_TOKEN:                        "GITLAB_TOKEN",
 	LOS_AUTH_TOKEN:                      "LOS_AUTH_TOKEN",
+	CI_SERVER_HOST:                      "CI_SERVER_HOST",
 }
 
 func (v Variable) Key() string {
@@ -73,6 +76,7 @@ func (v Variable) Get() string {
 	}
 	return value
 }
+
 func (v Variable) Lookup() (string, error) {
 	value, set := os.LookupEnv(v.Key())
 	if set {

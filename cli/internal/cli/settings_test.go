@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"kapigen.kateops.com/internal/version"
 	"testing"
+
+	"kapigen.kateops.com/internal/version"
 )
 
 func TestSetMode(t *testing.T) {
@@ -12,9 +13,9 @@ func TestSetMode(t *testing.T) {
 			t.Errorf("should be gitlab mode, is %s", setting.Mode.Name())
 		}
 
-		setting = NewSettings(SetMode(version.Los))
-		if setting.Mode != version.Los {
-			t.Errorf("should be los mode, is %s", setting.Mode.Name())
+		setting = NewSettings(SetMode(version.FILE))
+		if setting.Mode != version.FILE {
+			t.Errorf("should be file mode, is %s", setting.Mode.Name())
 		}
 	})
 }

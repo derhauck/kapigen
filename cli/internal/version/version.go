@@ -1,11 +1,11 @@
 package version
 
 import (
+	"strings"
+
 	"github.com/xanzy/go-gitlab"
 	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/logger"
-	"kapigen.kateops.com/internal/los"
-	"strings"
 )
 
 const EmptyTag = "0.0.0"
@@ -17,6 +17,7 @@ type Mode int
 const (
 	Gitlab Mode = iota
 	Los
+	FILE
 	None
 )
 
@@ -24,8 +25,6 @@ func (m Mode) getTag() string {
 	switch m {
 	case Gitlab:
 		return Gitlab.Name()
-	case Los:
-		return Los.Name()
 	default:
 		return None.Name()
 
@@ -34,7 +33,7 @@ func (m Mode) getTag() string {
 
 var values = map[Mode]string{
 	Gitlab: "gitlab",
-	Los:    "los",
+	FILE:   "file",
 	None:   "none",
 }
 
@@ -52,18 +51,16 @@ type Controller struct {
 	new          string
 	mode         Mode
 	gitlabClient *gitlab.Client
-	losClient    *los.Client
 	refresh      bool
 }
 
-func NewController(mode Mode, gitlabClient *gitlab.Client, losClient *los.Client) *Controller {
+func NewController(mode Mode, gitlabClient *gitlab.Client) *Controller {
 	return &Controller{
 		"",
 		"",
 		"",
 		mode,
 		gitlabClient,
-		losClient,
 		false,
 	}
 }
@@ -106,16 +103,6 @@ func (c *Controller) createTagFromGitlab(version string) string {
 	logger.DebugAny(tag)
 	return tag.Name
 }
-
-func (c *Controller) getTagFromLos(path string) string {
-	if c.refresh == false && c.current != "" {
-		return c.current
-	}
-	if c.losClient == nil {
-		return EmptyTag
-	}
-	return c.losClient.GetLatestVersion(environment.CI_PROJECT_ID.Get(), path)
-}
 func (c *Controller) Refresh() *Controller {
 	c.refresh = true
 	return c
@@ -125,10 +112,12 @@ func (c *Controller) GetCurrentTag(path string) string {
 		switch c.mode {
 		case Gitlab:
 			c.current = c.getTagFromGitlab()
-		case Los:
-			c.current = c.getTagFromLos(path)
 		case None:
-			c.current = NoTag
+			c.current = EmptyTag
+		case FILE:
+			c.current = EmptyTag
+		default:
+			c.current = EmptyTag
 		}
 	}
 
@@ -152,8 +141,6 @@ func (c *Controller) GetNewTag(path string) string {
 				c.GetCurrentTag(path),
 				c.getVersionIncrease(environment.CI_PROJECT_ID.Get(), environment.GetMergeRequestId()),
 			)
-		case Los:
-			c.new = EmptyTag
 		case None:
 			c.new = NoTag
 
@@ -168,7 +155,7 @@ func (c *Controller) GetIntermediateTag(path string) string {
 		switch c.mode {
 		case Gitlab:
 			c.intermediate = GetFeatureBranchVersion(c.GetCurrentTag(path), environment.GetBranchName())
-		case Los:
+		case FILE:
 			c.intermediate = EmptyTag
 		case None:
 			c.intermediate = NoTag
@@ -186,8 +173,6 @@ func (c *Controller) SetNewVersion(path string) string {
 	switch c.mode {
 	case Gitlab:
 		return c.createTagFromGitlab(c.new)
-	case Los:
-		return c.new
 	case None:
 		return c.new
 	default:
@@ -217,8 +202,6 @@ func GetModeFromString(mode string) Mode {
 	switch mode {
 	case Gitlab.Name():
 		return Gitlab
-	case Los.Name():
-		return Los
 	default:
 		return None
 	}

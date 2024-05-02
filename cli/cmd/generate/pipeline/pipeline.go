@@ -1,6 +1,8 @@
 package pipeline
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 	"kapigen.kateops.com/factory"
@@ -11,7 +13,6 @@ import (
 	"kapigen.kateops.com/internal/pipeline/jobs"
 	"kapigen.kateops.com/internal/pipeline/types"
 	"kapigen.kateops.com/internal/version"
-	"os"
 )
 
 var Cmd = &cobra.Command{
@@ -97,6 +98,6 @@ func init() {
 	Cmd.Flags().String("file", "pipeline.yaml", "output file")
 	Cmd.Flags().String("config", "config.kapigen.yaml", "config to use")
 	Cmd.Flags().Bool("no-merge", false, "use dynamic job merge")
-	Cmd.Flags().String("mode", version.Gitlab.Name(), "mode used for versioning: los,gitlab")
+	Cmd.Flags().String("mode", version.FILE.Name(), "mode used for versioning: file,gitlab")
 
 }

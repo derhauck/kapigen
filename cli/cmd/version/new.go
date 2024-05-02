@@ -2,6 +2,7 @@ package version
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/cli"
@@ -33,6 +34,6 @@ var NewCmd = &cobra.Command{
 }
 
 func init() {
-	NewCmd.Flags().String("mode", version.Gitlab.Name(), "mode used for versioning: los,gitlab")
+	NewCmd.Flags().String("mode", version.FILE.Name(), "mode used for versioning: file,gitlab")
 	NewCmd.Flags().String("path", "", "path for version (los mode only)")
 }
