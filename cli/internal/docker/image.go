@@ -2,12 +2,13 @@ package docker
 
 import (
 	"fmt"
+
 	"kapigen.kateops.com/internal/logger"
 )
 
 type Image int
 
-const DEPENDENCY_PROXY = "gitlab.kateops.com/infrastructure/dependency_proxy/containers/"
+const DEPENDENCY_PROXY = "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/"
 
 const (
 	Kapigen_Latest Image = iota

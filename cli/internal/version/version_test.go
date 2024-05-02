@@ -20,15 +20,15 @@ func TestGetTag(t *testing.T) {
 	environment.SetLocalEnv()
 	var defaultTag = "0.0.0"
 	t.Run("can get empty tag", func(t *testing.T) {
-		controller := NewController(Gitlab, nil)
+		controller := NewController(Gitlab, nil, nil)
 		tag := controller.GetCurrentTag("")
 		if tag != defaultTag {
 			t.Errorf("is unset and should be %s, received %s", defaultTag, tag)
 		}
 
-		controller = NewController(FILE, nil)
+		controller = NewController(FILE, nil, NewFileReader())
 		tag = controller.GetCurrentTag("")
-		if tag != defaultTag {
+		if tag != "" {
 			t.Errorf("is unset and should be %s, received %s", defaultTag, tag)
 		}
 	})

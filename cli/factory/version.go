@@ -6,5 +6,6 @@ func (m *MainFactory) newVersionController(mode version.Mode) *version.Controlle
 	return version.NewController(
 		mode,
 		m.clients.GetGitlabClient(),
+		version.NewFileReader(),
 	)
 }
