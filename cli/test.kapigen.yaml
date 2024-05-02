@@ -20,7 +20,7 @@ pipelines:
   - type: golang
     id: test-go
     config:
-      imageName: 'gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21.3-alpine3.18'
+      imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
       path: cli
       docker:
         path: cli
@@ -44,7 +44,7 @@ pipelines:
   - type: golang
     id: test-go2
     config:
-      imageName: 'gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21.3-alpine3.18'
+      imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
       path: cli
       docker:
         path: cli
@@ -68,7 +68,7 @@ pipelines:
   - type: golang
     id: test-go3
     config:
-      imageName: 'gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21.3-alpine3.18'
+      imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
       path: cli
       coverage:
         packages:
