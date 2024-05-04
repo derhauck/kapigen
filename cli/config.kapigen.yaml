@@ -10,6 +10,6 @@ pipelines:
         packages:
           - kapigen.kateops.com/internal/...
       imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
-      docker:
-        path: cli
-        release: true
+#      docker:
+#        path: cli
+#        release: true
