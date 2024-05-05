@@ -28,7 +28,7 @@ var values = map[Image]string{
 	Terraform_Base:   "hub.kateops.com/base/terraform:latest",
 	BUILDKIT:         DEPENDENCY_PROXY + "moby/buildkit:master",
 	BUILDKIT_DAEMON:  DEPENDENCY_PROXY + "moby/buildkit:master-rootless",
-	BUILDKIT_ROTLESS: DEPENDENCY_PROXY + "moby/buildkit:rootless",
+	BUILDKIT_ROTLESS: DEPENDENCY_PROXY + "moby/buildkit:v0.12.3",
 	CRANE_DEBUG:      "gcr.io/go-containerregistry/crane:debug",
 	GOLANG_1_21:      DEPENDENCY_PROXY + "golang:1.21",
 }
