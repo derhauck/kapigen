@@ -60,7 +60,8 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 		ciJob.Rules = *job.DefaultPipelineRules()
 		ciJob.AddVariable("KTC_PATH", path).
 			AddVariable("BUILDKITD_FLAGS", "--oci-worker-no-process-sandbox").
-			AddVariable("DOCKER_CONFIG", "${CI_BUILDS_DIR}")
+			AddVariable("DOCKER_CONFIG", "${CI_BUILDS_DIR}").
+			AddVariable("BUILDCTL_CONNECT_RETRIES_MAX", "52")
 		ciJob.Tags.Add(tags.PRESSURE_BUILDKIT)
 	})
 }
