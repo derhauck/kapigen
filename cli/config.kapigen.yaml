@@ -1,10 +1,10 @@
 noop: true
-tag: true
+versioning: true
+tags:
+  - saas-linux-medium-amd64
 pipelines:
   - type: golang
     id: cli
-    tags:
-      - saas-linux-medium-amd64
     config:
       path: cli
       name: cli

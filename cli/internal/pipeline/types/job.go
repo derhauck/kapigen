@@ -250,3 +250,11 @@ func JobsToMap(jobs *Jobs) map[string]interface{} {
 	}
 	return ciPipeline
 }
+
+func (j *Jobs) OverwriteTags(tags []string) {
+	if len(tags) > 0 {
+		for _, evaluatedJob := range j.GetJobs() {
+			evaluatedJob.CiJobYaml.Tags = tags
+		}
+	}
+}

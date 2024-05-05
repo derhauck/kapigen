@@ -56,9 +56,10 @@ func (p *PipelineTypeConfig) GetType() PipelineType {
 }
 
 type PipelineConfig struct {
-	Noop      bool                 `yaml:"noop,omitempty"`
-	Tag       bool                 `yaml:"tag,omitempty"`
-	Pipelines []PipelineTypeConfig `yaml:"pipelines" yaml:"pipelines"`
+	Noop       bool                 `yaml:"noop,omitempty"`
+	Versioning bool                 `yaml:"versioning,omitempty"`
+	Tags       []string             `yaml:"tags"`
+	Pipelines  []PipelineTypeConfig `yaml:"pipelines" yaml:"pipelines"`
 }
 
 func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterface, pipelineType PipelineType, pipelineId string) (*Jobs, error) {

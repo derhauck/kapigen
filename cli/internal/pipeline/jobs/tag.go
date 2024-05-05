@@ -10,7 +10,7 @@ import (
 )
 
 func NewTag() *types.Job {
-	return types.NewJob("Tag", docker.Kapigen_Latest.String(), func(ciJob *job.CiJob) {
+	return types.NewJob("Versioning", docker.Kapigen_Latest.String(), func(ciJob *job.CiJob) {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
 		ciJob.AddVariable("LOGGER_LEVEL", level.Info.String())
 		ciJob.Script.Value.Add("kapigen version new --mode gitlab")
@@ -22,7 +22,7 @@ func NewTag() *types.Job {
 	}).AddName("Default")
 }
 func NewTagKapigen() *types.Job {
-	return types.NewJob("Tag", docker.GOLANG_1_21.String(), func(ciJob *job.CiJob) {
+	return types.NewJob("Versioning", docker.GOLANG_1_21.String(), func(ciJob *job.CiJob) {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
 		ciJob.AddVariable("LOGGER_LEVEL", level.Info.String())
 		ciJob.BeforeScript.Value.Add("cd cli")
