@@ -16,19 +16,21 @@ const (
 	Terraform_Base
 	BUILDKIT
 	BUILDKIT_DAEMON
+	BUILDKIT_ROTLESS
 	CRANE_DEBUG
 
 	GOLANG_1_21
 )
 
 var values = map[Image]string{
-	Kapigen_Latest:  "kapigen",
-	Alpine_3_18:     DEPENDENCY_PROXY + "alpine:3.18",
-	Terraform_Base:  "hub.kateops.com/base/terraform:latest",
-	BUILDKIT:        DEPENDENCY_PROXY + "moby/buildkit:master",
-	BUILDKIT_DAEMON: DEPENDENCY_PROXY + "moby/buildkit:master-rootless",
-	CRANE_DEBUG:     "gcr.io/go-containerregistry/crane:debug",
-	GOLANG_1_21:     DEPENDENCY_PROXY + "golang:1.21",
+	Kapigen_Latest:   "kapigen",
+	Alpine_3_18:      DEPENDENCY_PROXY + "alpine:3.18",
+	Terraform_Base:   "hub.kateops.com/base/terraform:latest",
+	BUILDKIT:         DEPENDENCY_PROXY + "moby/buildkit:master",
+	BUILDKIT_DAEMON:  DEPENDENCY_PROXY + "moby/buildkit:master-rootless",
+	BUILDKIT_ROTLESS: DEPENDENCY_PROXY + "moby/buildkit:rootless",
+	CRANE_DEBUG:      "gcr.io/go-containerregistry/crane:debug",
+	GOLANG_1_21:      DEPENDENCY_PROXY + "golang:1.21",
 }
 
 func (c Image) String() string {
