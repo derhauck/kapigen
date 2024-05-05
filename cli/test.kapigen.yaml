@@ -3,16 +3,22 @@ tag: false
 pipelines:
   - type: docker
     id: test-cli
+    tags:
+      - saas-linux-medium-amd64
     config:
       path: cli
       name: test-cli
   - type: docker
     id: test-file
+    tags:
+      - saas-linux-medium-amd64
     config:
       path: cli
       name: test-file
   - type: docker
     id: duplicate-test
+    tags:
+      - saas-linux-medium-amd64
     config:
       path: cli
       dockerfile: Dockerfile
@@ -27,6 +33,8 @@ pipelines:
         name: test-file
   - type: docker
     id: test-cli2
+    tags:
+      - saas-linux-medium-amd64
     config:
       path: cli
       name: test-cli
@@ -37,6 +45,8 @@ pipelines:
       name: test-file
   - type: docker
     id: duplicate-test2
+    tags:
+      - saas-linux-medium-amd64
     config:
       path: cli
       dockerfile: Dockerfile
@@ -51,22 +61,30 @@ pipelines:
         name: test-file
   - type: docker
     id: test-cli3
+    tags:
+      - saas-linux-medium-amd64
     config:
       path: cli
       name: test-cli
   - type: docker
     id: test-file3
+    tags:
+      - saas-linux-medium-amd64
     config:
       path: cli
       name: test-file
   - type: docker
     id: duplicate-test3
+    tags:
+      - saas-linux-medium-amd64
     config:
       path: cli
       dockerfile: Dockerfile
       name: test-cli
   - type: golang
     id: test-go3
+    tags:
+      - saas-linux-medium-amd64
     config:
       imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
       path: cli

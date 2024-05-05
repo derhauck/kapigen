@@ -3,20 +3,22 @@ package types
 import (
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/kylelemons/godebug/diff"
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/logger"
-	"os"
 )
 
 type Job struct {
-	Names       []string
-	CiJob       *job.CiJob
-	Needs       Needs
-	currentName int
-	fn          []func(job *job.CiJob)
-	CiJobYaml   *job.CiJobYaml
+	Names        []string
+	CiJob        *job.CiJob
+	Needs        Needs
+	currentName  int
+	fn           []func(job *job.CiJob)
+	CiJobYaml    *job.CiJobYaml
+	ExternalTags []string
 }
 
 func (j *Job) AddJobAsNeed(job *Job) *Job {
@@ -163,7 +165,7 @@ func (j *Job) Render() error {
 		fn(j.CiJob)
 	}
 	var err error
-	j.CiJobYaml, err = j.CiJob.Render(j.Needs.NeedsYaml())
+	j.CiJobYaml, err = j.CiJob.Render(j.Needs.NeedsYaml(), j.ExternalTags)
 	if err != nil {
 		return fmt.Errorf("job='%s'  can not be rendered: %w", j.Names, err)
 	}

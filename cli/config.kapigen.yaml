@@ -3,6 +3,8 @@ tag: true
 pipelines:
   - type: golang
     id: cli
+    tags:
+      - saas-linux-medium-amd64
     config:
       path: cli
       name: cli

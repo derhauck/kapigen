@@ -3,11 +3,12 @@ package types
 import (
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v3"
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/logger"
-	"os"
 )
 
 type PipelineTypeConfig struct {
@@ -15,6 +16,7 @@ type PipelineTypeConfig struct {
 	Config     interface{}  `yaml:"config"`
 	PipelineId string       `yaml:"id"`
 	Need       []string     `yaml:"need"`
+	Tags       []string     `yaml:"tags"`
 }
 
 func (p *PipelineTypeConfig) Decode(factory *factory.MainFactory, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
@@ -37,6 +39,9 @@ func (p *PipelineTypeConfig) Decode(factory *factory.MainFactory, configTypes ma
 			job.AddName(p.PipelineId)
 		}
 		job.AddName(string(p.Type))
+		if len(p.Tags) > 0 {
+			job.ExternalTags = p.Tags
+		}
 		err = job.Render()
 		if err != nil {
 			return nil, err
