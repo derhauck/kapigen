@@ -21,7 +21,7 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 			Add("sh").
 			Add("-c")
 		timeout.Command().
-			Add("sleep 300; touch ${CI_BUILDS_DIR}/.status.auth")
+			Add("sleep 30; touch ${CI_BUILDS_DIR}/.status.auth")
 		ciJob.Services.Add(timeout)
 
 		auth := job.NewService(docker.CRANE_DEBUG, "crane", 5000)
@@ -29,7 +29,7 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 			Add("sh").
 			Add("-c")
 		auth.Command().
-			Add("while [ ! -f ${CI_BUILDS_DIR}/.status.init ]; do echo 'wait for init'; sleep 1; done; " +
+			Add("while [ ! -f ${CI_BUILDS_DIR}/.status.init ]; do echo 'wait for init'; ls -la; sleep 1; done; " +
 				"export $(cat $CI_PROJECT_DIR/.env); " +
 				"crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}; " +
 				"touch ${CI_BUILDS_DIR}/.status.auth")
@@ -54,12 +54,13 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 			Add(`echo "REGISTRY_PUSH_USER=$REGISTRY_PUSH_USER" > .env`).
 			Add(`echo "REGISTRY_PUSH_TOKEN=$REGISTRY_PUSH_TOKEN" >> .env`).
 			Add("touch .status.init").
-			Add("while [ ! -f ${CI_BUILDS_DIR}/.status.auth ]; do echo 'wait for auth'; sleep 1; done")
+			Add("while [ ! -f ${CI_BUILDS_DIR}/.status.auth ]; do echo 'wait for auth'; ls -la; sleep 1; done")
 		ciJob.Script.Value.
 			Add(command)
 		ciJob.Rules = *job.DefaultPipelineRules()
-		ciJob.AddVariable("KTC_PATH", path)
-		ciJob.AddVariable("DOCKER_CONFIG", "${CI_BUILDS_DIR}")
+		ciJob.AddVariable("KTC_PATH", path).
+			AddVariable("BUILDKITD_FLAGS", "--oci-worker-no-process-sandbox").
+			AddVariable("DOCKER_CONFIG", "${CI_BUILDS_DIR}")
 		ciJob.Tags.Add(tags.PRESSURE_BUILDKIT)
 	})
 }
