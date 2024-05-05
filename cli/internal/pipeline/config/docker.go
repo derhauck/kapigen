@@ -61,7 +61,7 @@ func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ str
 		destination = append(destination, d.DefaultRegistry("latest"))
 	}
 
-	build := docker.NewBuildkitBuild(
+	build := docker.NewDaemonlessBuildkitBuild(
 		d.Path,
 		d.Context,
 		d.Dockerfile,
