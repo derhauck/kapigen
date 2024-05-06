@@ -31,7 +31,7 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 		auth.Command().
 			Add("while [ ! -f ${CI_BUILDS_DIR}/.status.init ]; do echo 'wait for init'; sleep 1; done; " +
 				"export $(cat $CI_PROJECT_DIR/.env); " +
-				"crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}; " +
+				"crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${GITLAB_REGISTRY}; " +
 				"crane auth login -u ${CI_DEPENDENCY_PROXY_USER} -p ${CI_DEPENDENCY_PROXY_PASSWORD} ${CI_DEPENDENCY_PROXY_SERVER}; " +
 				"touch ${CI_BUILDS_DIR}/.status.auth")
 		auth.AddVariable("DOCKER_CONFIG", "${CI_BUILDS_DIR}")
@@ -54,6 +54,10 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 		ciJob.BeforeScript.Value.
 			Add(`echo "REGISTRY_PUSH_USER=$REGISTRY_PUSH_USER" > .env`).
 			Add(`echo "REGISTRY_PUSH_TOKEN=$REGISTRY_PUSH_TOKEN" >> .env`).
+			Add(`echo "GITLAB_REGISTRY=$CI_REGISTRY" >> .env`).
+			Add(`echo "CI_DEPENDENCY_PROXY_USER=$CI_DEPENDENCY_PROXY_USER" >> .env`).
+			Add(`echo "CI_DEPENDENCY_PROXY_PASSWORD=$CI_DEPENDENCY_PROXY_PASSWORD" >> .env`).
+			Add(`echo "CI_DEPENDENCY_PROXY_SERVER=$CI_DEPENDENCY_PROXY_SERVER" >> .env`).
 			Add("touch .status.init").
 			Add("while [ ! -f ${CI_BUILDS_DIR}/.status.auth ]; do echo 'wait for auth'; sleep 1; done")
 		ciJob.Script.Value.
