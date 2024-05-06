@@ -11,7 +11,7 @@ import (
 )
 
 func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, destination []string) *types.Job {
-	return types.NewJob("Daemonless Build", docker.BUILDKIT.String(), func(ciJob *job.CiJob) {
+	return types.NewJob("Daemonless Build", docker.BUILDKIT_ROTLESS.String(), func(ciJob *job.CiJob) {
 		ciJob.Image.Entrypoint.
 			Add("sh").
 			Add("-c")
@@ -60,7 +60,7 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 			Add(command)
 		ciJob.Rules = *job.DefaultPipelineRules()
 		ciJob.AddVariable("KTC_PATH", path).
-			//AddVariable("BUILDKITD_FLAGS", "--oci-worker-no-process-sandbox").
+			AddVariable("BUILDKITD_FLAGS", "--oci-worker-no-process-sandbox").
 			AddVariable("DOCKER_CONFIG", "${CI_BUILDS_DIR}").
 			AddVariable("BUILDCTL_CONNECT_RETRIES_MAX", "52")
 		ciJob.Tags.Add(tags.PRESSURE_BUILDKIT)
