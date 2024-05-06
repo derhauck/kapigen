@@ -1,7 +1,7 @@
 noop: true
 versioning: false
-#tags:
-#  - saas-linux-medium-amd64
+tags:
+  - saas-linux-medium-amd64
 pipelines:
   - type: docker
     id: test-cli
