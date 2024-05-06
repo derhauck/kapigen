@@ -32,6 +32,7 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 			Add("while [ ! -f ${CI_BUILDS_DIR}/.status.init ]; do echo 'wait for init'; sleep 1; done; " +
 				"export $(cat $CI_PROJECT_DIR/.env); " +
 				"crane auth login -u ${REGISTRY_PUSH_USER} -p ${REGISTRY_PUSH_TOKEN} ${CI_REGISTRY}; " +
+				"crane auth login -u ${CI_DEPENDENCY_PROXY_USER} -p ${CI_DEPENDENCY_PROXY_PASSWORD} ${CI_DEPENDENCY_PROXY_SERVER}; " +
 				"touch ${CI_BUILDS_DIR}/.status.auth")
 		auth.AddVariable("DOCKER_CONFIG", "${CI_BUILDS_DIR}")
 		ciJob.Services.Add(auth)
