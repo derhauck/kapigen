@@ -3,4 +3,5 @@
 /**/.bin
 /**/.env
 /**/pipeline.yaml
+/**/pipeline-no-merge.yaml
 /**/profile.cov
