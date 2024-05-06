@@ -252,9 +252,11 @@ func JobsToMap(jobs *Jobs) map[string]interface{} {
 }
 
 func (j *Jobs) OverwriteTags(tags []string) {
-	if len(tags) > 0 {
+	if len(tags) > 0 && len(tags) > 0 {
 		for _, evaluatedJob := range j.GetJobs() {
-			evaluatedJob.CiJobYaml.Tags = tags
+			if evaluatedJob.CiJobYaml != nil {
+				evaluatedJob.CiJobYaml.Tags = tags
+			}
 		}
 	}
 }
