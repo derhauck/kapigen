@@ -11,7 +11,7 @@ import (
 )
 
 func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, destination []string) *types.Job {
-	return types.NewJob("Daemonless Build", docker.BUILDKIT_ROTLESS.String(), func(ciJob *job.CiJob) {
+	return types.NewJob("Daemonless Build", docker.BUILDKIT.String(), func(ciJob *job.CiJob) {
 		ciJob.Image.Entrypoint.
 			Add("sh").
 			Add("-c")
