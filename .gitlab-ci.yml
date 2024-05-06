@@ -10,7 +10,7 @@ workflow:
 
 default:
   tags:
-    - saas-linux-medium-amd64
+    - pressure::medium
 stages:
   - build
   - trigger
