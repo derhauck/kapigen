@@ -10,8 +10,6 @@ pipelines:
       name: test-cli
   - type: docker
     id: test-file
-    tags:
-      - saas-linux-medium-amd64
     config:
       path: cli
       name: test-file
