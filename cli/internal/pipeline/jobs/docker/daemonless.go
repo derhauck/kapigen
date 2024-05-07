@@ -57,8 +57,7 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 			Add(`echo "CI_DEPENDENCY_PROXY_PASSWORD=$CI_DEPENDENCY_PROXY_PASSWORD" >> .env`).
 			Add("touch .status.init").
 			Add("while [ ! -f ${CI_PROJECT_DIR}/.status.auth ]; do echo 'wait for auth'; sleep 1; done").
-			Add("ls -la ${CI_PROJECT_DIR}").
-			Add("cat config.json ")
+			Add("ls -la ${CI_PROJECT_DIR}; env")
 		ciJob.Script.Value.
 			Add(command)
 		ciJob.Rules = *job.DefaultPipelineRules()
