@@ -34,7 +34,7 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 				"crane auth login -u ${CI_REGISTRY_USER} -p ${CI_JOB_TOKEN} ${CI_REGISTRY}; " +
 				"crane auth login -u ${CI_DEPENDENCY_PROXY_USER} -p ${CI_DEPENDENCY_PROXY_PASSWORD} ${CI_DEPENDENCY_PROXY_SERVER}; " +
 				"touch ${CI_PROJECT_DIR}/.status.auth; " +
-				" ls -la ${CI_PROJECT_DIR};")
+				"chmod 666 ${CI_PROJECT_DIR}/config.json")
 		auth.AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}")
 		ciJob.Services.Add(auth)
 
