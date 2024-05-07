@@ -58,7 +58,7 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 			Add("touch .status.init").
 			Add("while [ ! -f ${CI_PROJECT_DIR}/.status.auth ]; do echo 'wait for auth'; sleep 1; done").
 			Add("ls -la ${CI_PROJECT_DIR}").
-			Add("cat ${CI_PROJECT_DIR}/.status.auth | ")
+			Add("cat config.json ")
 		ciJob.Script.Value.
 			Add(command)
 		ciJob.Rules = *job.DefaultPipelineRules()
