@@ -33,6 +33,7 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 				"export $(cat ${CI_PROJECT_DIR}/.env); " +
 				"crane auth login -u ${CI_REGISTRY_USER} -p ${CI_JOB_TOKEN} ${CI_REGISTRY}; " +
 				"crane auth login -u ${CI_DEPENDENCY_PROXY_USER} -p ${CI_DEPENDENCY_PROXY_PASSWORD} ${CI_DEPENDENCY_PROXY_SERVER}; " +
+				"crane auth login -u ${CI_DEPENDENCY_PROXY_USER} -p ${CI_DEPENDENCY_PROXY_PASSWORD} ${CI_SERVER_HOST}; " +
 				"touch ${CI_PROJECT_DIR}/.status.auth; " +
 				"chmod 666 ${CI_PROJECT_DIR}/config.json")
 		auth.AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}")
@@ -56,8 +57,7 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 			Add(`echo "CI_JOB_TOKEN=$CI_JOB_TOKEN" > .env`).
 			Add(`echo "CI_DEPENDENCY_PROXY_PASSWORD=$CI_DEPENDENCY_PROXY_PASSWORD" >> .env`).
 			Add("touch .status.init").
-			Add("while [ ! -f ${CI_PROJECT_DIR}/.status.auth ]; do echo 'wait for auth'; sleep 1; done").
-			Add("ls -la ${CI_PROJECT_DIR}; env")
+			Add("while [ ! -f ${CI_PROJECT_DIR}/.status.auth ]; do echo 'wait for auth'; sleep 1; done")
 		ciJob.Script.Value.
 			Add(command)
 		ciJob.Rules = *job.DefaultPipelineRules()
