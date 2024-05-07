@@ -21,7 +21,7 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 			Add("sh").
 			Add("-c")
 		timeout.Command().
-			Add("sleep 30; touch ${CI_BUILDS_DIR}/.status.auth")
+			Add("sleep 30; touch ${CI_PROJECT_DIR}/.status.auth")
 		ciJob.Services.Add(timeout)
 
 		auth := job.NewService(docker.CRANE_DEBUG, "crane", 5000)
@@ -29,13 +29,13 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 			Add("sh").
 			Add("-c")
 		auth.Command().
-			Add("while [ ! -f ${CI_BUILDS_DIR}/.status.init ]; do echo 'wait for init'; sleep 1; done; " +
-				"export $(cat $CI_PROJECT_DIR/.env); " +
+			Add("while [ ! -f ${CI_PROJECT_DIR}/.status.init ]; do echo 'wait for init'; sleep 1; done; " +
+				"export $(cat ${CI_PROJECT_DIR}/.env); " +
 				"crane auth login -u ${CI_REGISTRY_USER} -p ${CI_JOB_TOKEN} ${CI_REGISTRY}; " +
 				"crane auth login -u ${CI_DEPENDENCY_PROXY_USER} -p ${CI_DEPENDENCY_PROXY_PASSWORD} ${CI_DEPENDENCY_PROXY_SERVER}; " +
-				"touch ${CI_BUILDS_DIR}/.status.auth; " +
-				" ls -la ${CI_BUILDS_DIR};")
-		auth.AddVariable("DOCKER_CONFIG", "${CI_BUILDS_DIR}")
+				"touch ${CI_PROJECT_DIR}/.status.auth; " +
+				" ls -la ${CI_PROJECT_DIR};")
+		auth.AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}")
 		ciJob.Services.Add(auth)
 
 		cmd := fmt.Sprintf(`buildctl-daemonless.sh build --frontend dockerfile.v0 --local context="%s" --local dockerfile="%s" `, context, path)
@@ -56,15 +56,15 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 			Add(`echo "CI_JOB_TOKEN=$CI_JOB_TOKEN" > .env`).
 			Add(`echo "CI_DEPENDENCY_PROXY_PASSWORD=$CI_DEPENDENCY_PROXY_PASSWORD" >> .env`).
 			Add("touch .status.init").
-			Add("while [ ! -f ${CI_BUILDS_DIR}/.status.auth ]; do echo 'wait for auth'; sleep 1; done").
-			Add("ls -la ${CI_BUILDS_DIR}").
-			Add("cat ${CI_BUILDS_DIR}/.status.auth")
+			Add("while [ ! -f ${CI_PROJECT_DIR}/.status.auth ]; do echo 'wait for auth'; sleep 1; done").
+			Add("ls -la ${CI_PROJECT_DIR}").
+			Add("cat ${CI_PROJECT_DIR}/.status.auth | ")
 		ciJob.Script.Value.
 			Add(command)
 		ciJob.Rules = *job.DefaultPipelineRules()
 		ciJob.AddVariable("KTC_PATH", path).
 			AddVariable("BUILDKITD_FLAGS", "--oci-worker-no-process-sandbox").
-			AddVariable("DOCKER_CONFIG", "${CI_BUILDS_DIR}").
+			AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}").
 			AddVariable("BUILDCTL_CONNECT_RETRIES_MAX", "52")
 		ciJob.Tags.Add(tags.PRESSURE_BUILDKIT)
 	})
