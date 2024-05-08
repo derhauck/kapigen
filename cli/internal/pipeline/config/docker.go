@@ -81,5 +81,4 @@ func (d *Docker) DefaultRegistry(tag string) string {
 		return fmt.Sprintf("${CI_REGISTRY_IMAGE}/%s:%s", d.Name, tag)
 	}
 	return fmt.Sprintf("${CI_REGISTRY_IMAGE}:%s", tag)
-
 }

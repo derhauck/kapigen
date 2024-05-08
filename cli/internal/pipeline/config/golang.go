@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"strings"
 
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/logger"
@@ -45,9 +44,6 @@ func (g *Golang) Validate() error {
 	if g.Coverage == nil {
 		g.Coverage = &GolangCoverage{}
 	}
-	if g.Docker != nil {
-		g.Docker.Name = strings.Replace(g.Path, "/", "-", -1)
-	}
 
 	if err := g.Coverage.Validate(); err != nil {
 		return err
@@ -61,6 +57,10 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 	docker := g.Docker
 	var test *types.Job
 	var err error
+	if docker != nil && docker.Name == "" {
+		docker.Name = Id
+	}
+
 	if docker != nil {
 		jobs, err := types.GetPipelineJobs(factory, docker, pipelineType, Id)
 		if err != nil {

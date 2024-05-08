@@ -26,6 +26,7 @@ pipelines:
       path: cli
       docker:
         path: cli
+        dockerfile: test.Dockerfile
         name: test-file
   - type: docker
     id: test-cli2
