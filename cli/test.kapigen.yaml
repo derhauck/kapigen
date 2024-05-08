@@ -22,7 +22,6 @@ pipelines:
   - type: golang
     id: test-go
     config:
-      imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
       path: cli
       docker:
         path: cli
@@ -49,9 +48,6 @@ pipelines:
     config:
       imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
       path: cli
-      docker:
-        path: cli
-        name: test-file
   - type: docker
     id: test-cli3
     config:
@@ -76,6 +72,3 @@ pipelines:
       coverage:
         packages:
           - ./...
-      docker:
-        path: cli
-        name: test-file
