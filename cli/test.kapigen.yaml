@@ -26,7 +26,7 @@ pipelines:
       docker:
         path: cli
         dockerfile: test.Dockerfile
-        name: test-file
+        name: test-go
   - type: docker
     id: test-cli2
     config:
