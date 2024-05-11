@@ -23,20 +23,24 @@ func (m *MainFactory) GetVersionController() *version.Controller {
 			m.version = version.NewController(
 				m.Settings.Mode,
 				m.GetClients().GetGitlabClient(),
+				version.NewFileReader(),
 			)
 		case version.FILE:
 			m.version = version.NewController(
 				m.Settings.Mode,
 				nil,
+				version.NewFileReader(),
 			)
 		case version.None:
 			m.version = version.NewController(
 				m.Settings.Mode,
 				nil,
+				nil,
 			)
 		default:
 			m.version = version.NewController(
 				m.Settings.Mode,
+				nil,
 				nil,
 			)
 		}

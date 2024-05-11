@@ -36,7 +36,7 @@ func (c *Tags) Get() []*Tag {
 func (c *Tags) Add(tag tags.Size) *Tags {
 	appended := append(c.Get(), NewTag(&tag))
 	newCis := Tags(appended)
-	c = &newCis
+	*c = newCis
 	return c
 }
 func (c *Tags) Render() TagYaml {

@@ -17,7 +17,7 @@ stages:
 
 Build:
   stage: build
-  image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21
 
   before_script:
     - cd cli
@@ -30,7 +30,7 @@ Build:
 
 Tests:
   stage: build
-  image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21
   rules:
     - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
     - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -77,7 +77,7 @@ Start Big Pipeline:
   stage: trigger
   when: manual
   allow_failure: true
-  image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21
   script:
     - echo "trigger big pipeline"
 

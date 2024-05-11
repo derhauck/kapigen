@@ -16,7 +16,7 @@ stages:
 
 Build:
   stage: build
-  image: gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21
 
   before_script:
     - cd .kapigen

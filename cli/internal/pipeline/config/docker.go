@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/logger"
@@ -16,6 +17,7 @@ type Docker struct {
 	Name       string `yaml:"name"`
 	Dockerfile string `yaml:"dockerfile"`
 	Release    *bool  `yaml:"release,omitempty"`
+	ImageName  string
 }
 
 func (d *Docker) New() types.PipelineConfigInterface {
@@ -54,20 +56,23 @@ func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ str
 	tag := controller.GetCurrentPipelineTag(d.Path)
 	var destination []string
 	destination = append(destination, d.DefaultRegistry(tag))
+	d.ImageName = d.DefaultRegistry(tag)
 	if environment.IsRelease() && *d.Release {
 		destination = append(destination, d.DefaultRegistry("latest"))
 	}
 
-	build := docker.NewBuildkitBuild(
+	build := docker.NewDaemonlessBuildkitBuild(
 		d.Path,
 		d.Context,
 		d.Dockerfile,
 		destination,
 	)
 	return &types.Jobs{build}, nil
-
 }
 
+func (d *Docker) GetFinalImageName() string {
+	return d.ImageName
+}
 func (d *Docker) DefaultRegistry(tag string) string {
 	if tag == "" {
 		tag = "latest"
@@ -76,5 +81,4 @@ func (d *Docker) DefaultRegistry(tag string) string {
 		return fmt.Sprintf("${CI_REGISTRY_IMAGE}/%s:%s", d.Name, tag)
 	}
 	return fmt.Sprintf("${CI_REGISTRY_IMAGE}:%s", tag)
-
 }

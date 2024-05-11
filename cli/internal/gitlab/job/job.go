@@ -22,8 +22,8 @@ type CiJob struct {
 	Coverage     string       `yaml:"coverage"`
 }
 
-func (c *CiJob) Render(needs *NeedsYaml) (*CiJobYaml, error) {
-	return NewCiJobYaml(c, needs)
+func (c *CiJob) Render(needs *NeedsYaml, externalTags []string) (*CiJobYaml, error) {
+	return NewCiJobYaml(c, needs, externalTags)
 }
 
 type CiJobs []*CiJob
@@ -55,7 +55,7 @@ func (c *CiJobYaml) String() string {
 	}
 	return string(data)
 }
-func NewCiJobYaml(job *CiJob, needs *NeedsYaml) (*CiJobYaml, error) {
+func NewCiJobYaml(job *CiJob, needs *NeedsYaml, externalTags []string) (*CiJobYaml, error) {
 	var err error
 	artifact, err := job.Artifact.Render()
 	if err != nil {
@@ -71,6 +71,11 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml) (*CiJobYaml, error) {
 		stage = stages.DYNAMIC
 	}
 
+	tags := job.Tags.Render()
+	if len(externalTags) > 0 {
+		tags = externalTags
+	}
+
 	return &CiJobYaml{
 		Artifact:     artifact,
 		AfterScript:  job.AfterScript.GetRenderedValue(),
@@ -84,7 +89,7 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml) (*CiJobYaml, error) {
 		Rules:        job.Rules.GetRenderedValue(),
 		Stage:        stage.String(),
 		Services:     job.Services.Render(),
-		Tags:         job.Tags.Render(),
+		Tags:         tags,
 		Coverage:     job.Coverage,
 	}, nil
 }
