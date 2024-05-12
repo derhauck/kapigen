@@ -1,9 +1,10 @@
 package main
 
 import (
+	"os"
+
 	"kapigen.kateops.com/cmd"
 	"kapigen.kateops.com/internal/environment"
-	"os"
 )
 
 func main() {

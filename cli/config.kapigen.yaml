@@ -1,15 +1,19 @@
 noop: true
-tag: true
+versioning: true
+#tags:
+#  - saas-linux-medium-amd64
 pipelines:
   - type: golang
-    id: cli
+    id: cli-golang
     config:
       path: cli
       name: cli
       coverage:
         packages:
           - kapigen.kateops.com/internal/...
-      imageName: 'gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21.3-alpine3.18'
-      docker:
-        path: cli
-        release: true
+      imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
+  - type: docker
+    id: cli-docker
+    config:
+      path: cli
+      name: cli
