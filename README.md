@@ -27,7 +27,7 @@ The version increase will be set once the Merge Request is merged. Until then yo
 
 ```
 Merge Request   ->  current version + feature branch name
-Main            ->  will release on success with new version and set LOS version to latest
+Main            ->  will release on success with new version
 ```
 
 

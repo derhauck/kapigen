@@ -6,8 +6,8 @@ require (
 	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/kylelemons/godebug v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/spf13/cobra v1.7.0
-	github.com/xanzy/go-gitlab v0.93.2
+	github.com/spf13/cobra v1.8.0
+	github.com/xanzy/go-gitlab v0.105.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

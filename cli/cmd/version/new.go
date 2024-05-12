@@ -35,5 +35,5 @@ var NewCmd = &cobra.Command{
 
 func init() {
 	NewCmd.Flags().String("mode", version.FILE.Name(), "mode used for versioning: file,gitlab")
-	NewCmd.Flags().String("path", "", "path for version (los mode only)")
+	NewCmd.Flags().String("path", "", "path for version (file mode only)")
 }
