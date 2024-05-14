@@ -58,12 +58,12 @@ var Cmd = &cobra.Command{
 				AddJob(jobs.NewTagKapigen())
 		}
 
-		merge, err := cmd.Flags().GetBool("no-merge")
+		noMerge, err := cmd.Flags().GetBool("no-merge")
 		if err != nil {
 			return err
 		}
 		var ciPipeline map[string]interface{}
-		if merge == false {
+		if noMerge == false {
 			pipelineJobs, err = pipelineJobs.DynamicMerge()
 			if err != nil {
 				return err
@@ -87,7 +87,7 @@ var Cmd = &cobra.Command{
 		}
 		logger.Info("converted pipeline to yaml")
 
-		err = os.WriteFile(pipelineFile, data, 0777)
+		err = os.WriteFile(pipelineFile, data, 0666)
 		logger.Info("wrote yaml to file: " + pipelineFile)
 
 		return err
@@ -97,7 +97,7 @@ var Cmd = &cobra.Command{
 func init() {
 	Cmd.Flags().String("file", "pipeline.yaml", "output file")
 	Cmd.Flags().String("config", "config.kapigen.yaml", "config to use")
-	Cmd.Flags().Bool("no-merge", false, "use dynamic job merge")
+	Cmd.Flags().Bool("no-merge", false, "disable dynamic job merge")
 	Cmd.Flags().String("mode", version.FILE.Name(), "mode used for versioning: file,gitlab")
 
 }
