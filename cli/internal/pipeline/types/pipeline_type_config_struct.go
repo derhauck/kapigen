@@ -3,18 +3,19 @@ package types
 import (
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v3"
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/logger"
-	"os"
 )
 
 type PipelineTypeConfig struct {
 	Type       PipelineType `yaml:"type"`
 	Config     interface{}  `yaml:"config"`
 	PipelineId string       `yaml:"id"`
-	Need       []string     `yaml:"need"`
+	Needs      []string     `yaml:"needs"`
 }
 
 func (p *PipelineTypeConfig) Decode(factory *factory.MainFactory, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
@@ -76,7 +77,7 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 			err.Error(),
 		))
 	}
-	return jobs, nil
+	return jobs.SetPipelineId(pipelineId), nil
 }
 
 func LoadJobsFromPipelineConfig(factory *factory.MainFactory, configPath string, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, *PipelineConfig, error) {
@@ -103,7 +104,6 @@ func LoadJobsFromPipelineConfig(factory *factory.MainFactory, configPath string,
 func (p *PipelineConfig) Decode(factory *factory.MainFactory, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
 
 	var pipelineJobs Jobs
-
 	for i := 0; i < len(p.Pipelines); i++ {
 		configuration := p.Pipelines[i]
 		if configuration.PipelineId == "" {
@@ -118,6 +118,14 @@ func (p *PipelineConfig) Decode(factory *factory.MainFactory, configTypes map[Pi
 		if err != nil {
 			return nil, err
 		}
+
+		for _, pipelineId := range configuration.Needs {
+			logger.Info(fmt.Sprintf("PipelineId: '%s' adding need '%s'", configuration.PipelineId, pipelineId))
+			if needJobs := pipelineJobs.FindJobsByPipelineId(pipelineId); len(needJobs.GetJobs()) > 0 {
+				jobs.SetJobsAsNeed(needJobs)
+			}
+		}
+
 		pipelineJobs = append(pipelineJobs, jobs.GetJobs()...)
 	}
 

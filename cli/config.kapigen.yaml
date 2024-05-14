@@ -17,3 +17,5 @@ pipelines:
     config:
       path: cli
       name: cli
+    needs:
+      - cli-golang
