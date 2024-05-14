@@ -1,4 +1,4 @@
-FROM gitlab.kateops.com/infrastructure/dependency_proxy/containers/golang:1.21.3-alpine3.18 as builder
+FROM gitlab.com/kateops/dependency_proxy/containers/golang:1.21.3-alpine3.18 as builder
 #ENV CGO_ENABLED=0
 
 ENV GOMODCACHE=/app/.pkg
@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/app/.cache \
     go mod download && \
     go build -o kapigen
 #    go build -tags netgo -a -v -o kapigen
-FROM gitlab.kateops.com/infrastructure/dependency_proxy/containers/alpine:3.18.4
+FROM gitlab.com/kateops/dependency_proxy/containers/alpine:3.18.4
 RUN apk add --no-cache libc6-compat
 COPY --from=builder /app/kapigen /usr/bin/kapigen
 ENTRYPOINT ["/usr/bin/kapigen"]

@@ -18,7 +18,7 @@ Build:
         DOCKER_CONFIG: $CI_PROJECT_DIR
         KTC_PATH: cli
     image:
-        name: gitlab.kateops.com/infrastructure/dependency_proxy/containers/moby/buildkit:master
+        name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/moby/buildkit:master
         entrypoint:
             - sh
             - -c
@@ -37,7 +37,7 @@ Build:
           when: on_success
     stage: dynamic
     services:
-        - name: gitlab.kateops.com/infrastructure/dependency_proxy/containers/moby/buildkit:master-rootless
+        - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/moby/buildkit:master-rootless
           command:
             - --addr
             - unix:///run/user/1000/buildkit/buildkitd.sock
@@ -45,7 +45,7 @@ Build:
             - tcp://0.0.0.0:1234
             - --oci-worker-no-process-sandbox
           alias: buildkitd
-        - name: gitlab.kateops.com/infrastructure/dependency_proxy/containers/alpine:3.18
+        - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:3.18
           entrypoint:
             - sh
             - -c

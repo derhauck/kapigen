@@ -52,8 +52,8 @@ var Cmd = &cobra.Command{
 			pipelineJobs.AddJob(jobs.NewNoop())
 		}
 
-		if pipelineConfig.Tag {
-			logger.Info("tag mode activated, will add \"Tag\" job to pipeline")
+		if pipelineConfig.Versioning {
+			logger.Info("tag mode activated, will add \"Versioning\" job to pipeline")
 			pipelineJobs.AddJob(jobs.NewTag()).
 				AddJob(jobs.NewTagKapigen())
 		}
@@ -75,6 +75,7 @@ var Cmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		pipelineJobs.OverwriteTags(pipelineConfig.Tags)
 		logger.Info("ci jobs named to be unique")
 		ciPipeline = types.JobsToMap(pipelineJobs)
 		logger.Info("ci job list converted to map")

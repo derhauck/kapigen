@@ -50,16 +50,18 @@ type Controller struct {
 	new          string
 	mode         Mode
 	gitlabClient *gitlab.Client
+	FileReader   *FileReader
 	refresh      bool
 }
 
-func NewController(mode Mode, gitlabClient *gitlab.Client) *Controller {
+func NewController(mode Mode, gitlabClient *gitlab.Client, reader *FileReader) *Controller {
 	return &Controller{
 		"",
 		"",
 		"",
 		mode,
 		gitlabClient,
+		reader,
 		false,
 	}
 }
@@ -114,7 +116,7 @@ func (c *Controller) GetCurrentTag(path string) string {
 		case None:
 			c.current = EmptyTag
 		case FILE:
-			c.current = EmptyTag
+			c.current = c.FileReader.Get(path)
 		default:
 			c.current = EmptyTag
 		}
@@ -140,6 +142,8 @@ func (c *Controller) GetNewTag(path string) string {
 				c.GetCurrentTag(path),
 				c.getVersionIncrease(environment.CI_PROJECT_ID.Get(), environment.GetMergeRequestId()),
 			)
+		case FILE:
+			c.new = NoTag
 		case None:
 			c.new = NoTag
 
@@ -172,6 +176,8 @@ func (c *Controller) SetNewVersion(path string) string {
 	switch c.mode {
 	case Gitlab:
 		return c.createTagFromGitlab(c.new)
+	case FILE:
+		return c.new
 	case None:
 		return c.new
 	default:

@@ -19,6 +19,7 @@ type Job struct {
 	fn          []func(job *job.CiJob)
 	CiJobYaml   *job.CiJobYaml
 	PipelineId  string
+	ExternalTags []string
 }
 
 func (j *Job) AddJobAsNeed(job *Job) *Job {
@@ -165,7 +166,7 @@ func (j *Job) Render() error {
 		fn(j.CiJob)
 	}
 	var err error
-	j.CiJobYaml, err = j.CiJob.Render(j.Needs.NeedsYaml())
+	j.CiJobYaml, err = j.CiJob.Render(j.Needs.NeedsYaml(), j.ExternalTags)
 	if err != nil {
 		return fmt.Errorf("job='%s'  can not be rendered: %w", j.Names, err)
 	}
@@ -275,4 +276,14 @@ func JobsToMap(jobs *Jobs) map[string]interface{} {
 		ciPipeline[evaluatedJob.GetName()] = evaluatedJob.CiJobYaml
 	}
 	return ciPipeline
+}
+
+func (j *Jobs) OverwriteTags(tags []string) {
+	if len(tags) > 0 && len(tags) > 0 {
+		for _, evaluatedJob := range j.GetJobs() {
+			if evaluatedJob.CiJobYaml != nil {
+				evaluatedJob.CiJobYaml.Tags = tags
+			}
+		}
+	}
 }
