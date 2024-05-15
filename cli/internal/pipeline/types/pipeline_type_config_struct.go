@@ -15,7 +15,7 @@ type PipelineTypeConfig struct {
 	Type       PipelineType `yaml:"type"`
 	Config     interface{}  `yaml:"config"`
 	PipelineId string       `yaml:"id"`
-	Need       []string     `yaml:"need"`
+	Needs      []string     `yaml:"needs"`
 	Tags       []string     `yaml:"tags"`
 }
 
@@ -66,7 +66,7 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 	err := config.Validate()
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf(
-			"Pipeline type: %s, id: %s, encountered validation error: %s",
+			"pipeline type: %s, id: %s, encountered validation error: %s",
 			pipelineType,
 			pipelineId,
 			err.Error(),
@@ -76,13 +76,13 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 	jobs, err := config.Build(factory, pipelineType, pipelineId)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf(
-			"Pipeline type: %s, id: %s, encountered build error: %s",
+			"pipeline type: %s, id: %s, encountered build error: %s",
 			pipelineType,
 			pipelineId,
 			err.Error(),
 		))
 	}
-	return jobs, nil
+	return jobs.SetPipelineId(pipelineId), nil
 }
 
 func LoadJobsFromPipelineConfig(factory *factory.MainFactory, configPath string, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, *PipelineConfig, error) {
@@ -109,7 +109,6 @@ func LoadJobsFromPipelineConfig(factory *factory.MainFactory, configPath string,
 func (p *PipelineConfig) Decode(factory *factory.MainFactory, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
 
 	var pipelineJobs Jobs
-
 	for i := 0; i < len(p.Pipelines); i++ {
 		configuration := p.Pipelines[i]
 		if configuration.PipelineId == "" {
@@ -124,6 +123,18 @@ func (p *PipelineConfig) Decode(factory *factory.MainFactory, configTypes map[Pi
 		if err != nil {
 			return nil, err
 		}
+
+		for _, pipelineId := range configuration.Needs {
+			logger.Info(fmt.Sprintf("pipeline id: %s, adding pipeline as need: %s", configuration.PipelineId, pipelineId))
+			needJobs, err := pipelineJobs.FindJobsByPipelineId(pipelineId)
+			if err != nil {
+				return nil, fmt.Errorf("pipeline id: %s %w", configuration.PipelineId, err)
+			}
+			if len(needJobs.GetJobs()) > 0 {
+				jobs.SetJobsAsNeed(needJobs)
+			}
+		}
+
 		pipelineJobs = append(pipelineJobs, jobs.GetJobs()...)
 	}
 
