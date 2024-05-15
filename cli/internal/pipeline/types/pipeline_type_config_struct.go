@@ -66,7 +66,7 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 	err := config.Validate()
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf(
-			"Pipeline type: %s, id: %s, encountered validation error: %s",
+			"pipeline type: %s, id: %s, encountered validation error: %s",
 			pipelineType,
 			pipelineId,
 			err.Error(),
@@ -76,7 +76,7 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 	jobs, err := config.Build(factory, pipelineType, pipelineId)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf(
-			"Pipeline type: %s, id: %s, encountered build error: %s",
+			"pipeline type: %s, id: %s, encountered build error: %s",
 			pipelineType,
 			pipelineId,
 			err.Error(),
@@ -125,8 +125,12 @@ func (p *PipelineConfig) Decode(factory *factory.MainFactory, configTypes map[Pi
 		}
 
 		for _, pipelineId := range configuration.Needs {
-			logger.Info(fmt.Sprintf("PipelineId: '%s' adding need '%s'", configuration.PipelineId, pipelineId))
-			if needJobs := pipelineJobs.FindJobsByPipelineId(pipelineId); len(needJobs.GetJobs()) > 0 {
+			logger.Info(fmt.Sprintf("pipeline id: %s, adding pipeline as need: %s", configuration.PipelineId, pipelineId))
+			needJobs, err := pipelineJobs.FindJobsByPipelineId(pipelineId)
+			if err != nil {
+				return nil, fmt.Errorf("pipeline id: %s %w", configuration.PipelineId, err)
+			}
+			if len(needJobs.GetJobs()) > 0 {
 				jobs.SetJobsAsNeed(needJobs)
 			}
 		}

@@ -12,13 +12,13 @@ import (
 )
 
 type Job struct {
-	Names       []string
-	CiJob       *job.CiJob
-	Needs       Needs
-	currentName int
-	fn          []func(job *job.CiJob)
-	CiJobYaml   *job.CiJobYaml
-	PipelineId  string
+	Names        []string
+	CiJob        *job.CiJob
+	Needs        Needs
+	currentName  int
+	fn           []func(job *job.CiJob)
+	CiJobYaml    *job.CiJobYaml
+	PipelineId   string
 	ExternalTags []string
 }
 
@@ -259,15 +259,17 @@ func (j *Jobs) EvaluateNames() (*Jobs, error) {
 	}
 	return &evaluatedJobs, nil
 }
-func (j *Jobs) FindJobsByPipelineId(pipelineId string) *Jobs {
+func (j *Jobs) FindJobsByPipelineId(pipelineId string) (*Jobs, error) {
 	found := Jobs{}
 	for _, currentJob := range j.GetJobs() {
 		if currentJob.PipelineId == pipelineId {
 			found = append(found, currentJob)
 		}
 	}
-
-	return &found
+	if len(found) == 0 {
+		return &found, fmt.Errorf("can not find pipeline as need: %s", pipelineId)
+	}
+	return &found, nil
 }
 func JobsToMap(jobs *Jobs) map[string]interface{} {
 	var ciPipeline = make(map[string]interface{})
