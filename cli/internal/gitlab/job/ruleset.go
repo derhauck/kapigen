@@ -8,6 +8,11 @@ import (
 )
 
 func DefaultPipelineRules() *Rules {
+	rules := &Rules{}
+	return rules.AddRules(*DefaultMergeRequestRules()).
+		AddRules(*DefaultMainBranchRules())
+}
+func DefaultMergeRequestRules() *Rules {
 	return &Rules{
 		&Rule{
 			If:   "$KTC_STOP_PIPELINE != \"false\" && $DEBUG == null",
@@ -21,13 +26,24 @@ func DefaultPipelineRules() *Rules {
 		&Rule{
 			If: "$KTC_TEST_PIPELINE",
 		},
-		&Rule{
-			If:   "$CI_COMMIT_TAG != null",
-			When: NewWhen(when.OnSuccess),
-		},
 	}
 }
 
+func DefaultMainBranchRules() *Rules {
+	return &Rules{
+		&Rule{
+			If:   "$KTC_STOP_PIPELINE != \"false\" && $DEBUG == null",
+			When: NewWhen(when.Never),
+		},
+		&Rule{
+			If:   "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
+			When: NewWhen(when.OnSuccess),
+		},
+		&Rule{
+			If: "$KTC_TEST_PIPELINE",
+		},
+	}
+}
 func DefaultOnlyReleasePipelineRules() *Rules {
 	return &Rules{
 		&Rule{
