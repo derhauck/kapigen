@@ -12,7 +12,7 @@ type Clients struct {
 
 func (c *Clients) GetGitlabClient() *gitlab.Client {
 	if c.Gitlab == nil {
-		client, err := gitlab.NewClient(environment.CI_JOB_TOKEN.Get(), gitlab.WithBaseURL(environment.CI_SERVER_HOST.Get()))
+		client, err := gitlab.NewClient(environment.CI_JOB_TOKEN.Get(), gitlab.WithBaseURL(environment.CI_SERVER_URL.Get()))
 		if err != nil {
 			logger.Error("could not create gitlab client")
 			return nil
