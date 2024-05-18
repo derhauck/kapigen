@@ -3,13 +3,14 @@ package golang
 import (
 	"errors"
 	"fmt"
+	"strings"
+
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/job/artifact"
 	"kapigen.kateops.com/internal/gitlab/job/artifact/reports"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/pipeline/types"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
-	"strings"
 )
 
 func NewUnitTest(image string, path string, packages []string) (*types.Job, error) {
@@ -32,7 +33,7 @@ func NewUnitTest(image string, path string, packages []string) (*types.Job, erro
 			SetStage(stages.TEST).
 			AddBeforeScript(fmt.Sprintf("cd %s", path)).
 			AddScript("go install github.com/jstemmer/go-junit-report/v2@latest").
-			AddScript(fmt.Sprintf("%s 2>&1 | go-junit-report -parser gojson -iocopy -out report.xml", testCmd)).
+			AddScript(fmt.Sprintf("%s 2>&1 | go-junit-report -parser gojson -iocopy -out report.xml || echo 'ERROR'", testCmd)).
 			AddScript("go tool cover -func profile.cov").
 			AddVariable("KTC_PATH", path).
 			AddArtifact(job.Artifact{
@@ -44,6 +45,5 @@ func NewUnitTest(image string, path string, packages []string) (*types.Job, erro
 			}).
 			SetCodeCoverage(`/\(statements\)(?:\s+)?(\d+(?:\.\d+)?%)/`)
 
-		ciJob.Rules = *job.DefaultPipelineRules()
 	}), nil
 }

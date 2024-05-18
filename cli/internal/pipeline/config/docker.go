@@ -6,6 +6,7 @@ import (
 
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/environment"
+	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/jobs/docker"
 	"kapigen.kateops.com/internal/pipeline/types"
@@ -43,8 +44,8 @@ func (d *Docker) Validate() error {
 	}
 
 	if d.Release == nil {
-		logger.Info("no release set, defaulting to false")
-		tmp := false
+		logger.Info("no release set, defaulting to true")
+		tmp := true
 		d.Release = &tmp
 	}
 
@@ -57,7 +58,7 @@ func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ str
 	var destination []string
 	destination = append(destination, d.DefaultRegistry(tag))
 	d.ImageName = d.DefaultRegistry(tag)
-	if environment.IsRelease() && *d.Release {
+	if environment.IsRelease() {
 		destination = append(destination, d.DefaultRegistry("latest"))
 	}
 
@@ -81,4 +82,15 @@ func (d *Docker) DefaultRegistry(tag string) string {
 		return fmt.Sprintf("${CI_REGISTRY_IMAGE}/%s:%s", d.Name, tag)
 	}
 	return fmt.Sprintf("${CI_REGISTRY_IMAGE}:%s", tag)
+}
+
+func (d *Docker) Rules() *job.Rules {
+	rules := &job.Rules{}
+	if *d.Release {
+		rules.
+			AddRules(*job.DefaultOnlyReleasePipelineRules()).
+			AddRules(*job.DefaultMainBranchRules())
+	}
+	rules.AddRules(*job.DefaultMergeRequestRules())
+	return rules
 }
