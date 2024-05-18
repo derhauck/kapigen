@@ -27,7 +27,8 @@ The version increase will be set once the Merge Request is merged. Until then yo
 
 ```
 Merge Request   ->  current version + feature branch name
-Main            ->  will tag with new version and then release artifacts
+Main            ->  will tag with new version
+Tag             ->  creates new artifacts
 ```
 
 
