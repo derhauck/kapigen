@@ -128,7 +128,7 @@ func (c *Controller) GetCurrentTag(path string) string {
 
 func (c *Controller) GetCurrentPipelineTag(path string) string {
 	if environment.IsRelease() {
-		return c.GetNewTag(path)
+		return environment.CI_COMMIT_TAG.Get()
 	}
 
 	return c.GetIntermediateTag(path)

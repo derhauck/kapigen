@@ -15,7 +15,6 @@ const (
 	Alpine_3_18
 	Terraform_Base
 	BUILDKIT
-	BUILDKIT_DAEMON
 	BUILDKIT_ROTLESS
 	CRANE_DEBUG
 
@@ -23,11 +22,10 @@ const (
 )
 
 var values = map[Image]string{
-	Kapigen_Latest:   "kapigen",
+	Kapigen_Latest:   "registry.gitlab.com/kateops/kapigen/cli:latest",
 	Alpine_3_18:      DEPENDENCY_PROXY + "alpine:3.18",
 	Terraform_Base:   "hub.kateops.com/base/terraform:latest",
 	BUILDKIT:         DEPENDENCY_PROXY + "moby/buildkit:master",
-	BUILDKIT_DAEMON:  DEPENDENCY_PROXY + "moby/buildkit:master-rootless",
 	BUILDKIT_ROTLESS: DEPENDENCY_PROXY + "moby/buildkit:v0.12.3-rootless",
 	CRANE_DEBUG:      "gcr.io/go-containerregistry/crane:debug",
 	GOLANG_1_21:      DEPENDENCY_PROXY + "golang:1.21",

@@ -18,8 +18,9 @@ func TestIsRelease(t *testing.T) {
 		CI_MERGE_REQUEST_ID.Unset()
 		CI_COMMIT_BRANCH.Set("master")
 		CI_DEFAULT_BRANCH.Set("master")
+		CI_COMMIT_TAG.Set("1.0.0")
 		if !IsRelease() {
-			t.Errorf("should be true as env was prepared id: %s, commit: %s, default :%s", CI_MERGE_REQUEST_ID.Get(), CI_COMMIT_BRANCH.Get(), CI_DEFAULT_BRANCH.Get())
+			t.Errorf("should be true as env was prepared id: %s, commit: %s, default :%s, tag:%s", CI_MERGE_REQUEST_ID.Get(), CI_COMMIT_BRANCH.Get(), CI_DEFAULT_BRANCH.Get(), CI_COMMIT_TAG.Get())
 		}
 	})
 	t.Run("will not work when not on default branch", func(t *testing.T) {

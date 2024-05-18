@@ -2,6 +2,7 @@ package job
 
 import (
 	"fmt"
+
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 	"kapigen.kateops.com/internal/when"
 )
@@ -18,11 +19,6 @@ func DefaultPipelineRules() *Rules {
 			When:    NewWhen(when.OnSuccess),
 		},
 		&Rule{
-			If:      "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
-			Changes: *wrapper.NewStringSlice().Add("${KTC_PATH}/**/*"),
-			When:    NewWhen(when.OnSuccess),
-		},
-		&Rule{
 			If: "$KTC_TEST_PIPELINE",
 		},
 	}
@@ -34,7 +30,7 @@ func DefaultOnlyReleasePipelineRules() *Rules {
 			If: "$KTC_STOP_PIPELINE != \"false\" && $DEBUG == null",
 		},
 		&Rule{
-			If:      "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
+			If:      "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH && $CI_COMMIT_TAG != null",
 			Changes: *wrapper.NewStringSlice().Add("${KTC_PATH}/**/*"),
 			When:    NewWhen(when.OnSuccess),
 		},
@@ -46,7 +42,7 @@ func DefaultOnlyReleasePipelineRules() *Rules {
 
 func RulesNotKapigen(rules *Rules) *Rules {
 	for _, rule := range rules.Get() {
-		rule.If = fmt.Sprintf("%s && %s", rule.If, "$CI_PROJECT_ID != \"125\"")
+		rule.If = fmt.Sprintf("%s && %s", rule.If, "$CI_PROJECT_ID != \"57482547\"")
 	}
 
 	return rules
@@ -54,7 +50,7 @@ func RulesNotKapigen(rules *Rules) *Rules {
 
 func RulesKapigen(rules *Rules) *Rules {
 	for _, rule := range rules.Get() {
-		rule.If = fmt.Sprintf("%s && %s", rule.If, "$CI_PROJECT_ID == \"125\"")
+		rule.If = fmt.Sprintf("%s && %s", rule.If, "$CI_PROJECT_ID == \"57482547\"")
 	}
 
 	return rules

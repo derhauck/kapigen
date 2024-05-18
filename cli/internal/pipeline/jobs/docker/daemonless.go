@@ -61,6 +61,9 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 		ciJob.Script.Value.
 			Add(command)
 		ciJob.Rules = *job.DefaultPipelineRules()
+		for _, rule := range job.DefaultOnlyReleasePipelineRules().Get() {
+			ciJob.Rules.Add(rule)
+		}
 		ciJob.AddVariable("KTC_PATH", path).
 			AddVariable("BUILDKITD_FLAGS", "--oci-worker-no-process-sandbox").
 			AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}").
