@@ -20,24 +20,21 @@ func IsRelease() bool {
 }
 
 func GetBranchName() string {
-	if IsRelease() {
+	if _, err := CI_MERGE_REQUEST_ID.Lookup(); err != nil {
 		return CI_COMMIT_BRANCH.Get()
 	}
 	return CI_MERGE_REQUEST_SOURCE_BRANCH_NAME.Get()
 }
 
 func GetMergeRequestId() int {
-	if IsRelease() {
+	if _, err := CI_MERGE_REQUEST_ID.Lookup(); err != nil {
 		return getMergeRequestIdFromCommit(CI_COMMIT_MESSAGE.Get())
 	}
 	return getMergeRequestIdFromEnv()
 }
 
 func getMergeRequestIdFromEnv() int {
-	id, err := CI_MERGE_REQUEST_ID.Lookup()
-	if err != nil {
-
-	}
+	id := CI_MERGE_REQUEST_ID.Get()
 	i, err := strconv.ParseInt(id, 10, 32)
 	if err != nil {
 		logger.Error(fmt.Sprintf("could not parse merge request id %s", id))
