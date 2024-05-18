@@ -87,5 +87,5 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 }
 
 func (g *Golang) Rules() *job.Rules {
-	return &job.Rules{}
+	return &*job.DefaultPipelineRules()
 }

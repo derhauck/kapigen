@@ -45,6 +45,5 @@ func NewUnitTest(image string, path string, packages []string) (*types.Job, erro
 			}).
 			SetCodeCoverage(`/\(statements\)(?:\s+)?(\d+(?:\.\d+)?%)/`)
 
-		ciJob.Rules = *job.DefaultPipelineRules()
 	}), nil
 }
