@@ -96,6 +96,9 @@ func (c *Controller) createTagFromGitlab(version string) string {
 		logger.Error("no gitlab client configured")
 		return EmptyTag
 	}
+	if version == EmptyTag {
+		return EmptyTag
+	}
 
 	release, _, err := c.gitlabClient.Releases.CreateRelease(environment.CI_PROJECT_ID.Get(), &gitlab.CreateReleaseOptions{
 		TagName:    &version,

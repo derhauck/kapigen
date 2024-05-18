@@ -28,7 +28,12 @@ var NewCmd = &cobra.Command{
 		factory := factory.New(settings)
 
 		controller := factory.GetVersionController()
-		logger.Info(fmt.Sprintf("Created new version %s", controller.SetNewVersion(path)))
+		newVersion := controller.SetNewVersion(path)
+		if newVersion == version.EmptyTag {
+			logger.Error("Empty version ref, did not create new tag")
+			return nil
+		}
+		logger.Info(fmt.Sprintf("Created new version %s", newVersion))
 		return nil
 	},
 }
