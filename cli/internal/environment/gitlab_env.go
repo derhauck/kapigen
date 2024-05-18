@@ -16,6 +16,7 @@ const (
 	CI_COMMIT_BRANCH
 	CI_COMMIT_MESSAGE
 	CI_COMMIT_SHA
+	CI_COMMIT_TAG
 	CI_DEFAULT_BRANCH
 	CI_JOB_TOKEN
 	CI_MERGE_REQUEST_LABELS
@@ -31,6 +32,7 @@ var values = map[Variable]string{
 	CI_COMMIT_SHA:                       "CI_COMMIT_SHA",
 	CI_COMMIT_BRANCH:                    "CI_COMMIT_BRANCH",
 	CI_COMMIT_MESSAGE:                   "CI_COMMIT_MESSAGE",
+	CI_COMMIT_TAG:                       "CI_COMMIT_TAG",
 	CI_DEFAULT_BRANCH:                   "CI_DEFAULT_BRANCH",
 	CI_JOB_TOKEN:                        "CI_JOB_TOKEN",
 	CI_PROJECT_ID:                       "CI_PROJECT_ID",

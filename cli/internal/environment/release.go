@@ -2,25 +2,21 @@ package environment
 
 import (
 	"fmt"
-	"kapigen.kateops.com/internal/logger"
 	"regexp"
 	"strconv"
+
+	"kapigen.kateops.com/internal/logger"
 )
 
 func IsRelease() bool {
-	commit, errCommit := CI_COMMIT_BRANCH.Lookup()
-	def, errDefault := CI_DEFAULT_BRANCH.Lookup()
-	mr, errMr := CI_MERGE_REQUEST_ID.Lookup()
-	if errDefault != nil || errCommit != nil {
+	commit, _ := CI_COMMIT_BRANCH.Lookup()
+	def, _ := CI_DEFAULT_BRANCH.Lookup()
+	_, errTag := CI_COMMIT_TAG.Lookup()
+	if commit == def && errTag == nil {
+		return true
+	} else {
 		return false
 	}
-	if errMr == nil || mr != "" {
-		return false
-	}
-	if commit != def {
-		return false
-	}
-	return true
 }
 
 func GetBranchName() string {

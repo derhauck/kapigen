@@ -34,12 +34,12 @@ func (d *Docker) Validate() error {
 	}
 
 	if d.Context == "" {
-		logger.Info("no context set, using path")
+		logger.Info("no context set, defaulting to path")
 		d.Context = d.Path
 	}
 
 	if d.Name == "" {
-		logger.Info("no name set, using container root registry")
+		logger.Info("no name set, defaulting to container root registry")
 	}
 
 	if d.Release == nil {

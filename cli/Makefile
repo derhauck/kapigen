@@ -25,7 +25,7 @@ test:
 
 .PHONY: pipeline
 pipeline:
-	$(MAKE) run ARGS="generate pipeline -v"
+	$(MAKE) run ARGS="generate pipeline -v --mode gitlab"
 
 .PHONY: test-pipeline
 test-pipeline:
