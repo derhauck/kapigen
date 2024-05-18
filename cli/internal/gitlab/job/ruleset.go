@@ -14,7 +14,7 @@ func DefaultPipelineRules() *Rules {
 			When: NewWhen(when.Never),
 		},
 		&Rule{
-			If:      "($CI_MERGE_REQUEST_IID || $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH)",
+			If:      "($CI_MERGE_REQUEST_IID || $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH && $CI_COMMIT_TAG != null)",
 			Changes: *wrapper.NewStringSlice().Add("${KTC_PATH}/**/*"),
 			When:    NewWhen(when.OnSuccess),
 		},
