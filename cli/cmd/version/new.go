@@ -15,7 +15,7 @@ var NewCmd = &cobra.Command{
 	Short:            "Will create a new version",
 	TraverseChildren: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cli.NewPersistentConfig(cmd)
+		cli.PreparePersistentFlags(cmd)
 		mode, err := cmd.Flags().GetString("mode")
 		path, err := cmd.Flags().GetString("path")
 		if err != nil {
