@@ -211,6 +211,8 @@ func GetModeFromString(mode string) Mode {
 	switch mode {
 	case Gitlab.Name():
 		return Gitlab
+	case FILE.Name():
+		return FILE
 	default:
 		return None
 	}
