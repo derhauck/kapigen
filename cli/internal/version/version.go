@@ -96,17 +96,21 @@ func (c *Controller) createTagFromGitlab(version string) string {
 		logger.Error("no gitlab client configured")
 		return EmptyTag
 	}
-	tag, _, err := c.gitlabClient.Tags.CreateTag(environment.CI_PROJECT_ID.Get(), &gitlab.CreateTagOptions{
-		TagName: &version,
-		Ref:     &ref,
-		Message: &msg,
+
+	release, _, err := c.gitlabClient.Releases.CreateRelease(environment.CI_PROJECT_ID.Get(), &gitlab.CreateReleaseOptions{
+		TagName:    &version,
+		Ref:        &ref,
+		TagMessage: &msg,
 	})
+	if err != nil {
+		return ""
+	}
 	if err != nil {
 		logger.ErrorE(err)
 		return EmptyTag
 	}
-	logger.DebugAny(tag)
-	return tag.Name
+	logger.DebugAny(release)
+	return version
 }
 func (c *Controller) Refresh() *Controller {
 	c.refresh = true
