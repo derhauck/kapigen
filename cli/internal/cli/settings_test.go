@@ -17,5 +17,10 @@ func TestSetMode(t *testing.T) {
 		if setting.Mode != version.FILE {
 			t.Errorf("should be file mode, is %s", setting.Mode.Name())
 		}
+
+		setting = NewSettings(SetMode(version.None))
+		if setting.Mode != version.None {
+			t.Errorf("should be file mode, is %s", setting.Mode.Name())
+		}
 	})
 }

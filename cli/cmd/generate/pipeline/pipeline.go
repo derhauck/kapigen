@@ -20,7 +20,7 @@ var Cmd = &cobra.Command{
 	Short:            "Generate pipeline",
 	TraverseChildren: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cli.NewPersistentConfig(cmd)
+		cli.PreparePersistentFlags(cmd)
 		logger.Debug("activated verbose mode")
 
 		configPath, err := cmd.Flags().GetString("config")

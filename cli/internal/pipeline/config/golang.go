@@ -34,12 +34,13 @@ func (g *Golang) New() types.PipelineConfigInterface {
 }
 
 func (g *Golang) Validate() error {
-	//if g.ImageName == "" && g.Docker == nil {
-	//	return errors.New("no imageName or docker config set, required")
-	//}
+	if g.ImageName == "" && g.Docker == nil {
+		return errors.New("no imageName or docker config set, required")
+	}
 
 	if g.Path == "" {
-		return errors.New("no path set, required")
+		logger.Info("no path set, defaulting to '.'")
+		g.Path = "."
 	}
 
 	if g.Coverage == nil {
