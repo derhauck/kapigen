@@ -81,7 +81,11 @@ func (c *Controller) getTagFromGitlab() string {
 		logger.ErrorE(err)
 		return EmptyTag
 	}
-	logger.DebugAny(tags)
+
+	if len(tags) == 0 {
+		return EmptyTag
+	}
+
 	return tags[0].Name
 }
 
