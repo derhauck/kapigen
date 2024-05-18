@@ -60,10 +60,7 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 			Add("while [ ! -f ${CI_PROJECT_DIR}/.status.auth ]; do echo 'wait for auth'; sleep 1; done")
 		ciJob.Script.Value.
 			Add(command)
-		ciJob.Rules = *job.DefaultPipelineRules()
-		for _, rule := range job.DefaultOnlyReleasePipelineRules().Get() {
-			ciJob.Rules.Add(rule)
-		}
+		ciJob.Rules = *job.DefaultMergeRequestRules().AddRules(*job.DefaultOnlyReleasePipelineRules())
 		ciJob.AddVariable("KTC_PATH", path).
 			AddVariable("BUILDKITD_FLAGS", "--oci-worker-no-process-sandbox").
 			AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}").

@@ -63,6 +63,13 @@ func (r *Rules) Add(rule *Rule) *Rules {
 	return r
 }
 
+func (r *Rules) AddRules(rules Rules) *Rules {
+	for _, rule := range rules.Get() {
+		r.Add(rule)
+	}
+	return r
+}
+
 type RuleYaml struct {
 	If           string   `yaml:"if,omitempty"`
 	Changes      []string `yaml:"changes,omitempty"`
