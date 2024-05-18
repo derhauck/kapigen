@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"kapigen.kateops.com/factory"
+	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/jobs/golang"
 	"kapigen.kateops.com/internal/pipeline/types"
@@ -70,8 +71,8 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 		if err != nil {
 			return nil, err
 		}
-		for _, job := range jobs.GetJobs() {
-			test.AddJobAsNeed(job)
+		for _, currentJob := range jobs.GetJobs() {
+			test.AddJobAsNeed(currentJob)
 		}
 		allJobs = append(allJobs, jobs.GetJobs()...)
 	} else {
@@ -83,4 +84,8 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 
 	allJobs = append(allJobs, test)
 	return &allJobs, nil
+}
+
+func (g *Golang) Rules() *job.Rules {
+	return &job.Rules{}
 }

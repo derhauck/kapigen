@@ -2,6 +2,7 @@ package config
 
 import (
 	"kapigen.kateops.com/factory"
+	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/pipeline/jobs/infrastructure"
 	"kapigen.kateops.com/internal/pipeline/types"
 )
@@ -30,8 +31,12 @@ func (i *Infrastructure) Build(_ *factory.MainFactory, pipelineType types.Pipeli
 		NewTerraformPlan(i.Path, i.State, i.S3).
 		AddJobAsNeed(init)
 	var tmp = types.Jobs{init, plan}
-	for _, job := range tmp {
-		job.CiJob.Cache.SetDefaultCacheKey(i.Path, string(pipelineType))
+	for _, currentJob := range tmp {
+		currentJob.CiJob.Cache.SetDefaultCacheKey(i.Path, string(pipelineType))
 	}
 	return &tmp, nil
+}
+
+func (i *Infrastructure) Rules() *job.Rules {
+	return &job.Rules{}
 }

@@ -82,7 +82,12 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 			err.Error(),
 		))
 	}
-	return jobs.SetPipelineId(pipelineId), nil
+	rules := config.Rules()
+	for _, currentJob := range jobs.GetJobs() {
+		currentJob.PipelineId = pipelineId
+		currentJob.CiJob.Rules = *rules
+	}
+	return jobs, nil
 }
 
 func LoadJobsFromPipelineConfig(factory *factory.MainFactory, configPath string, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, *PipelineConfig, error) {

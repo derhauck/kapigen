@@ -184,12 +184,6 @@ func (j *Jobs) SetJobsAsNeed(jobs *Jobs) *Jobs {
 
 	return j
 }
-func (j *Jobs) SetPipelineId(pipelineId string) *Jobs {
-	for _, currentJob := range j.GetJobs() {
-		currentJob.PipelineId = pipelineId
-	}
-	return j
-}
 
 func (j *Jobs) AddJob(job *Job) *Jobs {
 	*j = append(*j, job)
