@@ -112,10 +112,6 @@ func (c *Controller) createTagFromGitlab(version string) string {
 	logger.DebugAny(release)
 	return version
 }
-func (c *Controller) Refresh() *Controller {
-	c.refresh = true
-	return c
-}
 func (c *Controller) GetCurrentTag(path string) string {
 	if c.current == "" || c.refresh {
 		switch c.mode {
