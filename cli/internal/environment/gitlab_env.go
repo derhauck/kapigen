@@ -23,6 +23,7 @@ const (
 	CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
 	CI_PIPELINE_TOKEN
 	CI_SERVER_HOST
+	CI_SERVER_URL
 	GITLAB_TOKEN
 	LOS_AUTH_TOKEN
 	KAPIGEN_VERSION
@@ -44,6 +45,7 @@ var values = map[Variable]string{
 	GITLAB_TOKEN:                        "GITLAB_TOKEN",
 	LOS_AUTH_TOKEN:                      "LOS_AUTH_TOKEN",
 	CI_SERVER_HOST:                      "CI_SERVER_HOST",
+	CI_SERVER_URL:                       "CI_SERVER_URL",
 }
 
 func (v Variable) Key() string {
