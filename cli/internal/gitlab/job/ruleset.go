@@ -14,12 +14,16 @@ func DefaultPipelineRules() *Rules {
 			When: NewWhen(when.Never),
 		},
 		&Rule{
-			If:      "($CI_MERGE_REQUEST_IID || $CI_COMMIT_TAG != null)",
+			If:      "$CI_MERGE_REQUEST_IID",
 			Changes: *wrapper.NewStringSlice().Add("${KTC_PATH}/**/*"),
 			When:    NewWhen(when.OnSuccess),
 		},
 		&Rule{
 			If: "$KTC_TEST_PIPELINE",
+		},
+		&Rule{
+			If:   "$CI_COMMIT_TAG != null",
+			When: NewWhen(when.OnSuccess),
 		},
 	}
 }
@@ -30,9 +34,8 @@ func DefaultOnlyReleasePipelineRules() *Rules {
 			If: "$KTC_STOP_PIPELINE != \"false\" && $DEBUG == null",
 		},
 		&Rule{
-			If:      "$CI_COMMIT_TAG != null",
-			Changes: *wrapper.NewStringSlice().Add("${KTC_PATH}/**/*"),
-			When:    NewWhen(when.OnSuccess),
+			If:   "$CI_COMMIT_TAG != null",
+			When: NewWhen(when.OnSuccess),
 		},
 		&Rule{
 			If: "$KTC_TEST_PIPELINE",
