@@ -9,10 +9,8 @@ import (
 )
 
 func IsRelease() bool {
-	commit, _ := CI_COMMIT_BRANCH.Lookup()
-	def, _ := CI_DEFAULT_BRANCH.Lookup()
 	_, errTag := CI_COMMIT_TAG.Lookup()
-	if commit == def && errTag == nil {
+	if errTag == nil {
 		return true
 	} else {
 		return false
