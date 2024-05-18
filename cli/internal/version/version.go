@@ -186,7 +186,7 @@ func (c *Controller) SetNewVersion(path string) string {
 }
 
 func (c *Controller) getVersionIncrease(projectId string, mrId int) string {
-	if environment.IsRelease() {
+	if _, err := environment.CI_MERGE_REQUEST_ID.Lookup(); err != nil {
 		return getVersionIncreaseFromLabels(
 			c.getMrLabelsFromApi(projectId, mrId),
 		)
