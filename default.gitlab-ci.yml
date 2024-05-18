@@ -21,7 +21,7 @@ Build:
   before_script:
     - cd .kapigen
   script:
-    - kapigen generate pipeline -v
+    - kapigen generate pipeline -v  --mode gitlab
   artifacts:
     paths:
       - pipeline.yaml
