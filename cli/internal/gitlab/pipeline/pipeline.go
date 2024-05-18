@@ -51,6 +51,10 @@ func NewDefaultCiPipeline() *CiPipeline {
 					If:   "$CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'",
 					When: job.NewWhen(when.Always),
 				},
+				&job.Rule{
+					If:   "$CI_COMMIT_TAG != null",
+					When: job.NewWhen(when.Always),
+				},
 			},
 		},
 		Variables: map[string]string{

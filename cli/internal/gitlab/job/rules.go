@@ -3,13 +3,14 @@ package job
 import (
 	"errors"
 	"fmt"
+
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 	"kapigen.kateops.com/internal/when"
 )
 
 type Rule struct {
-	If           string              `yaml:"if"`
+	If           string              `yaml:"if,omitempty"`
 	Changes      wrapper.StringSlice `yaml:"changes"`
 	AllowFailure wrapper.Bool        `yaml:"allow_failure"`
 	Variables    struct{}            `yaml:"variables"`
@@ -63,7 +64,7 @@ func (r *Rules) Add(rule *Rule) *Rules {
 }
 
 type RuleYaml struct {
-	If           string   `yaml:"if"`
+	If           string   `yaml:"if,omitempty"`
 	Changes      []string `yaml:"changes,omitempty"`
 	AllowFailure any      `yaml:"allow_failure,omitempty"`
 	Variables    struct{} `yaml:"variables,omitempty"`

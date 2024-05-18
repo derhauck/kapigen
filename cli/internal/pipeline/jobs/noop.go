@@ -13,7 +13,6 @@ func NewNoop() *types.Job {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
 		ciJob.Script.Value.Add("echo \"successfully triggered\"")
 		ciJob.Rules.Add(&job.Rule{
-			If:   "($CI_MERGE_REQUEST_IID || $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH)",
 			When: job.NewWhen(when.OnSuccess),
 		})
 	})
