@@ -38,5 +38,7 @@ func (i *Infrastructure) Build(_ *factory.MainFactory, pipelineType types.Pipeli
 }
 
 func (i *Infrastructure) Rules() *job.Rules {
-	return &job.Rules{}
+	rules := &job.Rules{}
+	rules.AddRules(*job.DefaultPipelineRules(i.Path))
+	return rules
 }

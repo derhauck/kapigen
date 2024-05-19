@@ -99,5 +99,5 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 }
 
 func (g *Golang) Rules() *job.Rules {
-	return &*job.DefaultPipelineRules()
+	return &*job.DefaultPipelineRules(g.Path)
 }
