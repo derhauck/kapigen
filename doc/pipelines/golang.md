@@ -30,6 +30,7 @@ Either by using `imageName` or the `docker` configuration. If both are set the `
 * `docker.path: [required]` The path to the Dockerfile.
 * `docker.dockerfile: [optional | default: 'Dockerfile']` The name of the Dockerfile inside the `<path>`.
 * `docker.context: [optional | default: <path>]` The context for the docker build.
+* `docker.buildArgs: [optional]` Additional build arguments for the docker build.
 
 ### Example:
 **Image only**
@@ -56,4 +57,6 @@ config:
     path: cli
     context: cli
     dockerfile: Dockerfile
+    buildArgs:
+      FOO: bar
 ```
