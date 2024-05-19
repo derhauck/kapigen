@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/gitlab/job"
@@ -12,6 +13,12 @@ import (
 
 type GolangCoverage struct {
 	Packages []string `yaml:"packages"`
+}
+type GolangDocker struct {
+	Path       string            `yaml:"path"`
+	Context    string            `yaml:"context"`
+	Dockerfile string            `yaml:"dockerfile"`
+	BuildArgs  map[string]string `yaml:"buildArgs,omitempty"`
 }
 
 func (g *GolangCoverage) Validate() error {
@@ -25,7 +32,7 @@ func (g *GolangCoverage) Validate() error {
 type Golang struct {
 	ImageName string          `yaml:"imageName"`
 	Path      string          `yaml:"path"`
-	Docker    *Docker         `yaml:"docker,omitempty"`
+	Docker    *GolangDocker   `yaml:"docker,omitempty"`
 	Coverage  *GolangCoverage `yaml:"coverage,omitempty"`
 }
 
@@ -47,6 +54,10 @@ func (g *Golang) Validate() error {
 		g.Coverage = &GolangCoverage{}
 	}
 
+	if g.Docker != nil && g.Docker.Path == "" {
+		return errors.New("no docker.path set, required")
+	}
+
 	if err := g.Coverage.Validate(); err != nil {
 		return err
 	}
@@ -56,19 +67,28 @@ func (g *Golang) Validate() error {
 
 func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var allJobs = types.Jobs{}
-	docker := g.Docker
+	golangDocker := g.Docker
+	docker := &Docker{}
 	var test *types.Job
 	var err error
-	if docker != nil && docker.Name == "" {
+
+	if golangDocker != nil {
+		release := false
 		docker.Name = Id
+		docker.Release = &release
+		docker.Name = fmt.Sprintf("golang-%s", Id)
+		docker.Path = golangDocker.Path
+		docker.Context = golangDocker.Context
+		docker.Dockerfile = golangDocker.Dockerfile
+		docker.BuildArgs = golangDocker.BuildArgs
 	}
 
-	if docker != nil {
+	if golangDocker != nil {
 		jobs, err := types.GetPipelineJobs(factory, docker, pipelineType, Id)
 		if err != nil {
 			return nil, err
 		}
-		test, err = golang.NewUnitTest(g.Docker.GetFinalImageName(), g.Path, g.Coverage.Packages)
+		test, err = golang.NewUnitTest(docker.GetFinalImageName(), g.Path, g.Coverage.Packages)
 		if err != nil {
 			return nil, err
 		}
@@ -88,5 +108,5 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 }
 
 func (g *Golang) Rules() *job.Rules {
-	return &*job.DefaultPipelineRules()
+	return &*job.DefaultPipelineRules(g.Path)
 }

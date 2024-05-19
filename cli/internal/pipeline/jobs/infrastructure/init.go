@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"fmt"
+
 	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/gitlab/cache"
@@ -36,7 +37,6 @@ func NewTerraformInit(path string, state string, s3 bool) *types.Job {
 		ciJob.Variables = map[string]string{}
 		ciJob.Variables["TF_STATE_PROJECT"] = project
 		//job.AllowFailure.Failure = true
-		ciJob.Rules = *job.DefaultPipelineRules()
 		ciJob.Cache.SetPolicy(cache.PullPush).
 			SetActive()
 	})

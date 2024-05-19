@@ -10,7 +10,7 @@ import (
 	"kapigen.kateops.com/internal/pipeline/types"
 )
 
-func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, destination []string) *types.Job {
+func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, destination []string, buildArgs []string) *types.Job {
 	return types.NewJob("Daemonless Build", docker.BUILDKIT_ROTLESS.String(), func(ciJob *job.CiJob) {
 		ciJob.Image.Entrypoint.
 			Add("sh").
@@ -31,15 +31,19 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 		auth.Command().
 			Add("while [ ! -f ${CI_PROJECT_DIR}/.status.init ]; do echo 'wait for init'; sleep 1; done; " +
 				"export $(cat ${CI_PROJECT_DIR}/.env); " +
-				"crane auth login -u ${CI_REGISTRY_USER} -p ${CI_JOB_TOKEN} ${CI_REGISTRY}; " +
-				"crane auth login -u ${CI_DEPENDENCY_PROXY_USER} -p ${CI_DEPENDENCY_PROXY_PASSWORD} ${CI_DEPENDENCY_PROXY_SERVER}; " +
-				"crane auth login -u ${CI_DEPENDENCY_PROXY_USER} -p ${CI_DEPENDENCY_PROXY_PASSWORD} ${CI_SERVER_HOST}; " +
+				"crane auth login -u \"${CI_REGISTRY_USER}\" -p \"${CI_JOB_TOKEN}\" \"${CI_REGISTRY}\"; " +
+				"crane auth login -u \"${CI_DEPENDENCY_PROXY_USER}\" -p \"${CI_DEPENDENCY_PROXY_PASSWORD}\" \"${CI_DEPENDENCY_PROXY_SERVER}\"; " +
+				"crane auth login -u \"${CI_DEPENDENCY_PROXY_USER}\" -p \"${CI_DEPENDENCY_PROXY_PASSWORD}\" \"${CI_SERVER_HOST}\"; " +
 				"touch ${CI_PROJECT_DIR}/.status.auth; " +
 				"chmod 666 ${CI_PROJECT_DIR}/config.json")
 		auth.AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}")
 		ciJob.Services.Add(auth)
+		args := ""
+		for _, buildArg := range buildArgs {
+			args += fmt.Sprintf("--opt build-arg:%s", buildArg)
+		}
 
-		cmd := fmt.Sprintf(`buildctl-daemonless.sh build --frontend dockerfile.v0 --local context="%s" --local dockerfile="%s" `, context, path)
+		cmd := fmt.Sprintf(`buildctl-daemonless.sh build --frontend dockerfile.v0 --local context="%s" --local dockerfile="%s" %s`, context, path, args)
 		parameters := fmt.Sprintf(`--progress plain --opt filename="%s" --export-cache type=inline `, dockerfile)
 		cache := fmt.Sprintf(`--import-cache type=registry,ref="%s" `, destination[0])
 		push := fmt.Sprintf(`--output type=image,\"name=%s\",push=true `, strings.Join(destination, ","))

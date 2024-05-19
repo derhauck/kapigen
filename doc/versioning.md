@@ -11,9 +11,9 @@ Kapigen automates the versioning process to ensure consistency and efficiency. H
 ### Merging into Main
 
 - **Version Bump Based on Labels**: When you merge a feature branch into the main branch, Kapigen checks the labels on your merge request to determine how to bump the version:
-    - `version::major` - Increases the major version (e.g., `v1.2.3` to `v2.0.0`).
-    - `version::minor` - Increases the minor version (e.g., `v1.2.3` to `v1.3.0`).
-    - `version::patch` - Increases the patch version (e.g., `v1.2.3` to `v1.2.4`).
+    - `version::major` - Increases the major version (e.g., `1.2.3` to `2.0.0`).
+    - `version::minor` - Increases the minor version (e.g., `1.2.3` to `1.3.0`).
+    - `version::patch` - Increases the patch version (e.g., `1.2.3` to `1.2.4`).
 
 - **New Tag Creation**: Kapigen creates a new tag with the updated version on the main branch.
 
@@ -29,7 +29,7 @@ If you prefer to manage versioning manually, you can disable the automated versi
 
 1. **Merge Request**:
     - The current version is appended with the feature branch name.
-    - For example, merging `feature-xyz` into `main` with the current version `v1.2.3` will create `v1.2.3-feature-xyz`.
+    - For example, merging `feature-xyz` into `main` with the current version `1.2.3` will create `1.2.3-feature-xyz`.
 
 2. **Main (optional)**:
     - Will tag with a new version based on the labels in the merge request.

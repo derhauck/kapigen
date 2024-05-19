@@ -34,10 +34,13 @@ func (p *PipelineTypeConfig) Decode(factory *factory.MainFactory, configTypes ma
 	if err != nil {
 		return nil, err
 	}
+
+	rules := pipelineConfig.Rules()
 	for _, job := range jobs.GetJobs() {
 		if p.PipelineId != "" {
 			job.AddName(p.PipelineId)
 		}
+		job.CiJob.Rules = *rules
 		job.AddName(string(p.Type))
 		if len(p.Tags) > 0 {
 			job.ExternalTags = p.Tags
@@ -82,10 +85,8 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 			err.Error(),
 		))
 	}
-	rules := config.Rules()
 	for _, currentJob := range jobs.GetJobs() {
 		currentJob.PipelineId = pipelineId
-		currentJob.CiJob.Rules = *rules
 	}
 	return jobs, nil
 }
