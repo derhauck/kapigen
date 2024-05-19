@@ -6,6 +6,7 @@ import (
 	"kapigen.kateops.com/internal/gitlab/tags"
 	"kapigen.kateops.com/internal/logger/level"
 	"kapigen.kateops.com/internal/pipeline/types"
+	"kapigen.kateops.com/internal/pipeline/wrapper"
 	"kapigen.kateops.com/internal/when"
 )
 
@@ -13,6 +14,7 @@ func NewTag() *types.Job {
 	return types.NewJob("Versioning", docker.Kapigen_Latest.String(), func(ciJob *job.CiJob) {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
 		ciJob.AddVariable("LOGGER_LEVEL", level.Info.String())
+		ciJob.SetImageEntrypoint(*wrapper.NewStringSlice().Add(""))
 		ciJob.Script.Value.Add("kapigen version new --mode gitlab")
 		ciJob.Rules.Add(&job.Rule{
 			If:   "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
