@@ -14,15 +14,13 @@ default:
     - pressure::medium
 stages:
   - build
+  - trigger
 
 Build:
   stage: build
   image: registry.gitlab.com/kateops/kapigen/cli:latest
-
-  before_script:
-    - cd .kapigen
   script:
-    - kapigen generate pipeline -v  --mode gitlab
+    - kapigen generate pipeline --config .kapigen/config.kapigen.yml -v  --mode gitlab
   artifacts:
     paths:
       - pipeline.yaml

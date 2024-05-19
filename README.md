@@ -31,4 +31,4 @@ Kapigen allows you to generate pipelines based on the configuration defined in y
 
 [Kapigen Config](cli/config.kapigen.yaml)
 
-For more detailed information visit the [docs](doc/README.md) inside the repository.
+For more detailed information visit the [docs](doc/index) inside the repository.
