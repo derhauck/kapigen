@@ -87,9 +87,7 @@ func (d *Docker) DefaultRegistry(tag string) string {
 func (d *Docker) Rules() *job.Rules {
 	rules := &job.Rules{}
 	if *d.Release {
-		rules.
-			AddRules(*job.DefaultOnlyReleasePipelineRules()).
-			AddRules(*job.DefaultMainBranchRules(d.Context))
+		rules.AddRules(*job.DefaultOnlyReleasePipelineRules())
 	}
 	rules.AddRules(*job.DefaultMergeRequestRules(d.Context))
 	return rules

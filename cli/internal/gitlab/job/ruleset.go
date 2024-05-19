@@ -10,7 +10,7 @@ import (
 func DefaultPipelineRules(path string) *Rules {
 	rules := &Rules{}
 	return rules.AddRules(*DefaultMergeRequestRules(path)).
-		AddRules(*DefaultMainBranchRules(path))
+		AddRules(*DefaultMainBranchRules())
 }
 func DefaultMergeRequestRules(path string) *Rules {
 	return &Rules{
@@ -29,16 +29,15 @@ func DefaultMergeRequestRules(path string) *Rules {
 	}
 }
 
-func DefaultMainBranchRules(path string) *Rules {
+func DefaultMainBranchRules() *Rules {
 	return &Rules{
 		&Rule{
 			If:   "$KTC_STOP_PIPELINE != \"false\" && $DEBUG == null",
 			When: NewWhen(when.Never),
 		},
 		&Rule{
-			If:      "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
-			Changes: *wrapper.NewStringSlice().Add(fmt.Sprintf("%s/**/*", path)),
-			When:    NewWhen(when.OnSuccess),
+			If:   "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
+			When: NewWhen(when.OnSuccess),
 		},
 		&Rule{
 			If: "$KTC_TEST_PIPELINE",
