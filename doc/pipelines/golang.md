@@ -27,7 +27,7 @@ Either by using `imageName` or the `docker` configuration. If both are set the `
 
 **docker**
 * `docker: [optional]` Can be used to run the tests in a custom image
-* `docker.path: [optional | default: '.']` The path to the Dockerfile.
+* `docker.path: [required]` The path to the Dockerfile.
 * `docker.dockerfile: [optional | default: 'Dockerfile']` The name of the Dockerfile inside the `<path>`.
 * `docker.context: [optional | default: <path>]` The context for the docker build.
 

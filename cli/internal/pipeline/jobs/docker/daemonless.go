@@ -10,7 +10,7 @@ import (
 	"kapigen.kateops.com/internal/pipeline/types"
 )
 
-func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, destination []string) *types.Job {
+func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, destination []string, buildArgs []string) *types.Job {
 	return types.NewJob("Daemonless Build", docker.BUILDKIT_ROTLESS.String(), func(ciJob *job.CiJob) {
 		ciJob.Image.Entrypoint.
 			Add("sh").
@@ -38,8 +38,12 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 				"chmod 666 ${CI_PROJECT_DIR}/config.json")
 		auth.AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}")
 		ciJob.Services.Add(auth)
+		args := ""
+		for _, buildArg := range buildArgs {
+			args += fmt.Sprintf("--opt build-arg:%s", buildArg)
+		}
 
-		cmd := fmt.Sprintf(`buildctl-daemonless.sh build --frontend dockerfile.v0 --local context="%s" --local dockerfile="%s" `, context, path)
+		cmd := fmt.Sprintf(`buildctl-daemonless.sh build --frontend dockerfile.v0 --local context="%s" --local dockerfile="%s" %s`, context, path, args)
 		parameters := fmt.Sprintf(`--progress plain --opt filename="%s" --export-cache type=inline `, dockerfile)
 		cache := fmt.Sprintf(`--import-cache type=registry,ref="%s" `, destination[0])
 		push := fmt.Sprintf(`--output type=image,\"name=%s\",push=true `, strings.Join(destination, ","))

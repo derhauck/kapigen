@@ -12,11 +12,12 @@ import (
 )
 
 type Docker struct {
-	Path       string `yaml:"path"`
-	Context    string `yaml:"context"`
-	Name       string `yaml:"name"`
-	Dockerfile string `yaml:"dockerfile"`
-	Release    *bool  `yaml:"release,omitempty"`
+	Path       string            `yaml:"path"`
+	Context    string            `yaml:"context"`
+	Name       string            `yaml:"name"`
+	Dockerfile string            `yaml:"dockerfile"`
+	Release    *bool             `yaml:"release,omitempty"`
+	BuildArgs  map[string]string `yaml:"buildArgs,omitempty"`
 	ImageName  string
 }
 
@@ -61,12 +62,17 @@ func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ str
 	if environment.IsRelease() {
 		destination = append(destination, d.DefaultRegistry("latest"))
 	}
+	buildargs := []string{}
+	for key, value := range d.BuildArgs {
+		buildargs = append(buildargs, fmt.Sprintf("%s=\"%s\"", key, value))
+	}
 
 	build := docker.NewDaemonlessBuildkitBuild(
 		d.Path,
 		d.Context,
 		d.Dockerfile,
 		destination,
+		buildargs,
 	)
 	return &types.Jobs{build}, nil
 }

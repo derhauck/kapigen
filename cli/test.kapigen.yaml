@@ -13,6 +13,9 @@ pipelines:
     config:
       path: cli
       name: test-file
+      dockerfile: test.Dockerfile
+      buildArgs:
+        TEST: "Has set Var"
   - type: docker
     id: duplicate-test
     config:
@@ -27,6 +30,8 @@ pipelines:
         path: cli
         dockerfile: test.Dockerfile
         name: test-go
+        buildArgs:
+          TEST: "Has set Var"
   - type: docker
     id: test-cli2
     config:

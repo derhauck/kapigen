@@ -15,9 +15,10 @@ type GolangCoverage struct {
 	Packages []string `yaml:"packages"`
 }
 type GolangDocker struct {
-	Path       string `yaml:"path"`
-	Context    string `yaml:"context"`
-	Dockerfile string `yaml:"dockerfile"`
+	Path       string            `yaml:"path"`
+	Context    string            `yaml:"context"`
+	Dockerfile string            `yaml:"dockerfile"`
+	BuildArgs  map[string]string `yaml:"buildArgs,omitempty"`
 }
 
 func (g *GolangCoverage) Validate() error {
@@ -53,6 +54,10 @@ func (g *Golang) Validate() error {
 		g.Coverage = &GolangCoverage{}
 	}
 
+	if g.Docker != nil && g.Docker.Path == "" {
+		return errors.New("no docker.path set, required")
+	}
+
 	if err := g.Coverage.Validate(); err != nil {
 		return err
 	}
@@ -75,6 +80,7 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 		docker.Path = golangDocker.Path
 		docker.Context = golangDocker.Context
 		docker.Dockerfile = golangDocker.Dockerfile
+		docker.BuildArgs = golangDocker.BuildArgs
 	}
 
 	if golangDocker != nil {
