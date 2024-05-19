@@ -31,9 +31,9 @@ func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, 
 		auth.Command().
 			Add("while [ ! -f ${CI_PROJECT_DIR}/.status.init ]; do echo 'wait for init'; sleep 1; done; " +
 				"export $(cat ${CI_PROJECT_DIR}/.env); " +
-				"crane auth login -u ${CI_REGISTRY_USER} -p ${CI_JOB_TOKEN} ${CI_REGISTRY}; " +
-				"crane auth login -u ${CI_DEPENDENCY_PROXY_USER} -p ${CI_DEPENDENCY_PROXY_PASSWORD} ${CI_DEPENDENCY_PROXY_SERVER}; " +
-				"crane auth login -u ${CI_DEPENDENCY_PROXY_USER} -p ${CI_DEPENDENCY_PROXY_PASSWORD} ${CI_SERVER_HOST}; " +
+				"crane auth login -u \"${CI_REGISTRY_USER}\" -p \"${CI_JOB_TOKEN}\" \"${CI_REGISTRY}\"; " +
+				"crane auth login -u \"${CI_DEPENDENCY_PROXY_USER}\" -p \"${CI_DEPENDENCY_PROXY_PASSWORD}\" \"${CI_DEPENDENCY_PROXY_SERVER}\"; " +
+				"crane auth login -u \"${CI_DEPENDENCY_PROXY_USER}\" -p \"${CI_DEPENDENCY_PROXY_PASSWORD}\" \"${CI_SERVER_HOST}\"; " +
 				"touch ${CI_PROJECT_DIR}/.status.auth; " +
 				"chmod 666 ${CI_PROJECT_DIR}/config.json")
 		auth.AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}")
