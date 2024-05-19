@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 
 	"kapigen.kateops.com/factory"
@@ -27,7 +26,8 @@ func (d *Docker) New() types.PipelineConfigInterface {
 
 func (d *Docker) Validate() error {
 	if d.Path == "" {
-		return errors.New("no path set, required")
+		logger.Info("no path set, defaulting to '.'")
+		d.Path = "."
 	}
 
 	if d.Dockerfile == "" {

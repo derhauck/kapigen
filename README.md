@@ -2,33 +2,33 @@
 #### Kateops Pipeline Generator
 
 ----
-# CLI
-## Commands
-### Global Parameters
+
+## CLI
+
+### Commands
+
+#### Global Parameters
+
 ```shell
--v verbose log output
+-v  # Verbose log output
 ```
-### Generate
+
+#### Generate
+
 `generate pipeline`
+
 ```shell
 kapigen generate pipeline
 ```
-parameters
-```shell
---file 'output file' | default:  pipeline.yaml
---config 'pipeline config' | default: config.kapigen.yaml
-```
+
+### Parameters:
+- `--file 'output file'`: Specifies the output file. Default is `pipeline.yaml`.
+- `--config 'pipeline config'`: Specifies the pipeline configuration file. Default is `config.kapigen.yaml`.
 
 ## Pipeline Generation
-### Versions
-For the pipeline to release any version it will look up the current latest version for the repository.
 
-The version increase will be set once the Merge Request is merged. Until then you can only see the would be new version.
+Kapigen allows you to generate pipelines based on the configuration defined in your repository.
 
-```
-Merge Request   ->  current version + feature branch name
-Main            ->  will tag with new version
-Tag             ->  creates new artifacts
-```
+[Kapigen Config](cli/config.kapigen.yaml)
 
-
+For more detailed information visit the [docs](doc/README.md) inside the repository.
