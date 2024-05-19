@@ -72,6 +72,9 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 		docker.Name = Id
 		docker.Release = &release
 		docker.Name = fmt.Sprintf("golang-%s", Id)
+		docker.Path = golangDocker.Path
+		docker.Context = golangDocker.Context
+		docker.Dockerfile = golangDocker.Dockerfile
 	}
 
 	if golangDocker != nil {
