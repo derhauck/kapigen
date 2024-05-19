@@ -13,6 +13,7 @@ config:
     path: string
     dockerfile: string
     context: string
+    buildArgs: Record<string, string>
 ```
 
 ### Description:
@@ -23,7 +24,7 @@ Either by using `imageName` or the `docker` configuration. If both are set the `
 
 **coverage**
 * `coverage: [optional]` The coverage options
-* `coverage.packages: [optional | default: []]` The packages to consider for the coverage calculations
+* `coverage.packages: [optional]` The packages to consider for the coverage calculations
 
 **docker**
 * `docker: [optional]` Can be used to run the tests in a custom image

@@ -18,7 +18,7 @@ needs: Array<id>
 * `id: [required]` Unique identifier inside this pipeline.
 * `type: [required]` The type of pipeline that will run.
 * `config: [required]` The configuration for the specific type, differs and each type will have its own configuration.
-* `needs: [optional | default: []]` References pipeline ids from pipelines declared above the current pipeline. The current pipeline will then wait until said pipelines are finished before starting.
+* `needs: [optional]` References pipeline ids from pipelines declared above the current pipeline. The current pipeline will then wait until said pipelines are finished before starting.
 
 ### Available Pipeline Configurations
   * [docker](pipelines/docker.md)
