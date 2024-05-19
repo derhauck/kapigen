@@ -17,7 +17,7 @@ stages:
 
 Build:
   stage: build
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21
+  image: registry.gitlab.com/kateops/kapigen/cli:latest
 
   before_script:
     - cd .kapigen
