@@ -20,7 +20,7 @@ Build:
   stage: build
   image: registry.gitlab.com/kateops/kapigen/cli:latest
   script:
-    - kapigen generate pipeline --config .kapigen/config.kapigen.yml -v  --mode gitlab
+    - generate pipeline --config .kapigen/config.kapigen.yml -v  --mode gitlab
   artifacts:
     paths:
       - pipeline.yaml
