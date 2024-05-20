@@ -1,10 +1,11 @@
 package golang
 
 import (
-	"kapigen.kateops.com/internal/gitlab/tags"
 	"slices"
 	"strings"
 	"testing"
+
+	"kapigen.kateops.com/internal/gitlab/tags"
 )
 
 var defaultCoveragePackages = []string{"./..."}
@@ -24,7 +25,7 @@ func TestCreate(t *testing.T) {
 		if job != nil || err == nil {
 			t.Error("created job succeeded without image and path but should not")
 		}
-		if err != nil && !strings.Contains(err.Error(), "no image set") {
+		if err != nil && !strings.Contains(err.Error(), "no imageName set") {
 			t.Error(err)
 		}
 

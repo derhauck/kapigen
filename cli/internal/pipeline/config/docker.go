@@ -12,13 +12,14 @@ import (
 )
 
 type Docker struct {
-	Path       string            `yaml:"path"`
-	Context    string            `yaml:"context"`
-	Name       string            `yaml:"name"`
-	Dockerfile string            `yaml:"dockerfile"`
-	Release    *bool             `yaml:"release,omitempty"`
-	BuildArgs  map[string]string `yaml:"buildArgs,omitempty"`
-	ImageName  string
+	Path          string            `yaml:"path"`
+	Context       string            `yaml:"context"`
+	Name          string            `yaml:"name"`
+	Dockerfile    string            `yaml:"dockerfile"`
+	Release       *bool             `yaml:"release,omitempty"`
+	BuildArgs     map[string]string `yaml:"buildArgs,omitempty"`
+	ImageName     string            `yaml:"imageName"`
+	PushImageName string
 }
 
 func (d *Docker) New() types.PipelineConfigInterface {
@@ -58,7 +59,7 @@ func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ str
 	tag := controller.GetCurrentPipelineTag(d.Path)
 	var destination []string
 	destination = append(destination, d.DefaultRegistry(tag))
-	d.ImageName = d.DefaultRegistry(tag)
+	d.PushImageName = d.DefaultRegistry(tag)
 	if environment.IsRelease() {
 		destination = append(destination, d.DefaultRegistry("latest"))
 	}
@@ -68,6 +69,7 @@ func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ str
 	}
 
 	build := docker.NewDaemonlessBuildkitBuild(
+		d.ImageName,
 		d.Path,
 		d.Context,
 		d.Dockerfile,
@@ -78,7 +80,7 @@ func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ str
 }
 
 func (d *Docker) GetFinalImageName() string {
-	return d.ImageName
+	return d.PushImageName
 }
 func (d *Docker) DefaultRegistry(tag string) string {
 	if tag == "" {

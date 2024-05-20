@@ -10,8 +10,11 @@ import (
 	"kapigen.kateops.com/internal/pipeline/types"
 )
 
-func NewDaemonlessBuildkitBuild(path string, context string, dockerfile string, destination []string, buildArgs []string) *types.Job {
-	return types.NewJob("Daemonless Build", docker.BUILDKIT_ROTLESS.String(), func(ciJob *job.CiJob) {
+func NewDaemonlessBuildkitBuild(imageName string, path string, context string, dockerfile string, destination []string, buildArgs []string) *types.Job {
+	if imageName == "" {
+		imageName = docker.BUILDKIT_ROTLESS.String()
+	}
+	return types.NewJob("Daemonless Build", imageName, func(ciJob *job.CiJob) {
 		ciJob.Image.Entrypoint.
 			Add("sh").
 			Add("-c")
