@@ -20,7 +20,7 @@ stages:
 Build:
   stage: build
   image:
-    name: registry.gitlab.com/kateops/kapigen/cli:${KAPIGEN_VERISON}
+    name: registry.gitlab.com/kateops/kapigen/cli:${KAPIGEN_VERSIONK}
     entrypoint: [""]
   script:
     - kapigen generate pipeline --config .kapigen/config.kapigen.yaml -v  --mode gitlab
