@@ -13,22 +13,22 @@ import (
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 )
 
-func NewUnitTest(image string, path string, packages []string) (*types.Job, error) {
-	if image == "" {
-		return nil, errors.New("no image set, required")
+func NewUnitTest(imageName string, path string, packages []string) (*types.Job, error) {
+	if imageName == "" {
+		return nil, errors.New("no imageName set, required")
 	}
 	if path == "" {
 		return nil, errors.New("no path set, required")
 	}
 
-	return types.NewJob("Unit Test", image, func(ciJob *job.CiJob) {
+	return types.NewJob("Unit Test", imageName, func(ciJob *job.CiJob) {
 		var reportPath = fmt.Sprintf("%s/report.xml", path)
 		if path == "." {
 			reportPath = "report.xml"
 		}
 		coveragePkg := strings.Join(packages, ",")
 		testCmd := fmt.Sprintf("go test -json -cover ./... -coverpkg=%s -coverprofile=profile.cov", coveragePkg)
-		ciJob.SetImageName(image).
+		ciJob.SetImageName(imageName).
 			TagMediumPressure().
 			SetStage(stages.TEST).
 			AddBeforeScript(fmt.Sprintf("cd %s", path)).
