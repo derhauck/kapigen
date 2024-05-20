@@ -8,6 +8,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v3"
 	"kapigen.kateops.com/factory"
+	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/logger"
 )
 
@@ -59,10 +60,11 @@ func (p *PipelineTypeConfig) GetType() PipelineType {
 }
 
 type PipelineConfig struct {
-	Noop       bool                 `yaml:"noop,omitempty"`
-	Versioning bool                 `yaml:"versioning,omitempty"`
-	Tags       []string             `yaml:"tags"`
-	Pipelines  []PipelineTypeConfig `yaml:"pipelines" yaml:"pipelines"`
+	Noop            bool                 `yaml:"noop,omitempty"`
+	Versioning      bool                 `yaml:"versioning,omitempty"`
+	Tags            []string             `yaml:"tags"`
+	DependencyProxy string               `yaml:"dependencyProxy"`
+	Pipelines       []PipelineTypeConfig `yaml:"pipelines" yaml:"pipelines"`
 }
 
 func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterface, pipelineType PipelineType, pipelineId string) (*Jobs, error) {
@@ -102,6 +104,9 @@ func LoadJobsFromPipelineConfig(factory *factory.MainFactory, configPath string,
 	err = yaml.Unmarshal(body, &pipelineConfig)
 	if err != nil {
 		return nil, nil, err
+	}
+	if pipelineConfig.DependencyProxy != "" {
+		docker.DEPENDENCY_PROXY = fmt.Sprintf("%s/", pipelineConfig.DependencyProxy)
 	}
 
 	jobs, err := pipelineConfig.Decode(factory, configTypes)

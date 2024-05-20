@@ -1,5 +1,6 @@
 noop: true
 versioning: false
+dependencyProxy: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}
 #tags:
 #  - saas-linux-medium-amd64
 pipelines:

@@ -13,13 +13,14 @@ id: string
 type: string
 config: object
 needs: Array<id>
+tags: Array<string>
 ```
 #### Description
 * `id: [required]` Unique identifier inside this pipeline.
 * `type: [required]` The type of pipeline that will run.
 * `config: [required]` The configuration for the specific type, differs and each type will have its own configuration.
 * `needs: [optional]` References pipeline ids from pipelines declared above the current pipeline. The current pipeline will then wait until said pipelines are finished before starting.
-
+* `tags: [optinal]` Allows to overwrite the tags for the pipeline so the jobs will start on a runner of your choosing.
 ### Available Pipeline Configurations
   * [docker](pipelines/docker.md)
   * [golang](pipelines/golang.md)
