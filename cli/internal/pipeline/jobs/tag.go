@@ -3,6 +3,7 @@ package jobs
 import (
 	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/gitlab/job"
+	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/gitlab/tags"
 	"kapigen.kateops.com/internal/logger/level"
 	"kapigen.kateops.com/internal/pipeline/types"
@@ -13,6 +14,7 @@ import (
 func NewTag() *types.Job {
 	return types.NewJob("Versioning", docker.Kapigen_Latest.String(), func(ciJob *job.CiJob) {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+		ciJob.Stage = stages.FINAL
 		ciJob.AddVariable("LOGGER_LEVEL", level.Info.String())
 		ciJob.SetImageEntrypoint(*wrapper.NewStringSlice().Add(""))
 		ciJob.Script.Value.Add("kapigen version new --mode gitlab")
@@ -26,6 +28,7 @@ func NewTag() *types.Job {
 func NewTagKapigen() *types.Job {
 	return types.NewJob("Versioning", docker.GOLANG_1_21.String(), func(ciJob *job.CiJob) {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+		ciJob.Stage = stages.FINAL
 		ciJob.AddVariable("LOGGER_LEVEL", level.Info.String())
 		ciJob.BeforeScript.Value.Add("cd cli")
 		ciJob.Script.Value.Add("go mod download").

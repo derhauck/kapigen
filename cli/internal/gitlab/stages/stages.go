@@ -2,6 +2,7 @@ package stages
 
 import (
 	"fmt"
+
 	"kapigen.kateops.com/internal/logger"
 )
 
@@ -15,6 +16,7 @@ const (
 	RELEASE
 	DYNAMIC
 	TRIGGER
+	FINAL
 )
 
 var values = map[Stage]string{
@@ -25,6 +27,7 @@ var values = map[Stage]string{
 	RELEASE: "release",
 	DYNAMIC: "dynamic",
 	TRIGGER: "trigger",
+	FINAL:   "final",
 }
 
 func NewStage() Stage {
