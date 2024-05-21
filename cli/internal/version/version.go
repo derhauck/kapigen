@@ -106,9 +106,6 @@ func (c *Controller) createTagFromGitlab(version string) string {
 		TagMessage: &msg,
 	})
 	if err != nil {
-		return ""
-	}
-	if err != nil {
 		logger.ErrorE(err)
 		return EmptyTag
 	}
