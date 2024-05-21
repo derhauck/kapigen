@@ -7,12 +7,16 @@ import (
 	"kapigen.kateops.com/internal/when"
 )
 
-func DefaultPipelineRules(path string) *Rules {
+func DefaultPipelineRules(paths []string) *Rules {
 	rules := &Rules{}
-	return rules.AddRules(*DefaultMergeRequestRules(path)).
+	return rules.AddRules(*DefaultMergeRequestRules(paths)).
 		AddRules(*DefaultMainBranchRules())
 }
-func DefaultMergeRequestRules(path string) *Rules {
+func DefaultMergeRequestRules(paths []string) *Rules {
+	changes := wrapper.NewStringSlice()
+	for _, path := range paths {
+		changes.Add(fmt.Sprintf("%s/**/*", path))
+	}
 	return &Rules{
 		&Rule{
 			If:   "$KTC_STOP_PIPELINE != \"false\" && $DEBUG == null",
@@ -20,7 +24,7 @@ func DefaultMergeRequestRules(path string) *Rules {
 		},
 		&Rule{
 			If:      "$CI_MERGE_REQUEST_IID",
-			Changes: *wrapper.NewStringSlice().Add(fmt.Sprintf("%s/**/*", path)),
+			Changes: *changes,
 			When:    NewWhen(when.OnSuccess),
 		},
 		&Rule{

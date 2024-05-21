@@ -21,6 +21,12 @@ config:
 * `dockerfile: [optional | default: 'Dockerfile']` The name of the Dockerfile inside the `<path>`.
 * `release: [optional | default: true]` Whether the build will run on a release pipeline (tag pipeline) or only on feature branches.
 * `buildArgs: [optional]` Additional build arguments for the docker build.
+
+### Rules:
+Pipeline will execute for the following types:
+* `Merge Request` Uses `context` to watch for changes.
+* `Release`
+
 ### Example
 ```yaml
 id: example

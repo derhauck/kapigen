@@ -2,13 +2,28 @@
 # Versioning
 
 Kapigen automates the versioning process to ensure consistency and efficiency. Here’s how it works:
+## Automated Versioning
+**Requirements**
+
+`config.kateops.yaml`
+```yaml
+versioning: true
+```
+
+Project -> Settings -> Merge requests -> Merge commit message templates
+
+must include:
+```text
+%{reference}
+```
 
 ### Feature Branch Versioning
 
-- **Automatic Tagging**: When you create a feature branch, Kapigen fetches the latest Git tag and appends your branch name to it. For example, if the latest tag is `v1.2.3` and your branch is `feature-xyz`, the version will be `v1.2.3-feature-xyz`.
-- **Building**: This tagged version is used for all builds and tests in the feature branch pipeline.
+- **Automatic Tagging**: When you create a feature branch, Kapigen fetches the latest Git tag and appends your branch name to it. For example, if the latest tag is `1.2.3` and your branch is `feature-xyz`, the version will be `1.2.3-feature-xyz`. 
 
-### Merging into Main
+**Important**: Will not actually create a git tag, just juse this tag version for creating temporary artifacts.
+
+### Merging into Main (only if versioning is enabled)
 
 - **Version Bump Based on Labels**: When you merge a feature branch into the main branch, Kapigen checks the labels on your merge request to determine how to bump the version:
     - `version::major` - Increases the major version (e.g., `1.2.3` to `2.0.0`).
