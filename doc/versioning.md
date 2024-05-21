@@ -19,7 +19,7 @@ must include:
 
 ### Feature Branch Versioning
 
-- **Automatic Tagging**: When you create a feature branch, Kapigen fetches the latest Git tag and appends your branch name to it. For example, if the latest tag is `v1.2.3` and your branch is `feature-xyz`, the version will be `v1.2.3-feature-xyz`. 
+- **Automatic Tagging**: When you create a feature branch, Kapigen fetches the latest Git tag and appends your branch name to it. For example, if the latest tag is `1.2.3` and your branch is `feature-xyz`, the version will be `1.2.3-feature-xyz`. 
 
 **Important**: Will not actually create a git tag, just juse this tag version for creating temporary artifacts.
 
