@@ -17,6 +17,10 @@ var NewCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cli.PreparePersistentFlags(cmd)
 		mode, err := cmd.Flags().GetString("mode")
+		privateTokenName, err := cmd.Flags().GetString("private-token")
+		if err != nil {
+			return err
+		}
 		path, err := cmd.Flags().GetString("path")
 		if err != nil {
 			return err
@@ -24,6 +28,7 @@ var NewCmd = &cobra.Command{
 		logger.Info("will create settings")
 		settings := cli.NewSettings(
 			cli.SetMode(version.GetModeFromString(mode)),
+			cli.SetPrivateToken(privateTokenName),
 		)
 		factory := factory.New(settings)
 

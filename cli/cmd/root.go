@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"os"
+
+	"github.com/spf13/cobra"
 )
 
 var Verbose bool
@@ -15,6 +16,7 @@ func init() {
 	rootCmd.AddCommand(generateCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "will log verbose output")
+	rootCmd.PersistentFlags().String("private-token", "", "ENV var name to use for private token")
 }
 
 func Execute() {

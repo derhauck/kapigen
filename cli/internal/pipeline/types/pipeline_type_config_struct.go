@@ -3,7 +3,6 @@ package types
 import (
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v3"
@@ -60,11 +59,12 @@ func (p *PipelineTypeConfig) GetType() PipelineType {
 }
 
 type PipelineConfig struct {
-	Noop            bool                 `yaml:"noop,omitempty"`
-	Versioning      bool                 `yaml:"versioning,omitempty"`
-	Tags            []string             `yaml:"tags"`
-	DependencyProxy string               `yaml:"dependencyProxy"`
-	Pipelines       []PipelineTypeConfig `yaml:"pipelines" yaml:"pipelines"`
+	Noop             bool                 `yaml:"noop,omitempty"`
+	Versioning       bool                 `yaml:"versioning,omitempty"`
+	Tags             []string             `yaml:"tags"`
+	DependencyProxy  string               `yaml:"dependencyProxy"`
+	Pipelines        []PipelineTypeConfig `yaml:"pipelines" yaml:"pipelines"`
+	PrivateTokenName string               `yaml:"privateTokenName"`
 }
 
 func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterface, pipelineType PipelineType, pipelineId string) (*Jobs, error) {
@@ -93,28 +93,16 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 	return jobs, nil
 }
 
-func LoadJobsFromPipelineConfig(factory *factory.MainFactory, configPath string, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, *PipelineConfig, error) {
-	body, err := os.ReadFile(configPath)
-
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var pipelineConfig PipelineConfig
-	err = yaml.Unmarshal(body, &pipelineConfig)
-	if err != nil {
-		return nil, nil, err
-	}
+func LoadJobsFromPipelineConfig(factory *factory.MainFactory, pipelineConfig PipelineConfig, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
 	if pipelineConfig.DependencyProxy != "" {
 		docker.DEPENDENCY_PROXY = fmt.Sprintf("%s/", pipelineConfig.DependencyProxy)
 	}
-
 	jobs, err := pipelineConfig.Decode(factory, configTypes)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return jobs, &pipelineConfig, nil
+	return jobs, nil
 }
 
 func (p *PipelineConfig) Decode(factory *factory.MainFactory, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
