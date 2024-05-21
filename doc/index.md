@@ -4,7 +4,9 @@
 ----
 ### Core
 * [versioning](versioning.md)
-
+### Available Pipeline Configurations
+* [docker](pipelines/docker.md)
+* [golang](pipelines/golang.md)
 ---
 ## Pipelines
 ### Get Started
@@ -49,12 +51,45 @@ config: object
 needs: Array<id>
 tags: Array<string>
 ```
+
 #### Description
 * `id: [required]` Unique identifier inside this pipeline.
 * `type: [required]` The type of pipeline that will run.
 * `config: [required]` The configuration for the specific type, differs and each type will have its own configuration.
 * `needs: [optional]` References pipeline ids from pipelines declared above the current pipeline. The current pipeline will then wait until said pipelines are finished before starting.
 * `tags: [optinal]` Allows to overwrite the tags for the pipeline so the jobs will start on a runner of your choosing.
-### Available Pipeline Configurations
-  * [docker](pipelines/docker.md)
-  * [golang](pipelines/golang.md)
+---
+## Rules
+Different pipeline rules sets are available. More complicated rules will be mentioned inside the pipeline configuration itself.
+But the most basic ones are the following:
+
+### Merge Request
+Will execute when a merge request is opened, regardless of source or target branch. 
+This one is a little special as it will allow only run pipelines with changes to the respective pipeline path. 
+Which path is used for the change detection depends on the pipeline type and will be documented for each pipeline.
+Some pipelines may even run regardless of changes as they might not be path specific.
+
+**Example:**
+```yaml
+pipelines:
+  - type: golang
+    id: example-1
+    config:
+      path: first
+      imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
+  - type: golang
+    id: example-2
+    config:
+      path: second
+      imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
+```
+Now we make changes inside the `first` dir for our `example-1` go application. Then create a new merge request and a pipeline will run.
+But instead of both pipelines it will only run the `example-1` pipeline as we only made changes to the `first` dir.
+
+### Main
+Will execute when any commit is made to the default branch.
+### Release
+Will execute when a new Tag is added to the repository.
+
+---
+

@@ -33,6 +33,12 @@ Either by using `imageName` or the `docker` configuration. If both are set the `
 * `docker.context: [optional | default: <path>]` The context for the docker build.
 * `docker.buildArgs: [optional]` Additional build arguments for the docker build.
 
+### Rules:
+Pipeline will execute for the following types:
+* `Merge Request` Uses `path` to watch for changes.
+* `Main`
+
+
 ### Example:
 **Image only**
 ```yaml

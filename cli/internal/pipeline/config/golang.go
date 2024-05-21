@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"os"
 
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/gitlab/job"
@@ -48,6 +49,24 @@ func (g *Golang) Validate() error {
 	if g.Path == "" {
 		logger.Info("no path set, defaulting to '.'")
 		g.Path = "."
+	}
+
+	entries, err := os.ReadDir(g.Path)
+	if err != nil {
+		logger.ErrorE(err)
+		return err
+	}
+	var isGoMod = false
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		if entry.Name() == "go.mod" {
+			isGoMod = true
+		}
+	}
+	if isGoMod == false {
+		return errors.New("could not find go.mod file in path")
 	}
 
 	if g.Coverage == nil {
