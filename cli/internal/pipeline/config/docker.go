@@ -97,6 +97,6 @@ func (d *Docker) Rules() *job.Rules {
 	if *d.Release {
 		rules.AddRules(*job.DefaultOnlyReleasePipelineRules())
 	}
-	rules.AddRules(*job.DefaultMergeRequestRules(d.Context))
+	rules.AddRules(*job.DefaultMergeRequestRules([]string{d.Context}))
 	return rules
 }

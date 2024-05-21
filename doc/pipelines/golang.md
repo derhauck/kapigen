@@ -35,7 +35,7 @@ Either by using `imageName` or the `docker` configuration. If both are set the `
 
 ### Rules:
 Pipeline will execute for the following types:
-* `Merge Request` Uses `path` to watch for changes.
+* `Merge Request` Uses `path` and `docker.context` to watch for changes.
 * `Main`
 
 

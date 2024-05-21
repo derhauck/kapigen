@@ -35,6 +35,7 @@ type Golang struct {
 	Path      string          `yaml:"path"`
 	Docker    *GolangDocker   `yaml:"docker,omitempty"`
 	Coverage  *GolangCoverage `yaml:"coverage,omitempty"`
+	changes   []string
 }
 
 func (g *Golang) New() types.PipelineConfigInterface {
@@ -90,7 +91,7 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 	docker := &Docker{}
 	var test *types.Job
 	var err error
-
+	g.changes = []string{g.Path}
 	if golangDocker != nil {
 		release := false
 		docker.Name = Id
@@ -100,9 +101,6 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 		docker.Context = golangDocker.Context
 		docker.Dockerfile = golangDocker.Dockerfile
 		docker.BuildArgs = golangDocker.BuildArgs
-	}
-
-	if golangDocker != nil {
 		jobs, err := types.GetPipelineJobs(factory, docker, pipelineType, Id)
 		if err != nil {
 			return nil, err
@@ -115,6 +113,7 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 			test.AddJobAsNeed(currentJob)
 		}
 		allJobs = append(allJobs, jobs.GetJobs()...)
+		g.changes = append(g.changes, docker.Context)
 	} else {
 		test, err = golang.NewUnitTest(g.ImageName, g.Path, g.Coverage.Packages)
 		if err != nil {
@@ -127,5 +126,5 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 }
 
 func (g *Golang) Rules() *job.Rules {
-	return &*job.DefaultPipelineRules(g.Path)
+	return &*job.DefaultPipelineRules(g.changes)
 }
