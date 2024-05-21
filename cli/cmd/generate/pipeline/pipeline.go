@@ -73,8 +73,8 @@ var Cmd = &cobra.Command{
 
 		if pipelineConfig.Versioning {
 			logger.Info("tag mode activated, will add \"Versioning\" job to pipeline")
-			pipelineJobs.AddJob(jobs.NewTag()).
-				AddJob(jobs.NewTagKapigen())
+			pipelineJobs.AddJob(jobs.NewTag(settings.PrivateToken)).
+				AddJob(jobs.NewTagKapigen(settings.PrivateToken))
 		}
 
 		noMerge, err := cmd.Flags().GetBool("no-merge")
