@@ -1,6 +1,7 @@
 package factory
 
 import (
+	"github.com/xanzy/go-gitlab"
 	"kapigen.kateops.com/internal/cli"
 	"kapigen.kateops.com/internal/version"
 )
@@ -20,9 +21,15 @@ func (m *MainFactory) GetVersionController() *version.Controller {
 	if m.version == nil {
 		switch m.Settings.Mode {
 		case version.Gitlab:
+			var gitlabClient *gitlab.Client
+			if m.Settings.PrivateToken == "" {
+				gitlabClient = m.GetClients().GetGitlabJobClient()
+			} else {
+				gitlabClient = m.GetClients().GetGitlabClient(m.Settings.PrivateToken)
+			}
 			m.version = version.NewController(
 				m.Settings.Mode,
-				m.GetClients().GetGitlabClient(),
+				gitlabClient,
 				version.NewFileReader(),
 			)
 		case version.FILE:

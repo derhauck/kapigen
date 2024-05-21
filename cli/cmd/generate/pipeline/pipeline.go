@@ -35,13 +35,32 @@ var Cmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		privateTokenName, err := cmd.Flags().GetString("private-token")
+		if err != nil {
+			return err
+		}
 		logger.Info("will create settings")
-		settings := cli.NewSettings(
-			cli.SetMode(version.GetModeFromString(mode)),
-		)
 
 		logger.Info("will read pipeline config from: " + configPath)
-		pipelineJobs, pipelineConfig, err := types.LoadJobsFromPipelineConfig(factory.New(settings), configPath, config.PipelineConfigTypes)
+		body, err := os.ReadFile(configPath)
+		if err != nil {
+			return err
+		}
+
+		var pipelineConfig types.PipelineConfig
+		err = yaml.Unmarshal(body, &pipelineConfig)
+		if err != nil {
+			return err
+		}
+		if privateTokenName == "" {
+			privateTokenName = pipelineConfig.PrivateTokenName
+		}
+
+		settings := cli.NewSettings(
+			cli.SetMode(version.GetModeFromString(mode)),
+			cli.SetPrivateToken(privateTokenName),
+		)
+		pipelineJobs, err := types.LoadJobsFromPipelineConfig(factory.New(settings), pipelineConfig, config.PipelineConfigTypes)
 		if err != nil {
 			return err
 		}

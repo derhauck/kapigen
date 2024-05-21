@@ -5,7 +5,8 @@ import (
 )
 
 type Settings struct {
-	Mode version.Mode
+	Mode         version.Mode
+	PrivateToken string
 }
 
 type SettingsFn func(s *Settings)
@@ -21,5 +22,11 @@ func NewSettings(fns ...SettingsFn) *Settings {
 func SetMode(mode version.Mode) SettingsFn {
 	return func(s *Settings) {
 		s.Mode = mode
+	}
+}
+
+func SetPrivateToken(privateToken string) SettingsFn {
+	return func(s *Settings) {
+		s.PrivateToken = privateToken
 	}
 }
