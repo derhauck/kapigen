@@ -50,7 +50,11 @@ func (c *CiJob) AddScript(script string) *CiJob {
 
 	return c
 }
+func (c *CiJob) AddScriptf(script string, a ...any) *CiJob {
+	c.Script.Value.Addf(script, a...)
 
+	return c
+}
 func (c *CiJob) AddScripts(scripts []string) *CiJob {
 	c.Script.Value.AddSlice(scripts)
 
@@ -62,7 +66,11 @@ func (c *CiJob) AddBeforeScript(script string) *CiJob {
 
 	return c
 }
+func (c *CiJob) AddBeforeScriptf(script string, a ...any) *CiJob {
+	c.BeforeScript.Value.Addf(script, a...)
 
+	return c
+}
 func (c *CiJob) AddBeforeScripts(scripts []string) *CiJob {
 	c.BeforeScript.Value.AddSlice(scripts)
 
