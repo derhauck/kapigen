@@ -8,10 +8,10 @@ pipelines:
     id: cli-golang
     config:
       path: cli
-      #coverage:
-      #  packages:
-      #    - kapigen.kateops.com/internal/...
-      #imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
+      coverage:
+        packages:
+          - kapigen.kateops.com/internal/...
+      imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
   - type: docker
     id: cli-docker
     config:
