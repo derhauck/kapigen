@@ -16,6 +16,7 @@ import (
 
 type GolangCoverage struct {
 	Packages []string `yaml:"packages"`
+	Source   string   `yaml:"source"`
 }
 type GolangDocker struct {
 	Path       string            `yaml:"path"`
@@ -50,43 +51,54 @@ func (g *Golang) Validate() error {
 		logger.Info("no path set, defaulting to '.'")
 		g.Path = "."
 	}
-
-	entries, err := os.ReadDir(g.Path)
-	if err != nil {
-		return err
-	}
-	if g.ImageName == "" {
-		var isGoMod = false
-		for _, entry := range entries {
-			if entry.IsDir() {
-				continue
-			}
-			if entry.Name() == "go.mod" {
-				file, err := os.ReadFile(fmt.Sprintf("%s/%s", g.Path, entry.Name()))
-				if err != nil {
-					return err
-				}
-				fileString := string(file)
-
-				re := regexp.MustCompile(`go (.*)`)
-				match := re.FindStringSubmatch(fileString)
-				if len(match) > 0 {
-					logger.DebugAny(match[1])
-					g.ImageName = fmt.Sprintf("%s%s:%s", docker.DEPENDENCY_PROXY, "golang", match[1])
-				} else {
-					return fmt.Errorf("go.mod file should include go version")
-				}
-
-				isGoMod = true
-			}
-		}
-		if isGoMod == false {
-			return errors.New("could not find go.mod file in path")
-		}
-	}
-
 	if g.Coverage == nil {
 		g.Coverage = &GolangCoverage{}
+	}
+	entries, err := os.ReadDir(g.Path)
+	var isGoMod = false
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		if entry.Name() == "go.mod" {
+			file, err := os.ReadFile(fmt.Sprintf("%s/%s", g.Path, entry.Name()))
+			if err != nil {
+				return err
+			}
+			fileString := string(file)
+
+			re := regexp.MustCompile(`go (.*)`)
+			match := re.FindStringSubmatch(fileString)
+			if len(match) == 0 {
+				return fmt.Errorf("go.mod file should include go version")
+			}
+
+			logger.DebugAny(match[1])
+			g.ImageName = fmt.Sprintf("%s%s:%s", docker.DEPENDENCY_PROXY, "golang", match[1])
+
+			if len(g.Coverage.Packages) == 0 {
+				re := regexp.MustCompile(`module (.*)`)
+				match := re.FindStringSubmatch(fileString)
+				if len(match) == 0 {
+					return fmt.Errorf("go.mod file should include module name")
+				}
+				g.Coverage.Packages = []string{fmt.Sprintf("%s/...", match[1])}
+			}
+			if g.Coverage.Source == "" {
+				g.Coverage.Source = "./..."
+			}
+
+			isGoMod = true
+		}
+	}
+	if isGoMod == false {
+		return errors.New("could not find go.mod file in path")
+	}
+	if g.ImageName == "" {
+		if err != nil {
+			return err
+		}
+
 	}
 
 	if g.Docker != nil && g.Docker.Path == "" {
@@ -123,7 +135,7 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 		if err != nil {
 			return nil, err
 		}
-		test, err = golang.NewUnitTest(dockerPipeline.GetFinalImageName(), g.Path, g.Coverage.Packages)
+		test, err = golang.NewUnitTest(dockerPipeline.GetFinalImageName(), g.Path, g.Coverage.Packages, g.Coverage.Source)
 		if err != nil {
 			return nil, err
 		}
@@ -133,7 +145,7 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 		allJobs = append(allJobs, jobs.GetJobs()...)
 		g.changes = append(g.changes, dockerPipeline.Context)
 	} else {
-		test, err = golang.NewUnitTest(g.ImageName, g.Path, g.Coverage.Packages)
+		test, err = golang.NewUnitTest(g.ImageName, g.Path, g.Coverage.Packages, g.Coverage.Source)
 		if err != nil {
 			return nil, err
 		}

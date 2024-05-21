@@ -9,11 +9,12 @@ import (
 )
 
 var defaultCoveragePackages = []string{"./..."}
+var defaultSource = "./..."
 
 func TestCreate(t *testing.T) {
 	t.Parallel()
 	t.Run("can create job with correct parameters", func(t *testing.T) {
-		job, err := NewUnitTest("golang:1.16", "test", defaultCoveragePackages)
+		job, err := NewUnitTest("golang:1.16", "test", defaultCoveragePackages, defaultSource)
 		if job == nil && err != nil {
 			t.Error("can not create job")
 			t.Error(err)
@@ -21,7 +22,7 @@ func TestCreate(t *testing.T) {
 	})
 
 	t.Run("can not create test with wrong parameters", func(t *testing.T) {
-		job, err := NewUnitTest("", "", defaultCoveragePackages)
+		job, err := NewUnitTest("", "", defaultCoveragePackages, defaultSource)
 		if job != nil || err == nil {
 			t.Error("created job succeeded without image and path but should not")
 		}
@@ -29,7 +30,7 @@ func TestCreate(t *testing.T) {
 			t.Error(err)
 		}
 
-		job, err = NewUnitTest("golang:1.16", "", defaultCoveragePackages)
+		job, err = NewUnitTest("golang:1.16", "", defaultCoveragePackages, defaultSource)
 		if job != nil {
 			t.Error("created job succeeded without path but should not")
 		}
@@ -42,7 +43,7 @@ func TestCreate(t *testing.T) {
 	t.Run("has correct parameters", func(t *testing.T) {
 		expectedImageName := "golang:1.16"
 		expectedPath := "test"
-		job, _ := NewUnitTest(expectedImageName, expectedPath, defaultCoveragePackages)
+		job, _ := NewUnitTest(expectedImageName, expectedPath, defaultCoveragePackages, defaultSource)
 
 		if !slices.Contains(job.Names, "Unit Test") {
 			t.Error("job has wrong name")
