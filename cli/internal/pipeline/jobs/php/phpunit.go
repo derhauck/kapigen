@@ -10,19 +10,19 @@ import (
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 )
 
-func NewPhpUnit(imageName string, path string) (*types.Job, error) {
+func NewPhpUnit(imageName string, composerPath string, phpUnitXmlPath string, phpUnitArgs string) (*types.Job, error) {
 
 	return types.NewJob("PHP Unit", imageName, func(ciJob *job.CiJob) {
-		var reportPath = fmt.Sprintf("%s/report.xml", path)
-		if path == "." {
+		var reportPath = fmt.Sprintf("%s/report.xml", composerPath)
+		if composerPath == "." {
 			reportPath = "report.xml"
 		}
 
 		ciJob.TagMediumPressure().
 			SetStage(stages.TEST).
-			AddBeforeScriptf("cd %s", path).
-			AddScriptf("composer install").
-			AddScript("vendor/bin/phpunit --log-junit report.xml").
+			AddBeforeScriptf("cd %s", composerPath).
+			AddScriptf("composer install --no-progress --no-suggest").
+			AddScriptf("php vendor/bin/phpunit -c %s/phpunit.xml --log-junit report.xml %s", phpUnitXmlPath, phpUnitArgs).
 			AddArtifact(job.Artifact{
 				Name:  "report",
 				Paths: *wrapper.NewStringSlice().Add(reportPath),

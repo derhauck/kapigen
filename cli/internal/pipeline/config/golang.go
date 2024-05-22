@@ -73,7 +73,6 @@ func (g *Golang) Validate() error {
 				return fmt.Errorf("go.mod file should include go version")
 			}
 
-			logger.DebugAny(match[1])
 			g.ImageName = fmt.Sprintf("%s%s:%s", docker.DEPENDENCY_PROXY, "golang", match[1])
 
 			if len(g.Coverage.Packages) == 0 {
