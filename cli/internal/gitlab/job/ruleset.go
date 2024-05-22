@@ -15,7 +15,11 @@ func DefaultPipelineRules(paths []string) *Rules {
 func DefaultMergeRequestRules(paths []string) *Rules {
 	changes := wrapper.NewStringSlice()
 	for _, path := range paths {
-		changes.Add(fmt.Sprintf("%s/**/*", path))
+		if path == "." {
+			changes.Add("**/*")
+		} else {
+			changes.Add(fmt.Sprintf("%s/**/*", path))
+		}
 	}
 	return &Rules{
 		&Rule{
