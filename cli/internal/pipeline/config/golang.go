@@ -18,12 +18,6 @@ type GolangCoverage struct {
 	Packages []string `yaml:"packages"`
 	Source   string   `yaml:"source"`
 }
-type GolangDocker struct {
-	Path       string            `yaml:"path"`
-	Context    string            `yaml:"context"`
-	Dockerfile string            `yaml:"dockerfile"`
-	BuildArgs  map[string]string `yaml:"buildArgs,omitempty"`
-}
 
 func (g *GolangCoverage) Validate() error {
 	if len(g.Packages) == 0 {
@@ -36,7 +30,7 @@ func (g *GolangCoverage) Validate() error {
 type Golang struct {
 	ImageName string          `yaml:"imageName"`
 	Path      string          `yaml:"path"`
-	Docker    *GolangDocker   `yaml:"docker,omitempty"`
+	Docker    *SlimDocker     `yaml:"docker,omitempty"`
 	Coverage  *GolangCoverage `yaml:"coverage,omitempty"`
 	changes   []string
 }
@@ -101,7 +95,7 @@ func (g *Golang) Validate() error {
 	}
 
 	if g.Docker != nil && g.Docker.Path == "" {
-		return errors.New("no docker.path set, required")
+		return errors.New("docker.path not set, required")
 	}
 
 	if err := g.Coverage.Validate(); err != nil {

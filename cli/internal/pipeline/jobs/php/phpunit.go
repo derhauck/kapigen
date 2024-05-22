@@ -12,7 +12,7 @@ import (
 
 func NewPhpUnit(imageName string, composerPath string, phpUnitXmlPath string, phpUnitArgs string) (*types.Job, error) {
 
-	return types.NewJob("PHP Unit", imageName, func(ciJob *job.CiJob) {
+	return types.NewJob("Unit Test", imageName, func(ciJob *job.CiJob) {
 		var reportPath = fmt.Sprintf("%s/report.xml", composerPath)
 		if composerPath == "." {
 			reportPath = "report.xml"

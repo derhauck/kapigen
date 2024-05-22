@@ -21,6 +21,12 @@ type Docker struct {
 	ImageName     string            `yaml:"imageName"`
 	PushImageName string
 }
+type SlimDocker struct {
+	Path       string            `yaml:"path"`
+	Context    string            `yaml:"context"`
+	Dockerfile string            `yaml:"dockerfile"`
+	BuildArgs  map[string]string `yaml:"buildArgs,omitempty"`
+}
 
 func (d *Docker) New() types.PipelineConfigInterface {
 	return &Docker{}
