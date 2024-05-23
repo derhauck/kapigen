@@ -11,7 +11,7 @@ workflow:
 
 default:
   tags:
-    - pressure:medium
+    - pressure::medium
 stages:
   - build
   - trigger

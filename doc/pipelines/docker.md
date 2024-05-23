@@ -28,7 +28,7 @@ Pipeline will execute for the following types:
 * `Release`
 
 ### Tags:
-* `pressure:exclusive`
+* `pressure::exclusive`
 
 ### Example
 ```yaml
