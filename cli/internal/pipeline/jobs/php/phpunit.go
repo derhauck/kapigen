@@ -17,7 +17,6 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpU
 		if composerPath == "." {
 			reportPath = "report.xml"
 		}
-
 		ciJob.TagMediumPressure().
 			SetStage(stages.TEST).
 			AddBeforeScriptf("cd %s", composerPath).

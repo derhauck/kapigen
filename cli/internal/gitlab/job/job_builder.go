@@ -102,7 +102,7 @@ func (c *CiJob) TagMediumPressure() *CiJob {
 }
 
 func (c *CiJob) TagHighPressure() *CiJob {
-	c.Tags.Add(tags.PRESSURE_BUILDKIT)
+	c.Tags.Add(tags.PRESSURE_EXCLUSIVE)
 
 	return c
 }

@@ -5,7 +5,7 @@ import (
 	"runtime"
 )
 
-type ConfigError struct {
+type DetailedError struct {
 	Msg      string
 	Name     string
 	Filename string
@@ -14,16 +14,16 @@ type ConfigError struct {
 
 const delimiter = "\n======================================================================"
 
-func (c *ConfigError) Full() string {
+func (c *DetailedError) Full() string {
 	return fmt.Sprintf("%s\n=> FILE:\t%s:%d\n=> FUNCTION:\t%s\n=> MESSAGE:\t%s%s", delimiter, c.Filename, c.Line, c.Name, c.Msg, delimiter)
 }
-func (c *ConfigError) Error() string {
+func (c *DetailedError) Error() string {
 	return c.Msg
 }
 func ErrorHandler(msg string, caller int) error {
 
 	pc, filename, line, _ := runtime.Caller(caller)
-	return &ConfigError{
+	return &DetailedError{
 		Msg:      msg,
 		Name:     runtime.FuncForPC(pc).Name(),
 		Filename: filename,
