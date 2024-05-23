@@ -12,7 +12,7 @@ variables:
   KAPIGEN_VERSION: latest
 default:
   tags:
-    - pressure::medium
+    - pressure:medium
 stages:
   - build
   - trigger

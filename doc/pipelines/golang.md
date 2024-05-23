@@ -39,7 +39,7 @@ Pipeline will execute for the following types:
 * `Main`
 
 ### Tags:
-* `pressure::medium`
+* `pressure:medium`
 
 ### Example:
 **Image only**

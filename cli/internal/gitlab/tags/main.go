@@ -8,8 +8,8 @@ const (
 )
 
 var values = map[Size]string{
-	PRESSURE_MEDIUM:    "pressure::medium",
-	PRESSURE_EXCLUSIVE: "pressure::exclusive",
+	PRESSURE_MEDIUM:    "pressure:medium",
+	PRESSURE_EXCLUSIVE: "pressure:exclusive",
 }
 
 func (c *Size) String() string {
