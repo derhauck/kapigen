@@ -10,7 +10,7 @@ import (
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 )
 
-func NewPhpUnit(imageName string, composerPath string, phpUnitXmlPath string, phpUnitArgs string) (*types.Job, error) {
+func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpUnitXmlPath string, phpUnitArgs string) (*types.Job, error) {
 
 	return types.NewJob("Unit Test", imageName, func(ciJob *job.CiJob) {
 		var reportPath = fmt.Sprintf("%s/report.xml", composerPath)
@@ -21,7 +21,7 @@ func NewPhpUnit(imageName string, composerPath string, phpUnitXmlPath string, ph
 		ciJob.TagMediumPressure().
 			SetStage(stages.TEST).
 			AddBeforeScriptf("cd %s", composerPath).
-			AddScriptf("composer install --no-progress --no-suggest").
+			AddScriptf("composer install --no-progress %s", composerArgs).
 			AddScriptf("php vendor/bin/phpunit -c %s/phpunit.xml --log-junit report.xml %s", phpUnitXmlPath, phpUnitArgs).
 			AddArtifact(job.Artifact{
 				Name:  "report",

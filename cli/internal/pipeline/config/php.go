@@ -1,8 +1,6 @@
 package config
 
 import (
-	"errors"
-
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/logger"
@@ -12,9 +10,10 @@ import (
 
 type Php struct {
 	ComposerPath   string      `yaml:"composerPath"`
+	ComposerArgs   string      `yaml:"composerArgs"`
 	ImageName      string      `yaml:"ImageName"`
-	PhpUnitXmlPath string      `yaml:"phpUnitXmlPath"`
-	PhpUnitArgs    string      `yaml:"phpUnitArgs"`
+	PhpunitXmlPath string      `yaml:"phpunitXmlPath"`
+	PhpunitArgs    string      `yaml:"phpunitArgs"`
 	Docker         *SlimDocker `yaml:"docker,omitempty"`
 }
 
@@ -23,26 +22,29 @@ func (p *Php) New() types.PipelineConfigInterface {
 }
 func (p *Php) Validate() error {
 	if p.ComposerPath == "" {
-		return errors.New("composerPath not set, required")
+		return types.NewMissingArgError("composerPath")
 	}
-	if p.PhpUnitXmlPath == "" {
-		p.PhpUnitXmlPath = p.ComposerPath
+	if p.ComposerArgs == "" {
+		logger.Info("no composerArgs set")
 	}
-	if p.PhpUnitArgs == "" {
-		logger.Info("no phpUnitArgs set")
+	if p.PhpunitXmlPath == "" {
+		p.PhpunitXmlPath = p.ComposerPath
+	}
+	if p.PhpunitArgs == "" {
+		logger.Info("no phpunitArgs set")
 	}
 	if p.Docker != nil && p.Docker.Path == "" {
-		return errors.New("docker.path not set, required")
+		return types.NewMissingArgError("docker.path")
 	}
 	if p.ImageName == "" && p.Docker == nil {
-		return errors.New("imageName and docker not set, one required")
+		return types.NewMissingArgsError("imageName", "docker")
 	}
 	return nil
 }
 
 func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var jobs = &types.Jobs{}
-	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.ComposerPath, p.PhpUnitXmlPath, p.PhpUnitArgs)
+	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.ComposerPath, p.ComposerArgs, p.PhpunitXmlPath, p.PhpunitArgs)
 	if err != nil {
 		return nil, err
 	}
