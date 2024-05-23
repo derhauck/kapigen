@@ -1,6 +1,8 @@
 package job
 
 import (
+	"errors"
+
 	"gopkg.in/yaml.v3"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/logger"
@@ -65,13 +67,19 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml, externalTags []string) (*CiJobYa
 	if err != nil {
 		return nil, err
 	}
-
+	image, err := job.Image.GetRenderedValue()
+	if err != nil {
+		return nil, err
+	}
 	stage := job.Stage
 	if stage < stages.DYNAMIC {
 		stage = stages.DYNAMIC
 	}
-
+	if job.Tags == nil {
+		return nil, errors.New("tags are required")
+	}
 	tags := job.Tags.Render()
+
 	if len(externalTags) > 0 {
 		tags = externalTags
 	}
@@ -85,7 +93,7 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml, externalTags []string) (*CiJobYa
 		Script:       job.Script.GetRenderedValue(),
 		Needs:        needs,
 		Variables:    job.Variables,
-		Image:        job.Image.GetRenderedValue(),
+		Image:        image,
 		Rules:        job.Rules.GetRenderedValue(),
 		Stage:        stage.String(),
 		Services:     job.Services.Render(),

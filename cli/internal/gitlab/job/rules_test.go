@@ -1,9 +1,11 @@
 package job
 
 import (
-	"kapigen.kateops.com/internal/when"
 	"reflect"
+	"strings"
 	"testing"
+
+	"kapigen.kateops.com/internal/when"
 )
 
 func TestNewRulesYaml(t *testing.T) {
@@ -38,6 +40,53 @@ func TestWhenEnumType_When(t *testing.T) {
 		test := WhenWrapper{}
 		if test.Get() != expectation.Get() {
 			t.Errorf("Expected on_success, got: '%s'", test.Get())
+		}
+
+	})
+}
+func TestDefaultPipelineRules(t *testing.T) {
+	t.Parallel()
+	t.Run("Can get different paths in changes", func(t *testing.T) {
+		expectations := []string{"test/", "test2", "test3"}
+		for _, expectation := range expectations {
+			rules := DefaultPipelineRules([]string{expectation})
+			for _, rule := range rules.Get() {
+				for _, change := range rule.Changes.Get() {
+					t.Run(expectation, func(t *testing.T) {
+						if !strings.Contains(change, expectation) {
+							t.Errorf("Expected '%s' to contain '%s'", change, expectation)
+						}
+						if strings.Contains(change, "//") {
+							t.Errorf("Expected '%s' to not contain '%s' for value: '%s'", change, "//", expectation)
+						}
+						if i := strings.Index(change, "."); i == 0 {
+							t.Errorf("Expected '%s' to not begin with '%s' for value: '%s'", change, ".", expectation)
+						}
+					})
+
+				}
+			}
+		}
+
+	})
+	t.Run("Can get proper path for '.'", func(t *testing.T) {
+		expectation := "."
+		rules := DefaultPipelineRules([]string{expectation})
+		for _, rule := range rules.Get() {
+			for _, change := range rule.Changes.Get() {
+				t.Run(expectation, func(t *testing.T) {
+					if strings.Contains(change, expectation) {
+						t.Errorf("Expected '%s' not to contain '%s'", change, expectation)
+					}
+					if strings.Contains(change, "//") {
+						t.Errorf("Expected '%s' to not contain '%s' for value: '%s'", change, "//", expectation)
+					}
+					if i := strings.Index(change, "."); i == 0 {
+						t.Errorf("Expected '%s' to not begin with '%s' for value: '%s'", change, ".", expectation)
+					}
+				})
+
+			}
 		}
 
 	})

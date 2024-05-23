@@ -17,7 +17,8 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpU
 		if composerPath == "." {
 			reportPath = "report.xml"
 		}
-		ciJob.TagMediumPressure().
+		ciJob.
+			TagMediumPressure().
 			SetStage(stages.TEST).
 			AddBeforeScriptf("cd %s", composerPath).
 			AddScriptf("composer install --no-progress %s", composerArgs).
