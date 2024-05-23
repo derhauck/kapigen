@@ -62,7 +62,7 @@ Build:
           variables:
             DOCKER_CONFIG: $CI_PROJECT_DIR
     tags:
-        - pressure::medium
+        - pressure:medium
 stages:
     - build
     - test

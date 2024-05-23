@@ -4,12 +4,12 @@ type Size int
 
 const (
 	PRESSURE_MEDIUM Size = iota
-	PRESSURE_BUILDKIT
+	PRESSURE_EXCLUSIVE
 )
 
 var values = map[Size]string{
-	PRESSURE_MEDIUM:   "pressure::medium",
-	PRESSURE_BUILDKIT: "pressure::buildkit",
+	PRESSURE_MEDIUM:    "pressure:medium",
+	PRESSURE_EXCLUSIVE: "pressure:exclusive",
 }
 
 func (c *Size) String() string {

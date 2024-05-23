@@ -14,4 +14,5 @@ var PipelineConfigTypes = map[types.PipelineType]types.PipelineConfigInterface{
 	DockerPipeline:         &Docker{},
 	InfrastructurePipeline: &Infrastructure{},
 	GOLANG:                 &Golang{},
+	PHPPipeline:            &Php{},
 }

@@ -70,6 +70,10 @@ type PipelineConfig struct {
 func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterface, pipelineType PipelineType, pipelineId string) (*Jobs, error) {
 	err := config.Validate()
 	if err != nil {
+		var re *DetailedError
+		if errors.As(err, &re) {
+			logger.Debug(re.Full())
+		}
 		return nil, errors.New(fmt.Sprintf(
 			"pipeline type: %s, id: %s, encountered validation error: %s",
 			pipelineType,

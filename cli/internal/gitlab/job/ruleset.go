@@ -2,6 +2,7 @@ package job
 
 import (
 	"fmt"
+	"regexp"
 
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 	"kapigen.kateops.com/internal/when"
@@ -14,8 +15,17 @@ func DefaultPipelineRules(paths []string) *Rules {
 }
 func DefaultMergeRequestRules(paths []string) *Rules {
 	changes := wrapper.NewStringSlice()
+	change := "**/*"
 	for _, path := range paths {
-		changes.Add(fmt.Sprintf("%s/**/*", path))
+		if path != "." {
+			change = fmt.Sprintf("%s/%s", path, change)
+		}
+		r, _ := regexp.Compile("/+")
+		if r != nil {
+			change = r.ReplaceAllString(change, "/")
+		}
+		changes.Add(change)
+
 	}
 	return &Rules{
 		&Rule{
@@ -77,21 +87,4 @@ func RulesKapigen(rules *Rules) *Rules {
 	}
 
 	return rules
-}
-
-type DefaultPipelineRule struct {
-	Changes wrapper.StringSlice
-	Rules   *Rules
-}
-
-func (d *DefaultPipelineRule) Get() *Rules {
-	rules := *d.Rules
-	for _, rule := range rules.Get() {
-		if len(rule.Changes.Get()) > 0 {
-			for _, change := range d.Changes.Get() {
-				rule.AddChange(change)
-			}
-		}
-	}
-	return &rules
 }

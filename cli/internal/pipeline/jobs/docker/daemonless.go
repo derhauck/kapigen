@@ -71,6 +71,6 @@ func NewDaemonlessBuildkitBuild(imageName string, path string, context string, d
 			AddVariable("BUILDKITD_FLAGS", "--oci-worker-no-process-sandbox").
 			AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}").
 			AddVariable("BUILDCTL_CONNECT_RETRIES_MAX", "52")
-		ciJob.Tags.Add(tags.PRESSURE_BUILDKIT)
+		ciJob.Tags.Add(tags.PRESSURE_EXCLUSIVE)
 	})
 }

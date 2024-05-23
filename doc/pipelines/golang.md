@@ -38,6 +38,8 @@ Pipeline will execute for the following types:
 * `Merge Request` Uses `path` and `docker.context` to watch for changes.
 * `Main`
 
+### Tags:
+* `pressure:medium`
 
 ### Example:
 **Image only**

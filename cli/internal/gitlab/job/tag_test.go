@@ -47,7 +47,7 @@ func TestTags_Add(t *testing.T) {
 			name: "can add two",
 			want: []tags.Size{
 				tags.PRESSURE_MEDIUM,
-				tags.PRESSURE_BUILDKIT,
+				tags.PRESSURE_EXCLUSIVE,
 			},
 		},
 	}

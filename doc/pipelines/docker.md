@@ -27,6 +27,9 @@ Pipeline will execute for the following types:
 * `Merge Request` Uses `context` to watch for changes.
 * `Release`
 
+### Tags:
+* `pressure:exclusive`
+
 ### Example
 ```yaml
 id: example
