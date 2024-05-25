@@ -45,6 +45,35 @@ default:
     - saas-linux-medium-amd64
 ```
 
-[Kapigen Config](cli/config.kapigen.yaml)
+### Pipelines Configuration
+
+[Kapigen Config](cli/config.kapigen.yaml):
+
+```yaml
+noop: true
+versioning: true
+dependencyProxy: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}
+privateTokenName: CI_PIPELINE_TOKEN
+tags:
+  - saas-linux-medium-amd64
+pipelines:
+  - type: golang
+    id: cli-golang
+    config:
+      path: cli
+      coverage:
+        packages:
+          - kapigen.kateops.com/internal/...
+      imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
+  - type: docker
+    id: cli-docker
+    config:
+      path: cli
+      name: cli
+    needs:
+      - cli-golang
+
+
+```
 
 For more detailed information visit the [docs](doc/index.md) inside the repository.
