@@ -50,6 +50,8 @@ Tests:
 
 Trigger Build:
   stage: trigger
+  variables:
+    KTC_TEST_PIPELINE: true
   trigger:
     strategy: depend
     include:
