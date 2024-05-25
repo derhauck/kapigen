@@ -1,13 +1,14 @@
-# Golang Pipeline
-This pipeline allows you to run golang tests
+# PHP Pipeline
+This pipeline allows you to run php tests
 
 ### Parameters:
 ```yaml
-type: golang
+type: php
 config:
-  path: string
-  coverage:
-    packages: Array<string>
+  composerPath: string
+  composerArgs: string
+  phpunitXmlPath: string
+  phpunitArgs: string
   imageName: string
   docker:
     path: string
@@ -17,14 +18,14 @@ config:
 ```
 
 ### Description:
-The pipeline will run golang tests. In order to execute those it will run the jobs inside the specified image. 
+The pipeline will run php tests. In order to execute those it will run the jobs inside the specified image. 
 Either by using `imageName` or the `docker` configuration. If both are set the `docker` config takes precedence.
-* `path: [optional | default: '.']` The path to the golang code for executing the tests.
+* `composerPath: [optional | default: '.']` The path to the composer.json file for installing the dependencies.
+* `composerArgs: [optional]` Additional arguments for the composer install command.
+* `phpunitXmlPath: [optional | default: '.']` The path to the `phpunit.xml`, relative to the composerPath.
+* `phpunitArgs: [optional]` Additional arguments for the phpunit command.
 * `imageName: [optional]` The image name to use for running the tests.
 
-**coverage**
-* `coverage: [optional]` The coverage options
-* `coverage.packages: [optional]` The packages to consider for the coverage calculations
 
 **docker**
 * `docker: [optional]` Can be used to run the tests in a custom image
@@ -35,7 +36,7 @@ Either by using `imageName` or the `docker` configuration. If both are set the `
 
 ### Rules:
 Pipeline will execute for the following types:
-* `Merge Request` Uses `path` and `docker.context` to watch for changes.
+* `Merge Request` Uses `composerPath` and `docker.context` to watch for changes.
 * `Main`
 
 ### Tags:
@@ -45,27 +46,26 @@ Pipeline will execute for the following types:
 ### Example:
 **Image only**
 ```yaml
-type: golang
-id: example
+id: php
 config:
-  path: cli
-  coverage:
-    packages:
-      - kapigen.kateops.com/internal/...
-  imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
+  composerPath: code
+  composerArgs: --no-dev
+  phpunitXmlPath: tests
+  phpunitArgs: --testsuite unit
+  imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/php:8.1-cli-alpine3.15'
 ```
 **Docker only**
 ```yaml
-type: golang
-id: example
+type: php
+id: php
 config:
-  path: cli
-  coverage:
-    packages:
-      - kapigen.kateops.com/internal/...
+  composerPath: code
+  composerArgs: --no-dev
+  phpunitXmlPath: tests
+  phpunitArgs: --testsuite unit
   docker:
     path: cli
-    context: cli
+    context: .
     dockerfile: Dockerfile
     buildArgs:
       FOO: bar

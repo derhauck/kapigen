@@ -2,6 +2,7 @@
 /**/.cache
 /**/.bin
 /**/.env
+/.idea/cody_history.xml
 /**/pipeline.yaml
 /**/pipeline-no-merge.yaml
 /**/profile.cov
