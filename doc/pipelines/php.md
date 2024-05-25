@@ -22,7 +22,7 @@ The pipeline will run php tests. In order to execute those it will run the jobs 
 Either by using `imageName` or the `docker` configuration. If both are set the `docker` config takes precedence.
 * `composerPath: [optional | default: '.']` The path to the composer.json file for installing the dependencies.
 * `composerArgs: [optional]` Additional arguments for the composer install command.
-* `phpunitXmlPath: [optional | default: composerPath]` The path to the `phpunit.xml`, relative to the composerPath.
+* `phpunitXmlPath: [optional | default: '.']` The path to the `phpunit.xml`, relative to the composerPath.
 * `phpunitArgs: [optional]` Additional arguments for the phpunit command.
 * `imageName: [optional]` The image name to use for running the tests.
 
