@@ -25,17 +25,17 @@ func (p *PhpComposer) Validate() error {
 }
 
 type Phpunit struct {
-	XmlPath string `yaml:"XmlPath"`
-	Args    string `yaml:"args"`
+	Path string `yaml:"path"`
+	Args string `yaml:"args"`
 }
 
-func (p *Phpunit) Validate() error {
-	if p.XmlPath == "" {
-		logger.Info("no phpunit.path set, defaulting to '.'")
-		p.XmlPath = "."
+func (p *Phpunit) Validate(composer *PhpComposer) error {
+	if p.Path == "" {
+		logger.Info("no phpunit.path set, defaulting to 'composer.path'")
+		p.Path = composer.Path
 	}
 	if p.Args == "" {
-		logger.Info("no composer.args set")
+		logger.Info("no phpunit.args set")
 	}
 	return nil
 }
@@ -55,7 +55,7 @@ func (p *Php) Validate() error {
 	if err := p.Composer.Validate(); err != nil {
 		return err
 	}
-	if err := p.Phpunit.Validate(); err != nil {
+	if err := p.Phpunit.Validate(&p.Composer); err != nil {
 		return err
 	}
 	if p.Docker != nil && p.Docker.Path == "" {
@@ -69,7 +69,7 @@ func (p *Php) Validate() error {
 
 func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var jobs = &types.Jobs{}
-	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.XmlPath, p.Phpunit.Args)
+	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.Path, p.Phpunit.Args)
 	p.changes = []string{p.Composer.Path}
 	if err != nil {
 		return nil, err

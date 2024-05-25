@@ -21,7 +21,7 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpU
 			SetStage(stages.TEST).
 			AddVariable("XDEBUG_MODE", "coverage").
 			AddScriptf("composer install --no-progress --working-dir=%s %s", composerPath, composerArgs).
-			AddScriptf("php %s/vendor/bin/phpunit -c %s/phpunit.xml --log-junit report.xml  --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml%s", composerPath, phpUnitXmlPath, phpUnitArgs).
+			AddScriptf("php %s/vendor/bin/phpunit -c %s/phpunit.xml --log-junit report.xml  --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml %s", composerPath, phpUnitXmlPath, phpUnitArgs).
 			SetCodeCoverage(`/^\s*Lines:\s*\d+.\d+\%/`).
 			AddArtifact(job.Artifact{
 				Name:  "report",
