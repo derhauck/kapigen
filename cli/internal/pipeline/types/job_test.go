@@ -2,6 +2,10 @@ package types
 
 import (
 	"testing"
+
+	"kapigen.kateops.com/internal/gitlab/job"
+	"kapigen.kateops.com/internal/gitlab/stages"
+	"kapigen.kateops.com/internal/gitlab/tags"
 )
 
 func TestJobs_FindJobsByPipelineId(t *testing.T) {
@@ -94,4 +98,187 @@ func TestJobs_FindJobsByPipelineId(t *testing.T) {
 
 		}
 	})
+}
+
+func TestNewJob(t *testing.T) {
+	t.Parallel()
+
+	t.Run("creates job with correct parameters", func(t *testing.T) {
+		name := "Test Job"
+		imageName := "golang:1.16"
+		fn := func(ciJob *job.CiJob) {}
+
+		newJob := NewJob(name, imageName, fn)
+
+		if newJob.Names[0] != name {
+			t.Errorf("unexpected job name: %s", newJob.Names[0])
+		}
+
+		if newJob.CiJob.Image.Name != imageName {
+			t.Errorf("unexpected image name: %s", newJob.CiJob.Image.Name)
+		}
+	})
+}
+
+func TestJob_AddName(t *testing.T) {
+	t.Parallel()
+
+	t.Run("adds name to job", func(t *testing.T) {
+		newJob := NewJob("Test Job", "golang:1.16", nil)
+		newJob.AddName("Another Name")
+
+		if len(newJob.Names) != 2 {
+			t.Errorf("unexpected number of names: %d", len(newJob.Names))
+		}
+
+		if newJob.Names[1] != "Another Name" {
+			t.Errorf("unexpected second name: %s", newJob.Names[1])
+		}
+	})
+}
+
+func TestJob_Render(t *testing.T) {
+	t.Parallel()
+
+	t.Run("renders job correctly", func(t *testing.T) {
+		newJob := NewJob("Test Job", "golang:1.16", func(ciJob *job.CiJob) {
+			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+		})
+		err := newJob.Render()
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		if newJob.CiJobYaml == nil {
+			t.Error("expected CiJobYaml to be set after rendering")
+		}
+		if newJob.CiJobYaml.Image.Name != "golang:1.16" {
+			t.Errorf("unexpected image name: %s", newJob.CiJobYaml.Image.Name)
+		}
+
+		if !contains(newJob.CiJobYaml.Tags, tags.PRESSURE_MEDIUM.String()) {
+			t.Errorf("expected to contain tag: %s", tags.PRESSURE_MEDIUM.String())
+		}
+
+		if len(newJob.CiJobYaml.Tags) != 1 {
+			t.Errorf("unexpected number of tags: %d", len(newJob.CiJobYaml.Tags))
+		}
+		if newJob.CiJobYaml.Stage != stages.DYNAMIC.String() {
+			t.Errorf("unexpected stage: %s", newJob.CiJobYaml.Stage)
+		}
+	})
+}
+func TestJob_DynamicMerge(t *testing.T) {
+	t.Parallel()
+
+	t.Run("merges job with compatible job", func(t *testing.T) {
+		job1 := NewJob("Job 1", "golang:1.16", func(ciJob *job.CiJob) {
+			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+		})
+		job2 := NewJob("Job 2", "golang:1.16", func(ciJob *job.CiJob) {
+			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+		})
+		jobs := Jobs{job1, job2}
+		job2.AddJobAsNeed(job1)
+		merged, err := job1.DynamicMerge(&jobs)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		if merged != nil {
+			t.Error("expected merged job to be nil")
+		}
+
+		if len(job1.Needs.GetNeeds()) != 0 {
+			t.Errorf("unexpected number of needs for job1: %d", len(job1.Needs.GetNeeds()))
+		}
+
+		if len(job2.Needs.GetNeeds()) != 1 {
+			t.Errorf("unexpected number of needs for job2: %d", len(job2.Needs.GetNeeds()))
+		}
+
+		if job2.Needs.HasJob(job1) {
+			t.Error("job2 needs should include job1")
+		}
+	})
+
+	t.Run("does not merge job with incompatible job", func(t *testing.T) {
+		job1 := NewJob("Job 1", "golang:1.16", func(ciJob *job.CiJob) {
+			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+		})
+		job2 := NewJob("Job 2", "node:14", func(ciJob *job.CiJob) {
+			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+		})
+		jobs := Jobs{job1, job2}
+
+		merged, err := job1.DynamicMerge(&jobs)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		if merged != job1 {
+			t.Error("expected merged job to be job1")
+		}
+
+		if len(job1.Needs.GetNeeds()) != 0 {
+			t.Errorf("unexpected number of needs for job1: %d", len(job1.Needs.GetNeeds()))
+		}
+
+		if len(job2.Needs.GetNeeds()) != 0 {
+			t.Errorf("unexpected number of needs for job2: %d", len(job2.Needs.GetNeeds()))
+		}
+	})
+}
+
+func TestJobs_DynamicMerge(t *testing.T) {
+	t.Parallel()
+
+	t.Run("merges compatible jobs", func(t *testing.T) {
+		job1 := NewJob("Job 1", "golang:1.16", func(ciJob *job.CiJob) {
+			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+		})
+		job2 := NewJob("Job 2", "golang:1.16", func(ciJob *job.CiJob) {
+			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+		})
+		job3 := NewJob("Job 3", "node:14", func(ciJob *job.CiJob) {
+			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+		})
+		jobs := Jobs{job1, job2, job3}
+		job3.AddJobAsNeed(job1)
+		merged, err := jobs.DynamicMerge()
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		if len(merged.GetJobs()) != 2 {
+			t.Errorf("unexpected number of merged jobs: %d", len(merged.GetJobs()))
+		}
+
+		mergedJob1 := merged.GetJobs()[0]
+		mergedJob2 := merged.GetJobs()[1]
+
+		if len(mergedJob1.Needs.GetNeeds()) != 0 {
+			t.Errorf("unexpected number of needs for mergedJob1: %d", len(mergedJob1.Needs.GetNeeds()))
+		}
+
+		if len(mergedJob2.Needs.GetNeeds()) != 1 {
+			t.Errorf("unexpected number of needs for mergedJob2: %d", len(mergedJob2.Needs.GetNeeds()))
+		}
+
+		if mergedJob1.Needs.HasJob(mergedJob2) {
+			t.Error("mergedJob1 needs should include mergedJob2")
+		}
+
+		if merged.GetJobs()[1] != job3 {
+			t.Error("job3 should not be merged")
+		}
+	})
+}
+func contains(slice []string, element string) bool {
+	for _, s := range slice {
+		if s == element {
+			return true
+		}
+	}
+	return false
 }

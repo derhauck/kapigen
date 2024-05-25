@@ -53,10 +53,12 @@ Pipeline will execute for the following types:
 ```yaml
 id: php
 config:
-  composerPath: code
-  composerArgs: --no-dev
-  phpunitXmlPath: tests
-  phpunitArgs: --testsuite unit
+  composer:
+    path: code
+    args: --no-dev
+  phpunit:
+    path: tests
+    args: --testsuite unit
   imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/php:8.1-cli-alpine3.15'
 ```
 **Docker only**
@@ -64,14 +66,36 @@ config:
 type: php
 id: php
 config:
-  composerPath: code
-  composerArgs: --no-dev
-  phpunitXmlPath: tests
-  phpunitArgs: --testsuite unit
+  composer: 
+    path: code
+    args: --no-dev
+  phpunit:
+    path: tests
+    args: --testsuite unit
   docker:
     path: cli
     context: .
     dockerfile: Dockerfile
     buildArgs:
       FOO: bar
+```
+
+For a real example look at the [php tests](../../cli/tests/php) inside this repository.
+
+The pipeline configuration for running those tests: [Test Pipeline Config](../../cli/test.kapigen.yaml)
+```yaml
+noop: true
+versioning: false
+dependencyProxy: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}
+#tags:
+#  - saas-linux-medium-amd64
+pipelines:
+# ...
+  - type: php
+    id: php
+    config:
+      composer:
+        path: cli/tests/php
+      docker:
+        path: cli/tests/php
 ```

@@ -12,8 +12,8 @@ var values = map[Size]string{
 	PRESSURE_EXCLUSIVE: "pressure:exclusive",
 }
 
-func (c *Size) String() string {
-	if value, ok := values[*c]; ok {
+func (c Size) String() string {
+	if value, ok := values[c]; ok {
 		return value
 	}
 	return values[PRESSURE_MEDIUM]
