@@ -9,14 +9,18 @@ import (
 
 func (c *CiJob) SetStage(stage stages.Stage) *CiJob {
 	c.Stage = stage
+
 	return c
 }
 
-func (c *CiJob) SetCodeCoverage(regex string) {
+func (c *CiJob) SetCodeCoverage(regex string) *CiJob {
 	c.Coverage = regex
+
+	return c
 }
 func (c *CiJob) AddArtifact(artifact Artifact) *CiJob {
 	c.Artifact = artifact
+
 	return c
 }
 
@@ -25,6 +29,7 @@ func (c *CiJob) AddVariable(key string, value string) *CiJob {
 		c.Variables = map[string]string{}
 	}
 	c.Variables[key] = value
+
 	return c
 }
 

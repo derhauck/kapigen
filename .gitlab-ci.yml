@@ -61,6 +61,8 @@ Trigger Build:
 
 Trigger Tests:
   stage: trigger
+  variables:
+    KTC_TEST_PIPELINE: true
   rules:
     - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
     - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'

@@ -153,7 +153,7 @@ func NewJob(name string, image string, fn func(ciJob *job.CiJob)) *Job {
 	var newJob = &Job{
 		Names:       []string{name},
 		CiJob:       job.NewCiJob(image),
-		currentName: 0,
+		currentName: 2,
 		fn:          []func(job *job.CiJob){fn},
 		Needs:       Needs{},
 	}

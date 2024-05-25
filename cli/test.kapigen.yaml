@@ -81,6 +81,7 @@ pipelines:
   - type: php
     id: php
     config:
-      composerPath: cli/tests/php
+      composer:
+        path: cli/tests/php
       docker:
         path: cli/tests/php
