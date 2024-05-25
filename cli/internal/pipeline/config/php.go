@@ -15,6 +15,7 @@ type Php struct {
 	PhpunitXmlPath string      `yaml:"phpunitXmlPath"`
 	PhpunitArgs    string      `yaml:"phpunitArgs"`
 	Docker         *SlimDocker `yaml:"docker,omitempty"`
+	changes        []string
 }
 
 func (p *Php) New() types.PipelineConfigInterface {
@@ -22,13 +23,15 @@ func (p *Php) New() types.PipelineConfigInterface {
 }
 func (p *Php) Validate() error {
 	if p.ComposerPath == "" {
-		return types.NewMissingArgError("composerPath")
+		logger.Info("no composerPath set, using default")
+		p.ComposerPath = "."
 	}
 	if p.ComposerArgs == "" {
 		logger.Info("no composerArgs set")
 	}
 	if p.PhpunitXmlPath == "" {
-		p.PhpunitXmlPath = p.ComposerPath
+		logger.Info("no phpunitXmlPath set, using same as composerPath")
+		p.PhpunitXmlPath = "."
 	}
 	if p.PhpunitArgs == "" {
 		logger.Info("no phpunitArgs set")
@@ -45,6 +48,7 @@ func (p *Php) Validate() error {
 func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var jobs = &types.Jobs{}
 	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.ComposerPath, p.ComposerArgs, p.PhpunitXmlPath, p.PhpunitArgs)
+	p.changes = []string{p.ComposerPath}
 	if err != nil {
 		return nil, err
 	}
@@ -65,6 +69,7 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 			phpUnitJob.AddJobAsNeed(currentJob)
 		}
 		phpUnitJob.CiJob.Image.Name = dockerPipeline.GetFinalImageName()
+		p.changes = append(p.changes, dockerPipeline.Context)
 	}
 
 	jobs.AddJob(phpUnitJob)
@@ -72,5 +77,5 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 }
 
 func (p *Php) Rules() *job.Rules {
-	return &(*job.DefaultPipelineRules([]string{p.ComposerPath}))
+	return &(*job.DefaultPipelineRules(p.changes))
 }

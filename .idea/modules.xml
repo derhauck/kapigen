@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/kapigen.iml" filepath="$PROJECT_DIR$/.idea/kapigen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/kapigen.iml" filepath="$PROJECT_DIR$/kapigen.iml" />
     </modules>
   </component>
 </project>

@@ -1,0 +1,12 @@
+services:
+  php-cli:
+    image: php-complete
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    user: 1000:1000
+    environment:
+      XDEBUG_MODE: debug,coverage
+    volumes:
+      - .:/app

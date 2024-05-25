@@ -78,3 +78,9 @@ pipelines:
       coverage:
         packages:
           - ./...
+  - type: php
+    id: php
+    config:
+      composerPath: cli/tests/php
+      docker:
+        path: cli/tests/php
