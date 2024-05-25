@@ -11,6 +11,7 @@ config:
   dockerfile: string
   release: bool
   buildArgs: Record<string, string>
+  imageName: string
 ```
 
 ### Description:
@@ -21,6 +22,7 @@ config:
 * `dockerfile: [optional | default: 'Dockerfile']` The name of the Dockerfile inside the `<path>`.
 * `release: [optional | default: true]` Whether the build will run on a release pipeline (tag pipeline) or only on feature branches.
 * `buildArgs: [optional]` Additional build arguments for the docker build.
+* `imageName: [optional | default: 'moby/buildkit:v0.12.3-rootless']` The image name to use for running the build job.
 
 ### Rules:
 Pipeline will execute for the following types:

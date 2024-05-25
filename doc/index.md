@@ -27,7 +27,7 @@ include:
   - remote: 'https://gitlab.com/kateops/kapigen/-/raw/main/default.gitlab-ci.yml'
 ```
 
-In case you are not using the default kapigen tags you can overwrite them to your liking e.g. for the pipeline generation itself.
+In case you are not using the default Kapigen tags you can overwrite them to your liking e.g. for the pipeline generation itself.
 ```yaml
 default:
   tags:

@@ -8,33 +8,55 @@ import (
 	"kapigen.kateops.com/internal/pipeline/types"
 )
 
+type PhpComposer struct {
+	Path string `yaml:"path"`
+	Args string `yaml:"args"`
+}
+
+func (p *PhpComposer) Validate() error {
+	if p.Path == "" {
+		logger.Info("no composer.path set, defaulting to '.'")
+		p.Path = "."
+	}
+	if p.Args == "" {
+		logger.Info("no composer.args set")
+	}
+	return nil
+}
+
+type Phpunit struct {
+	XmlPath string `yaml:"XmlPath"`
+	Args    string `yaml:"args"`
+}
+
+func (p *Phpunit) Validate() error {
+	if p.XmlPath == "" {
+		logger.Info("no phpunit.path set, defaulting to '.'")
+		p.XmlPath = "."
+	}
+	if p.Args == "" {
+		logger.Info("no composer.args set")
+	}
+	return nil
+}
+
 type Php struct {
-	ComposerPath   string      `yaml:"composerPath"`
-	ComposerArgs   string      `yaml:"composerArgs"`
-	ImageName      string      `yaml:"ImageName"`
-	PhpunitXmlPath string      `yaml:"phpunitXmlPath"`
-	PhpunitArgs    string      `yaml:"phpunitArgs"`
-	Docker         *SlimDocker `yaml:"docker,omitempty"`
-	changes        []string
+	Composer  PhpComposer `yaml:"composer"`
+	ImageName string      `yaml:"ImageName"`
+	Phpunit   Phpunit     `yaml:"phpunit"`
+	Docker    *SlimDocker `yaml:"docker,omitempty"`
+	changes   []string
 }
 
 func (p *Php) New() types.PipelineConfigInterface {
 	return &Php{}
 }
 func (p *Php) Validate() error {
-	if p.ComposerPath == "" {
-		logger.Info("no composerPath set, using default")
-		p.ComposerPath = "."
+	if err := p.Composer.Validate(); err != nil {
+		return err
 	}
-	if p.ComposerArgs == "" {
-		logger.Info("no composerArgs set")
-	}
-	if p.PhpunitXmlPath == "" {
-		logger.Info("no phpunitXmlPath set, using same as composerPath")
-		p.PhpunitXmlPath = "."
-	}
-	if p.PhpunitArgs == "" {
-		logger.Info("no phpunitArgs set")
+	if err := p.Phpunit.Validate(); err != nil {
+		return err
 	}
 	if p.Docker != nil && p.Docker.Path == "" {
 		return types.NewMissingArgError("docker.path")
@@ -47,8 +69,8 @@ func (p *Php) Validate() error {
 
 func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var jobs = &types.Jobs{}
-	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.ComposerPath, p.ComposerArgs, p.PhpunitXmlPath, p.PhpunitArgs)
-	p.changes = []string{p.ComposerPath}
+	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.XmlPath, p.Phpunit.Args)
+	p.changes = []string{p.Composer.Path}
 	if err != nil {
 		return nil, err
 	}
