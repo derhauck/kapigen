@@ -19,10 +19,11 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpU
 			TagMediumPressure().
 			SetStage(stages.TEST).
 			AddVariable("XDEBUG_MODE", "coverage").
-			AddBeforeScript("while [ ! -f ${CI_PROJECT_DIR}/.status ]; do sleep 1; done;").
-			AddScriptf("composer install --working-dir=%s %s", composerPath, composerArgs).
+			AddBeforeScriptf("composer install --working-dir=%s %s", composerPath, composerArgs).
+			AddScript("while [ ! -f ${CI_PROJECT_DIR}/.ready ]; do sleep 1; done;").
 			AddScriptf("php %s/vendor/bin/phpunit -c %s/phpunit.xml --log-junit report.xml  --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml %s", composerPath, phpUnitXmlPath, phpUnitArgs).
 			SetCodeCoverage(`/^\s*Lines:\s*\d+.\d+\%/`).
+			AddAfterScript("cat ${CI_PROJECT_DIR}/.status").
 			AddArtifact(job.Artifact{
 				Name:  "report",
 				Paths: *wrapper.NewStringSlice().Add("report.xml"),
@@ -35,9 +36,9 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpU
 			listener.Entrypoint().AddSeveral("sh", "-c")
 			command := ""
 			for name, port := range listenerPorts {
-				command += fmt.Sprintf("while ! nc -vz -w 1 %s %d &> /dev/null; do echo \"waiting for %s\"; done; ", name, port, name)
+				command += fmt.Sprintf("while ! nc -vz -w 1 %s %d &> /dev/null; do echo \"waiting for %s\" >> ${CI_PROJECT_DIR}/.status; done; ", name, port, name)
 			}
-			command += "echo \"done\" > ${CI_PROJECT_DIR}/.status"
+			command += "echo \"done\" > ${CI_PROJECT_DIR}/.ready"
 			listener.Command().Add(command)
 			ciJob.AddService(listener)
 		}
