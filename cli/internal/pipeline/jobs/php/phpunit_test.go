@@ -6,7 +6,7 @@ func TestNewPhpUnit(t *testing.T) {
 	t.Run("Can create phpunit job", func(t *testing.T) {
 		t.Parallel()
 		t.Run("Correct parameters", func(t *testing.T) {
-			job, err := NewPhpUnit("testimage", "testpath", "test", ".", "")
+			job, err := NewPhpUnit("testimage", "testpath", "test", ".", "", map[string]int32{})
 			if err != nil {
 				t.Error(err)
 			}
@@ -19,7 +19,7 @@ func TestNewPhpUnit(t *testing.T) {
 			}
 		})
 		t.Run("Incorrect parameters", func(t *testing.T) {
-			job, err := NewPhpUnit("", "", "", "", "")
+			job, err := NewPhpUnit("", "", "", "", "", map[string]int32{})
 			if err != nil {
 				t.Error(err)
 			}

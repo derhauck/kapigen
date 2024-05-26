@@ -20,7 +20,7 @@ func (c *DetailedError) Full() string {
 func (c *DetailedError) Error() string {
 	return c.Msg
 }
-func ErrorHandler(msg string, caller int) error {
+func errorHandler(msg string, caller int) error {
 
 	pc, filename, line, _ := runtime.Caller(caller)
 	return &DetailedError{
@@ -31,8 +31,14 @@ func ErrorHandler(msg string, caller int) error {
 	}
 
 }
+func DetailedErrorE(err error) error {
+	return errorHandler(err.Error(), 2)
+}
+func DetailedErrorf(msg string, a ...any) error {
+	return errorHandler(fmt.Sprintf(msg, a...), 2)
+}
 func NewMissingArgError(name string) error {
-	return ErrorHandler(fmt.Sprintf("missing config arg '%s', required", name), 2)
+	return errorHandler(fmt.Sprintf("missing config arg '%s', required", name), 2)
 }
 func NewMissingArgsError(names ...string) error {
 	msg := "missing config args "
@@ -40,5 +46,5 @@ func NewMissingArgsError(names ...string) error {
 		msg += fmt.Sprintf("'%s', ", n)
 	}
 	msg += "at least one required"
-	return ErrorHandler(msg, 2)
+	return errorHandler(msg, 2)
 }

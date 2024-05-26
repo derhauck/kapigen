@@ -19,7 +19,8 @@ func (p *PhpComposer) Validate() error {
 		p.Path = "."
 	}
 	if p.Args == "" {
-		logger.Info("no composer.args set")
+		logger.Info("no composer.args defaulting to '--no-progress --no-cache --no-interaction'")
+		p.Args = "--no-progress --no-cache --no-interaction"
 	}
 	return nil
 }
@@ -41,11 +42,13 @@ func (p *Phpunit) Validate(composer *PhpComposer) error {
 }
 
 type Php struct {
-	Composer  PhpComposer `yaml:"composer"`
-	ImageName string      `yaml:"ImageName"`
-	Phpunit   Phpunit     `yaml:"phpunit"`
-	Docker    *SlimDocker `yaml:"docker,omitempty"`
-	changes   []string
+	Composer      PhpComposer `yaml:"composer"`
+	ImageName     string      `yaml:"ImageName"`
+	Phpunit       Phpunit     `yaml:"phpunit"`
+	Services      Services    `yaml:"services"`
+	Docker        *SlimDocker `yaml:"docker,omitempty"`
+	changes       []string
+	listenerPorts map[string]int32
 }
 
 func (p *Php) New() types.PipelineConfigInterface {
@@ -58,6 +61,13 @@ func (p *Php) Validate() error {
 	if err := p.Phpunit.Validate(&p.Composer); err != nil {
 		return err
 	}
+	if err := p.Services.Validate(); err != nil {
+		return types.DetailedErrorE(err)
+	}
+	p.listenerPorts = make(map[string]int32)
+	for _, service := range p.Services {
+		p.listenerPorts[service.Name] = service.Port
+	}
 	if p.Docker != nil && p.Docker.Path == "" {
 		return types.NewMissingArgError("docker.path")
 	}
@@ -69,7 +79,7 @@ func (p *Php) Validate() error {
 
 func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var jobs = &types.Jobs{}
-	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.Path, p.Phpunit.Args)
+	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.Path, p.Phpunit.Args, p.listenerPorts)
 	p.changes = []string{p.Composer.Path}
 	if err != nil {
 		return nil, err
@@ -92,6 +102,18 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 		}
 		phpUnitJob.CiJob.Image.Name = dockerPipeline.GetFinalImageName()
 		p.changes = append(p.changes, dockerPipeline.Context)
+	}
+	for _, serviceConfig := range p.Services {
+		serviceJobs, service, err := serviceConfig.CreateService(factory, Id, PHPPipeline)
+		if err != nil {
+			return nil, types.DetailedErrorf(err.Error())
+		}
+		for _, serviceJob := range serviceJobs.GetJobs() {
+			jobs.AddJob(serviceJob)
+			phpUnitJob.AddJobAsNeed(serviceJob).
+				CiJob.Services.
+				Add(service)
+		}
 	}
 
 	jobs.AddJob(phpUnitJob)

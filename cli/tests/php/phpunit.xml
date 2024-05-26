@@ -3,9 +3,14 @@
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true">
-    <testsuite name="unit">
-        <directory suffix="Test.php">./tests/unit</directory>
-    </testsuite>
+    <testsuites>
+        <testsuite name="unit">
+            <directory suffix="Test.php">./tests/unit</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory suffix="Test.php">./tests/integration</directory>
+        </testsuite>
+    </testsuites>
     <source>
         <include>
             <directory suffix=".php">./src</directory>
@@ -14,4 +19,10 @@
     <logging>
         <junit outputFile="reports/junit.xml"/>
     </logging>
+    <php>
+        <env name="DB_HOST" value="db"/>
+        <env name="DB_NAME" value="test"/>
+        <env name="DB_PASSWORD" value="password"/>
+        <env name="DB_USER" value="user"/>
+    </php>
 </phpunit>

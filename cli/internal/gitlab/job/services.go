@@ -1,12 +1,11 @@
 package job
 
 import (
-	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 )
 
 type Service struct {
-	name       docker.Image
+	name       string
 	alias      string
 	port       int32
 	variables  map[string]string
@@ -30,7 +29,7 @@ func (c *Service) AddVariable(key string, value string) *Service {
 	return c
 }
 
-func NewService(image docker.Image, alias string, port int32) *Service {
+func NewService(image string, alias string, port int32) *Service {
 	return &Service{
 		name:  image,
 		alias: alias,
@@ -56,7 +55,7 @@ func (c *Services) Add(service *Service) *Services {
 }
 func (c *Service) Render() *ServiceYaml {
 	return &ServiceYaml{
-		Name:       c.name.String(),
+		Name:       c.name,
 		Entrypoint: c.entrypoint.Get(),
 		Command:    c.command.Get(),
 		Alias:      c.alias,

@@ -19,7 +19,7 @@ func NewDaemonlessBuildkitBuild(imageName string, path string, context string, d
 			Add("sh").
 			Add("-c")
 
-		timeout := job.NewService(docker.Alpine_3_18, "failover", 5000)
+		timeout := job.NewService(docker.Alpine_3_18.String(), "failover", 5000)
 		timeout.Entrypoint().
 			Add("sh").
 			Add("-c")
@@ -27,7 +27,7 @@ func NewDaemonlessBuildkitBuild(imageName string, path string, context string, d
 			Add("sleep 30; touch ${CI_PROJECT_DIR}/.status.auth")
 		ciJob.Services.Add(timeout)
 
-		auth := job.NewService(docker.CRANE_DEBUG, "crane", 5000)
+		auth := job.NewService(docker.CRANE_DEBUG.String(), "crane", 5000)
 		auth.Entrypoint().
 			Add("sh").
 			Add("-c")

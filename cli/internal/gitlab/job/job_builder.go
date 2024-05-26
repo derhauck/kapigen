@@ -65,7 +65,11 @@ func (c *CiJob) AddScripts(scripts []string) *CiJob {
 
 	return c
 }
+func (c *CiJob) AddAfterScript(script string) *CiJob {
+	c.AfterScript.Value.Add(script)
 
+	return c
+}
 func (c *CiJob) AddBeforeScript(script string) *CiJob {
 	c.BeforeScript.Value.Add(script)
 
