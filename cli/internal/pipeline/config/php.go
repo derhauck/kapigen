@@ -42,12 +42,13 @@ func (p *Phpunit) Validate(composer *PhpComposer) error {
 }
 
 type Php struct {
-	Composer  PhpComposer `yaml:"composer"`
-	ImageName string      `yaml:"ImageName"`
-	Phpunit   Phpunit     `yaml:"phpunit"`
-	Services  Services    `yaml:"services"`
-	Docker    *SlimDocker `yaml:"docker,omitempty"`
-	changes   []string
+	Composer      PhpComposer `yaml:"composer"`
+	ImageName     string      `yaml:"ImageName"`
+	Phpunit       Phpunit     `yaml:"phpunit"`
+	Services      Services    `yaml:"services"`
+	Docker        *SlimDocker `yaml:"docker,omitempty"`
+	changes       []string
+	listenerPorts map[string]int32
 }
 
 func (p *Php) New() types.PipelineConfigInterface {
@@ -63,6 +64,10 @@ func (p *Php) Validate() error {
 	if err := p.Services.Validate(); err != nil {
 		return types.DetailedErrorE(err)
 	}
+	p.listenerPorts = make(map[string]int32)
+	for _, service := range p.Services {
+		p.listenerPorts[service.Name] = service.Port
+	}
 	if p.Docker != nil && p.Docker.Path == "" {
 		return types.NewMissingArgError("docker.path")
 	}
@@ -74,7 +79,7 @@ func (p *Php) Validate() error {
 
 func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var jobs = &types.Jobs{}
-	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.Path, p.Phpunit.Args)
+	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.Path, p.Phpunit.Args, p.listenerPorts)
 	p.changes = []string{p.Composer.Path}
 	if err != nil {
 		return nil, err
