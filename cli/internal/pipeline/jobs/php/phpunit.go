@@ -19,7 +19,7 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpU
 			TagMediumPressure().
 			SetStage(stages.TEST).
 			AddVariable("XDEBUG_MODE", "coverage").
-			AddBeforeScript("while [ ! -f ${CI_PROJECT_DIR}/.kapigen/.status ]; do sleep 1; done;").
+			AddBeforeScript("while [ ! -f ${CI_PROJECT_DIR}/.status ]; do sleep 1; done;").
 			AddScriptf("composer install --working-dir=%s %s", composerPath, composerArgs).
 			AddScriptf("php %s/vendor/bin/phpunit -c %s/phpunit.xml --log-junit report.xml  --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml %s", composerPath, phpUnitXmlPath, phpUnitArgs).
 			SetCodeCoverage(`/^\s*Lines:\s*\d+.\d+\%/`).
@@ -37,7 +37,7 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpU
 			for name, port := range listenerPorts {
 				command += fmt.Sprintf("while ! nc -vz -w 1 %s %d &> /dev/null; do echo \"waiting for %s\"; done; ", name, port, name)
 			}
-			command += "echo \"done\" > ${CI_PROJECT_DIR}/.kapigen/.status"
+			command += "echo \"done\" > ${CI_PROJECT_DIR}/.status"
 			listener.Command().Add(command)
 			ciJob.AddService(listener)
 		}
