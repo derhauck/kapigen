@@ -84,6 +84,10 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 
 	jobs, err := config.Build(factory, pipelineType, pipelineId)
 	if err != nil {
+		var re *DetailedError
+		if errors.As(err, &re) {
+			logger.Debug(re.Full())
+		}
 		return nil, errors.New(fmt.Sprintf(
 			"pipeline type: %s, id: %s, encountered build error: %s",
 			pipelineType,

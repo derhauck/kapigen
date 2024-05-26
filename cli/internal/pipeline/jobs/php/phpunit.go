@@ -12,15 +12,11 @@ import (
 func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpUnitXmlPath string, phpUnitArgs string) (*types.Job, error) {
 
 	return types.NewJob("Unit Test", imageName, func(ciJob *job.CiJob) {
-		//var reportPath = fmt.Sprintf("%s/report.xml", composerPath)
-		//if composerPath == "." {
-		//	reportPath = "report.xml"
-		//}
 		ciJob.
 			TagMediumPressure().
 			SetStage(stages.TEST).
 			AddVariable("XDEBUG_MODE", "coverage").
-			AddScriptf("composer install --no-progress --working-dir=%s %s", composerPath, composerArgs).
+			AddScriptf("composer install --working-dir=%s %s", composerPath, composerArgs).
 			AddScriptf("php %s/vendor/bin/phpunit -c %s/phpunit.xml --log-junit report.xml  --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml %s", composerPath, phpUnitXmlPath, phpUnitArgs).
 			SetCodeCoverage(`/^\s*Lines:\s*\d+.\d+\%/`).
 			AddArtifact(job.Artifact{

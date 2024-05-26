@@ -6,8 +6,7 @@ const (
 	InfrastructurePipeline types.PipelineType = "infrastructure"
 	DockerPipeline         types.PipelineType = "docker"
 	PHPPipeline            types.PipelineType = "php"
-
-	GOLANG types.PipelineType = "golang"
+	GOLANG                 types.PipelineType = "golang"
 )
 
 var PipelineConfigTypes = map[types.PipelineType]types.PipelineConfigInterface{

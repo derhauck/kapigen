@@ -20,12 +20,7 @@ type Docker struct {
 	BuildArgs     map[string]string `yaml:"buildArgs,omitempty"`
 	ImageName     string            `yaml:"imageName"`
 	PushImageName string
-}
-type SlimDocker struct {
-	Path       string            `yaml:"path"`
-	Context    string            `yaml:"context"`
-	Dockerfile string            `yaml:"dockerfile"`
-	BuildArgs  map[string]string `yaml:"buildArgs,omitempty"`
+	Id            string
 }
 
 func (d *Docker) New() types.PipelineConfigInterface {
@@ -60,7 +55,7 @@ func (d *Docker) Validate() error {
 	return nil
 }
 
-func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ string) (*types.Jobs, error) {
+func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, Id string) (*types.Jobs, error) {
 	controller := factory.GetVersionController()
 	tag := controller.GetCurrentPipelineTag(d.Path)
 	var destination []string
@@ -82,6 +77,7 @@ func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, _ str
 		destination,
 		buildargs,
 	)
+	build.AddName(Id)
 	return &types.Jobs{build}, nil
 }
 

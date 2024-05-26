@@ -30,7 +30,7 @@ func (g *GolangCoverage) Validate() error {
 type Golang struct {
 	ImageName string          `yaml:"imageName"`
 	Path      string          `yaml:"path"`
-	Docker    *SlimDocker     `yaml:"docker,omitempty"`
+	Docker    *SlimDocker     `yaml:"docker"`
 	Coverage  *GolangCoverage `yaml:"coverage,omitempty"`
 	changes   []string
 }

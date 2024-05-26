@@ -19,7 +19,8 @@ func (p *PhpComposer) Validate() error {
 		p.Path = "."
 	}
 	if p.Args == "" {
-		logger.Info("no composer.args set")
+		logger.Info("no composer.args defaulting to '--no-progress --no-cache --no-interaction'")
+		p.Args = "--no-progress --no-cache --no-interaction"
 	}
 	return nil
 }
@@ -44,6 +45,7 @@ type Php struct {
 	Composer  PhpComposer `yaml:"composer"`
 	ImageName string      `yaml:"ImageName"`
 	Phpunit   Phpunit     `yaml:"phpunit"`
+	Services  Services    `yaml:"services"`
 	Docker    *SlimDocker `yaml:"docker,omitempty"`
 	changes   []string
 }
@@ -57,6 +59,9 @@ func (p *Php) Validate() error {
 	}
 	if err := p.Phpunit.Validate(&p.Composer); err != nil {
 		return err
+	}
+	if err := p.Services.Validate(); err != nil {
+		return types.DetailedErrorE(err)
 	}
 	if p.Docker != nil && p.Docker.Path == "" {
 		return types.NewMissingArgError("docker.path")
@@ -92,6 +97,18 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 		}
 		phpUnitJob.CiJob.Image.Name = dockerPipeline.GetFinalImageName()
 		p.changes = append(p.changes, dockerPipeline.Context)
+	}
+	for _, serviceConfig := range p.Services {
+		serviceJobs, service, err := serviceConfig.CreateService(factory, Id, PHPPipeline)
+		if err != nil {
+			return nil, types.DetailedErrorf(err.Error())
+		}
+		for _, serviceJob := range serviceJobs.GetJobs() {
+			jobs.AddJob(serviceJob)
+			phpUnitJob.AddJobAsNeed(serviceJob).
+				CiJob.Services.
+				Add(service)
+		}
 	}
 
 	jobs.AddJob(phpUnitJob)

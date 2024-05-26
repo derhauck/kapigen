@@ -79,9 +79,16 @@ pipelines:
         packages:
           - ./...
   - type: php
-    id: php
+    id: php-id
     config:
       composer:
         path: cli/tests/php
+      phpunit:
+        args:
       docker:
         path: cli/tests/php
+      services:
+        - name: db
+          docker:
+            path: cli/tests/php/tests/integration
+          port: 3306
