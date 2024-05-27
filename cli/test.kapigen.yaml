@@ -79,12 +79,12 @@ pipelines:
         packages:
           - ./...
   - type: php
-    id: php-id
+    id: php-integration
     config:
       composer:
         path: cli/tests/php
       phpunit:
-        args:
+        args: --testsuite integration
       docker:
         path: cli/tests/php
       services:
@@ -92,3 +92,13 @@ pipelines:
           docker:
             path: cli/tests/php/tests/integration
           port: 3306
+
+  - type: php
+    id: php-unit
+    config:
+      composer:
+        path: cli/tests/php
+      phpunit:
+        args: --testsuite unit
+      docker:
+        path: cli/tests/php

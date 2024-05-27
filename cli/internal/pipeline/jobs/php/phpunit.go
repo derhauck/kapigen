@@ -31,16 +31,15 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpU
 					SetJunit(artifact.NewJunitReport("report.xml")).
 					SetCoverageReport(artifact.NewCoverageReport(reports.Cobertura, "coverage.cobertura.xml")),
 			})
-		if len(listenerPorts) > 0 {
-			listener := job.NewService(docker.Alpine_3_18.String(), "kapigen-listener", 0)
-			listener.Entrypoint().AddSeveral("sh", "-c")
-			command := ""
-			for name, port := range listenerPorts {
-				command += fmt.Sprintf("while ! nc -vz -w 1 %s %d &> /dev/null; do echo \"waiting for %s\" >> ${CI_PROJECT_DIR}/.status; sleep 1; done; ", name, port, name)
-			}
-			command += "echo \"done\" > ${CI_PROJECT_DIR}/.ready"
-			listener.Command().Add(command)
-			ciJob.AddService(listener)
+
+		listener := job.NewService(docker.Alpine_3_18.String(), "kapigen-listener", 0)
+		listener.Entrypoint().AddSeveral("sh", "-c")
+		command := ""
+		for name, port := range listenerPorts {
+			command += fmt.Sprintf("while ! nc -vz -w 1 %s %d &> /dev/null; do echo \"waiting for %s\" >> ${CI_PROJECT_DIR}/.status; sleep 1; done; ", name, port, name)
 		}
+		command += "while :; do echo \"done\" > ${CI_PROJECT_DIR}/.ready; sleep 10; done"
+		listener.Command().Add(command)
+		ciJob.AddService(listener)
 	}), nil
 }
