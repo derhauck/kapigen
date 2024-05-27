@@ -102,8 +102,3 @@ pipelines:
         args: --testsuite unit
       docker:
         path: cli/tests/php
-      services:
-        - name: db
-          docker:
-            path: cli/tests/php/tests/integration
-          port: 3306
