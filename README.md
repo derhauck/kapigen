@@ -1,7 +1,7 @@
 # Kapigen
 #### Kateops Pipeline Generator
 
-----
+---- 
 
 ## CLI
 
@@ -25,7 +25,7 @@ kapigen generate pipeline
 - `--file 'output file'`: Specifies the output file. Default is `pipeline.yaml`.
 - `--config 'pipeline config'`: Specifies the pipeline configuration file. Default is `config.kapigen.yaml`.
 
-## Pipeline Generation
+## [Pipeline Generation Documentation](doc/index.md)
 
 ### Quick start
 
