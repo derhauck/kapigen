@@ -38,7 +38,7 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpU
 		for name, port := range listenerPorts {
 			command += fmt.Sprintf("while ! nc -vz -w 1 %s %d &> /dev/null; do echo \"waiting for %s\" >> ${CI_PROJECT_DIR}/.status; sleep 1; done; ", name, port, name)
 		}
-		command += "echo \"done\" > ${CI_PROJECT_DIR}/.ready"
+		command += "while :; do echo \"done\" > ${CI_PROJECT_DIR}/.ready; sleep 10; done"
 		listener.Command().Add(command)
 		ciJob.AddService(listener)
 	}), nil
