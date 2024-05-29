@@ -12,8 +12,15 @@ import (
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 )
 
-func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpUnitXmlPath string, phpUnitArgs string, listenerPorts map[string]int32) (*types.Job, error) {
+func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpunitXmlPath string, phpunitArgs string, phpUnitBin string, listenerPorts map[string]int32) (*types.Job, error) {
 
+	if imageName == "" {
+		return nil, types.NewMissingArgError("imageName")
+	}
+
+	if composerPath == "" {
+		return nil, types.NewMissingArgError("composerPath")
+	}
 	return types.NewJob("Unit Test", imageName, func(ciJob *job.CiJob) {
 		ciJob.
 			TagMediumPressure().
@@ -21,7 +28,7 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpU
 			AddVariable("XDEBUG_MODE", "coverage").
 			AddBeforeScriptf("composer install --working-dir=%s %s", composerPath, composerArgs).
 			AddScript("while [ ! -f ${CI_PROJECT_DIR}/.ready ]; do sleep 1; done;").
-			AddScriptf("php %s/vendor/bin/phpunit -c %s/phpunit.xml --log-junit report.xml  --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml %s", composerPath, phpUnitXmlPath, phpUnitArgs).
+			AddScriptf("php %s -c %s/phpunit.xml --log-junit report.xml  --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml %s", phpUnitBin, phpunitXmlPath, phpunitArgs).
 			SetCodeCoverage(`/^\s*Lines:\s*\d+.\d+\%/`).
 			AddAfterScript("tail ${CI_PROJECT_DIR}/.status").
 			AddArtifact(job.Artifact{

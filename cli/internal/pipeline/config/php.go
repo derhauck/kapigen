@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/logger"
@@ -28,6 +30,7 @@ func (p *PhpComposer) Validate() error {
 type Phpunit struct {
 	Path string `yaml:"path"`
 	Args string `yaml:"args"`
+	Bin  string `yaml:"bin"`
 }
 
 func (p *Phpunit) Validate(composer *PhpComposer) error {
@@ -37,6 +40,10 @@ func (p *Phpunit) Validate(composer *PhpComposer) error {
 	}
 	if p.Args == "" {
 		logger.Info("no phpunit.args set")
+	}
+	if p.Bin == "" {
+		logger.Info("no phpunit.bin set, defaulting to '<composer.path>/vendor/bin/phpunit'")
+		p.Bin = fmt.Sprintf("%s/vendor/bin/phpunit", composer.Path)
 	}
 	return nil
 }
@@ -79,7 +86,7 @@ func (p *Php) Validate() error {
 
 func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var jobs = &types.Jobs{}
-	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.Path, p.Phpunit.Args, p.listenerPorts)
+	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.Path, p.Phpunit.Args, p.Phpunit.Bin, p.listenerPorts)
 	p.changes = []string{p.Composer.Path}
 	if err != nil {
 		return nil, err
