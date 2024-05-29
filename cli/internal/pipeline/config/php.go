@@ -75,9 +75,14 @@ func (p *Php) Validate() error {
 	for _, service := range p.Services {
 		p.listenerPorts[service.Name] = service.Port
 	}
-	if p.Docker != nil && p.Docker.Path == "" {
-		return types.NewMissingArgError("docker.path")
+
+	if p.Docker != nil {
+		if p.Docker.Path == "" {
+			return types.NewMissingArgError("docker.path")
+		}
+		p.ImageName = "docker"
 	}
+
 	if p.ImageName == "" && p.Docker == nil {
 		return types.NewMissingArgsError("imageName", "docker")
 	}
@@ -104,6 +109,7 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 		if err != nil {
 			return nil, err
 		}
+
 		for _, currentJob := range jobs.GetJobs() {
 			phpUnitJob.AddJobAsNeed(currentJob)
 		}
@@ -115,6 +121,7 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 		if err != nil {
 			return nil, types.DetailedErrorf(err.Error())
 		}
+
 		for _, serviceJob := range serviceJobs.GetJobs() {
 			jobs.AddJob(serviceJob)
 			phpUnitJob.AddJobAsNeed(serviceJob).
