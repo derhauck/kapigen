@@ -32,6 +32,7 @@ type Golang struct {
 	Path      string          `yaml:"path"`
 	Docker    *SlimDocker     `yaml:"docker"`
 	Coverage  *GolangCoverage `yaml:"coverage,omitempty"`
+	Services  Services        `yaml:"services"`
 	changes   []string
 }
 
@@ -95,6 +96,9 @@ func (g *Golang) Validate() error {
 		return types.NewMissingArgError("docker.path")
 	}
 
+	if err := g.Services.Validate(); err != nil {
+		return types.DetailedErrorE(err)
+	}
 	if err := g.Coverage.Validate(); err != nil {
 		return err
 	}
@@ -137,7 +141,20 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 		g.changes = append(g.changes, dockerPipeline.Context)
 	}
 
-	allJobs = append(allJobs, test)
+	for _, serviceConfig := range g.Services {
+		serviceJobs, service, err := serviceConfig.CreateService(factory, Id, GOLANG)
+		if err != nil {
+			return nil, types.DetailedErrorf(err.Error())
+		}
+		for _, serviceJob := range serviceJobs.GetJobs() {
+			allJobs.AddJob(serviceJob)
+			test.AddJobAsNeed(serviceJob).
+				CiJob.Services.
+				Add(service)
+		}
+	}
+
+	allJobs.AddJob(test)
 	return &allJobs, nil
 }
 
