@@ -7,6 +7,7 @@
 ### Available Pipeline Configurations
 * [docker](pipelines/docker.md)
 * [golang](pipelines/golang.md)
+* [php](pipelines/php.md)
 ---
 ## Pipelines
 ### Get Started
