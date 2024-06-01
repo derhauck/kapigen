@@ -42,17 +42,16 @@ var Cmd = &cobra.Command{
 		logger.Info("will create settings")
 
 		logger.Info("will read pipeline config from: " + configPath)
+		cmd.SilenceUsage = true
 		body, err := os.ReadFile(configPath)
 		if err != nil {
-			logger.ErrorE(err)
-			return nil
+			return err
 		}
 
 		var pipelineConfig types.PipelineConfig
 		err = yaml.Unmarshal(body, &pipelineConfig)
 		if err != nil {
-			logger.ErrorE(err)
-			return nil
+			return err
 		}
 		if privateTokenName == "" {
 			privateTokenName = pipelineConfig.PrivateTokenName
@@ -64,8 +63,7 @@ var Cmd = &cobra.Command{
 		)
 		pipelineJobs, err := types.LoadJobsFromPipelineConfig(factory.New(settings), pipelineConfig, config.PipelineConfigTypes)
 		if err != nil {
-			logger.ErrorE(err)
-			return nil
+			return err
 		}
 		logger.Info("ci jobs created")
 
@@ -88,16 +86,14 @@ var Cmd = &cobra.Command{
 		if noMerge == false {
 			pipelineJobs, err = pipelineJobs.DynamicMerge()
 			if err != nil {
-				logger.ErrorE(err)
-				return nil
+				return err
 			}
 			logger.Info("ci jobs dynamically merged")
 		}
 
 		pipelineJobs, err = pipelineJobs.EvaluateNames()
 		if err != nil {
-			logger.ErrorE(err)
-			return nil
+			return err
 		}
 		pipelineJobs.OverwriteTags(pipelineConfig.Tags)
 		logger.Info("ci jobs named to be unique")
@@ -108,17 +104,14 @@ var Cmd = &cobra.Command{
 
 		data, err := yaml.Marshal(ciPipeline)
 		if err != nil {
-			logger.ErrorE(err)
-			return nil
+			return err
 		}
 		logger.Info("converted pipeline to yaml")
 
 		err = os.WriteFile(pipelineFile, data, 0666)
 		logger.Info("wrote yaml to file: " + pipelineFile)
-		if err != nil {
-			logger.ErrorE(err)
-		}
-		return nil
+
+		return err
 	},
 }
 

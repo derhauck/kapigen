@@ -1,8 +1,6 @@
 package config
 
 import (
-	"fmt"
-
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/pipeline/types"
@@ -13,6 +11,18 @@ type SlimDocker struct {
 	Context    string            `yaml:"context"`
 	Dockerfile string            `yaml:"dockerfile"`
 	BuildArgs  map[string]string `yaml:"buildArgs,omitempty"`
+}
+
+func (s *SlimDocker) DockerConfig() *Docker {
+	release := false
+	return &Docker{
+		Path:       s.Path,
+		Context:    s.Context,
+		Dockerfile: s.Dockerfile,
+		Release:    &release,
+		BuildArgs:  s.BuildArgs,
+		Hash:       true,
+	}
 }
 
 type Service struct {
@@ -40,22 +50,13 @@ func (s *Service) Validate() error {
 	return nil
 }
 
-func (s *Service) CreateService(factory *factory.MainFactory, Id string, pipelineType types.PipelineType) (*types.Jobs, *job.Service, error) {
+func (s *Service) CreateService(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, *job.Service, error) {
 	if s.Docker != nil {
-		dockerPipeline := &Docker{}
-		release := false
-		name := fmt.Sprintf("%s-%s", Id, s.Name)
-		dockerPipeline.Release = &release
-		dockerPipeline.Name = name
-		dockerPipeline.Path = s.Docker.Path
-		dockerPipeline.Context = s.Docker.Context
-		dockerPipeline.Dockerfile = s.Docker.Dockerfile
-		dockerPipeline.BuildArgs = s.Docker.BuildArgs
-		jobs, err := types.GetPipelineJobs(factory, dockerPipeline, pipelineType, name)
+		dockerPipeline := s.Docker.DockerConfig()
+		jobs, err := types.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
 		if err != nil {
 			return nil, nil, err
 		}
-		dockerPipeline.GetFinalImageName()
 		service := job.NewService(dockerPipeline.GetFinalImageName(), s.Name, s.Port)
 
 		return jobs, service, nil
@@ -80,5 +81,21 @@ func (s *Services) Validate() error {
 		}
 		servicePorts[service.Port] = true
 	}
+	return nil
+}
+
+func (s *Services) AddToJob(factory *factory.MainFactory, pipelineType types.PipelineType, Id string, pipelineJobs *types.Jobs, targetJob *types.Job) error {
+	for _, service := range *s {
+		jobs, jobService, err := service.CreateService(factory, pipelineType, Id)
+		if err != nil {
+			return types.DetailedErrorf(err.Error())
+		}
+		for _, serviceJob := range jobs.GetJobs() {
+			targetJob.AddJobAsNeed(serviceJob)
+			pipelineJobs.AddJob(serviceJob)
+		}
+		targetJob.CiJob.Services.Add(jobService)
+	}
+
 	return nil
 }

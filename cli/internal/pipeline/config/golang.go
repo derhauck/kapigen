@@ -32,6 +32,7 @@ type Golang struct {
 	Path      string          `yaml:"path"`
 	Docker    *SlimDocker     `yaml:"docker"`
 	Coverage  *GolangCoverage `yaml:"coverage,omitempty"`
+	Services  Services        `yaml:"services"`
 	changes   []string
 }
 
@@ -95,6 +96,9 @@ func (g *Golang) Validate() error {
 		return types.NewMissingArgError("docker.path")
 	}
 
+	if err := g.Services.Validate(); err != nil {
+		return types.DetailedErrorE(err)
+	}
 	if err := g.Coverage.Validate(); err != nil {
 		return err
 	}
@@ -107,37 +111,31 @@ func (g *Golang) Validate() error {
 
 func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var allJobs = types.Jobs{}
-	dockerPipeline := &Docker{}
-	var test *types.Job
-	var err error
 
-	test, err = golang.NewUnitTest(g.ImageName, g.Path, g.Coverage.Packages, g.Coverage.Source)
+	golangUnitTestJob, err := golang.NewUnitTest(g.ImageName, g.Path, g.Coverage.Packages, g.Coverage.Source)
 	if err != nil {
 		return nil, err
 	}
 	g.changes = []string{g.Path}
 	if g.Docker != nil {
-		release := false
-		dockerPipeline.Name = Id
-		dockerPipeline.Release = &release
-		dockerPipeline.Name = fmt.Sprintf("golang-%s", Id)
-		dockerPipeline.Path = g.Docker.Path
-		dockerPipeline.Context = g.Docker.Context
-		dockerPipeline.Dockerfile = g.Docker.Dockerfile
-		dockerPipeline.BuildArgs = g.Docker.BuildArgs
+		dockerPipeline := g.Docker.DockerConfig()
 		jobs, err := types.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
 		if err != nil {
 			return nil, err
 		}
-		test.CiJob.SetImageName(dockerPipeline.GetFinalImageName())
+		golangUnitTestJob.CiJob.SetImageName(dockerPipeline.GetFinalImageName())
 		for _, currentJob := range jobs.GetJobs() {
-			test.AddJobAsNeed(currentJob)
+			golangUnitTestJob.AddJobAsNeed(currentJob)
 		}
 		allJobs = append(allJobs, jobs.GetJobs()...)
 		g.changes = append(g.changes, dockerPipeline.Context)
 	}
 
-	allJobs = append(allJobs, test)
+	err = g.Services.AddToJob(factory, PHPPipeline, Id, &allJobs, golangUnitTestJob)
+	if err != nil {
+		return nil, err
+	}
+	allJobs.AddJob(golangUnitTestJob)
 	return &allJobs, nil
 }
 
