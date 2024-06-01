@@ -111,50 +111,31 @@ func (g *Golang) Validate() error {
 
 func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var allJobs = types.Jobs{}
-	dockerPipeline := &Docker{}
-	var test *types.Job
-	var err error
 
-	test, err = golang.NewUnitTest(g.ImageName, g.Path, g.Coverage.Packages, g.Coverage.Source)
+	golangUnitTestJob, err := golang.NewUnitTest(g.ImageName, g.Path, g.Coverage.Packages, g.Coverage.Source)
 	if err != nil {
 		return nil, err
 	}
 	g.changes = []string{g.Path}
 	if g.Docker != nil {
-		release := false
-		dockerPipeline.Name = Id
-		dockerPipeline.Release = &release
-		dockerPipeline.Name = fmt.Sprintf("golang-%s", Id)
-		dockerPipeline.Path = g.Docker.Path
-		dockerPipeline.Context = g.Docker.Context
-		dockerPipeline.Dockerfile = g.Docker.Dockerfile
-		dockerPipeline.BuildArgs = g.Docker.BuildArgs
+		dockerPipeline := g.Docker.DockerConfig()
 		jobs, err := types.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
 		if err != nil {
 			return nil, err
 		}
-		test.CiJob.SetImageName(dockerPipeline.GetFinalImageName())
+		golangUnitTestJob.CiJob.SetImageName(dockerPipeline.GetFinalImageName())
 		for _, currentJob := range jobs.GetJobs() {
-			test.AddJobAsNeed(currentJob)
+			golangUnitTestJob.AddJobAsNeed(currentJob)
 		}
 		allJobs = append(allJobs, jobs.GetJobs()...)
 		g.changes = append(g.changes, dockerPipeline.Context)
 	}
 
-	for _, serviceConfig := range g.Services {
-		serviceJobs, service, err := serviceConfig.CreateService(factory, Id, GOLANG)
-		if err != nil {
-			return nil, types.DetailedErrorf(err.Error())
-		}
-		for _, serviceJob := range serviceJobs.GetJobs() {
-			allJobs.AddJob(serviceJob)
-			test.AddJobAsNeed(serviceJob).
-				CiJob.Services.
-				Add(service)
-		}
+	err = g.Services.AddToJob(factory, PHPPipeline, Id, &allJobs, golangUnitTestJob)
+	if err != nil {
+		return nil, err
 	}
-
-	allJobs.AddJob(test)
+	allJobs.AddJob(golangUnitTestJob)
 	return &allJobs, nil
 }
 

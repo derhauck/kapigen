@@ -97,14 +97,7 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 		return nil, err
 	}
 	if p.Docker != nil {
-		dockerPipeline := &Docker{}
-		release := false
-		dockerPipeline.Release = &release
-		dockerPipeline.Name = Id
-		dockerPipeline.Path = p.Docker.Path
-		dockerPipeline.Context = p.Docker.Context
-		dockerPipeline.Dockerfile = p.Docker.Dockerfile
-		dockerPipeline.BuildArgs = p.Docker.BuildArgs
+		dockerPipeline := p.Docker.DockerConfig()
 		jobs, err = types.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
 		if err != nil {
 			return nil, err
@@ -116,18 +109,9 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 		phpUnitJob.CiJob.Image.Name = dockerPipeline.GetFinalImageName()
 		p.changes = append(p.changes, dockerPipeline.Context)
 	}
-	for _, serviceConfig := range p.Services {
-		serviceJobs, service, err := serviceConfig.CreateService(factory, Id, PHPPipeline)
-		if err != nil {
-			return nil, types.DetailedErrorf(err.Error())
-		}
-
-		for _, serviceJob := range serviceJobs.GetJobs() {
-			jobs.AddJob(serviceJob)
-			phpUnitJob.AddJobAsNeed(serviceJob).
-				CiJob.Services.
-				Add(service)
-		}
+	err = p.Services.AddToJob(factory, PHPPipeline, Id, jobs, phpUnitJob)
+	if err != nil {
+		return nil, err
 	}
 
 	jobs.AddJob(phpUnitJob)

@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"hash/fnv"
 
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/environment"
@@ -19,6 +20,7 @@ type Docker struct {
 	Release       *bool             `yaml:"release,omitempty"`
 	BuildArgs     map[string]string `yaml:"buildArgs,omitempty"`
 	ImageName     string            `yaml:"imageName"`
+	Hash          bool
 	PushImageName string
 	Id            string
 }
@@ -50,6 +52,16 @@ func (d *Docker) Validate() error {
 		logger.Info("no release set, defaulting to true")
 		tmp := true
 		d.Release = &tmp
+	}
+
+	if *d.Release == false {
+		configRepresentation := fmt.Sprintf("%s-%s-%s-%s", d.Path, d.Context, d.Dockerfile, d.BuildArgs)
+		hasher := fnv.New32a()
+		_, err := hasher.Write([]byte(configRepresentation))
+		if err != nil {
+			return err
+		}
+		d.Name = fmt.Sprintf("%d", hasher.Sum32())
 	}
 
 	return nil
