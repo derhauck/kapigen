@@ -151,11 +151,15 @@ func GolangAutoConfig() *Golang {
 	files := SearchPath(environment.CI_PROJECT_DIR.Get(), "go.mod", []string{})
 	for _, fileName := range files {
 		dir, _ := filepath.Split(fileName)
-		dir, found := strings.CutPrefix(dir, environment.CI_PROJECT_DIR.Get())
+		dir, found := strings.CutPrefix(dir, fmt.Sprintf("%s/", environment.CI_PROJECT_DIR.Get()))
 		if found == false {
 			return nil
 		}
-		if dir == "/" {
+		dir, found = strings.CutSuffix(dir, "/")
+		if found == false {
+			return nil
+		}
+		if dir == "" {
 			dir = "."
 		}
 		config.Path = dir

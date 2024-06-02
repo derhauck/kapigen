@@ -6,14 +6,8 @@ services:
     env_file: .env
     working_dir: /app/cli
     environment:
-      GOMODCACHE: /app/.pkg
-      GOCACHE: /app/.cache
+      GOMODCACHE: /app/cli/.pkg
+      GOCACHE: /app/cli/.cache
       ENVIRONMENT: DEV
     volumes:
       - .:/app/cli
-  register:
-    image: gitlab/gitlab-runner:latest
-    command: 'run'
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./../config:/etc/gitlab-runner

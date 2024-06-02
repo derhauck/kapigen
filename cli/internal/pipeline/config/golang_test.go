@@ -16,7 +16,7 @@ func TestGolangAutoConfig(t *testing.T) {
 			name: "Can get golang auto config",
 			want: &Golang{
 				ImageName: "golang:1.21",
-				Path:      ".",
+				Path:      "cli",
 			},
 		},
 	}
