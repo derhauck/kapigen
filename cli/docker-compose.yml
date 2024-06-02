@@ -4,13 +4,13 @@ services:
     image: golang:1.21
     command: go run . generate pipeline -v --config test.kapigen.yaml
     env_file: .env
-    working_dir: /app
+    working_dir: /app/cli
     environment:
       GOMODCACHE: /app/.pkg
       GOCACHE: /app/.cache
       ENVIRONMENT: DEV
     volumes:
-      - .:/app
+      - .:/app/cli
   register:
     image: gitlab/gitlab-runner:latest
     command: 'run'

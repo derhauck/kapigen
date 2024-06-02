@@ -1,6 +1,6 @@
 NPM_IMAGE=node:current-alpine3.15
 GO_IMAGE=golang:1.21
-DOCKER_RUN=docker run --rm $(DOCKER_ARGS) -v ${PWD}:/app -w /app -u $(shell id -u):$(shell id -g)
+DOCKER_RUN=docker run --rm $(DOCKER_ARGS) -v ${PWD}:/app/cli -w /app/cli -u $(shell id -u):$(shell id -g)
 .PHONY: cli
 cli: DOCKER_ARGS=-it
 cli:
