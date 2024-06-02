@@ -20,7 +20,6 @@ type Docker struct {
 	Release       *bool             `yaml:"release,omitempty"`
 	BuildArgs     map[string]string `yaml:"buildArgs,omitempty"`
 	ImageName     string            `yaml:"imageName"`
-	Hash          bool
 	PushImageName string
 	Id            string
 }
