@@ -1,6 +1,6 @@
 include ../Makefile
-GO_SRC_PATH=/app
-GO_ARGS=-it -e GOMODCACHE=/app/.pkg -e GOCACHE=/app/.cache -e ENVIRONMENT=DEV --env-file .env
+GO_SRC_PATH=/app/cli
+GO_ARGS=-it -e GOMODCACHE=/app/cli/.pkg -e GOCACHE=/app/cli/.cache -e ENVIRONMENT=DEV --env-file .env
 .PHONY: cli
 cli: DOCKER_ARGS=$(GO_ARGS)
 cli:

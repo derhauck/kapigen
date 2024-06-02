@@ -74,4 +74,40 @@ func TestDocker_Validate(t *testing.T) {
 			t.Error("dockerfile should be Dockerfile")
 		}
 	})
+	t.Run("Can validate and get hash", func(t *testing.T) {
+		release := false
+		docker := Docker{
+			Path:    "test",
+			Context: "context",
+			Release: &release,
+		}
+		err := docker.Validate()
+		if err != nil {
+			t.Error(err)
+		}
+		if *docker.Release != false {
+			t.Error("release should be false")
+		}
+		if docker.Name != "3196340155" {
+			t.Errorf("name should be '3196340155', got: %s", docker.Name)
+		}
+	})
+	t.Run("Can validate and get name", func(t *testing.T) {
+		release := true
+		docker := Docker{
+			Path:    "test",
+			Context: "context",
+			Release: &release,
+		}
+		err := docker.Validate()
+		if err != nil {
+			t.Error(err)
+		}
+		if *docker.Release != true {
+			t.Error("release should be true")
+		}
+		if docker.Name == "3196340155" {
+			t.Errorf("name should be '', got: %s", docker.Name)
+		}
+	})
 }

@@ -4,10 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
+	"strings"
 
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/docker"
+	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/jobs/golang"
@@ -141,4 +144,60 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 
 func (g *Golang) Rules() *job.Rules {
 	return &*job.DefaultPipelineRules(g.changes)
+}
+
+func GolangAutoConfig() *Golang {
+	config := &Golang{}
+	files := SearchPath(environment.CI_PROJECT_DIR.Get(), "go.mod", []string{})
+	for _, fileName := range files {
+		dir, _ := filepath.Split(fileName)
+		dir, found := strings.CutPrefix(dir, fmt.Sprintf("%s/", environment.CI_PROJECT_DIR.Get()))
+		if found == false {
+			return nil
+		}
+		dir, found = strings.CutSuffix(dir, "/")
+		if found == false {
+			return nil
+		}
+		if dir == "" {
+			dir = "."
+		}
+		config.Path = dir
+		file, err := os.ReadFile(fileName)
+		if err != nil {
+			return nil
+		}
+		fileString := string(file)
+
+		re := regexp.MustCompile(`go (.*)`)
+		match := re.FindStringSubmatch(fileString)
+		if len(match) == 0 {
+			return nil // fmt.Errorf("go.mod file should include go version")
+		}
+		fmt.Println(match[1])
+		config.ImageName = fmt.Sprintf("%s%s:%s", docker.DEPENDENCY_PROXY, "golang", match[1])
+	}
+	return config
+}
+
+func SearchPath(path string, name string, entries []string) []string {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		fmt.Println(err.Error())
+		return entries
+	}
+	for _, file := range files {
+		if strings.HasPrefix(file.Name(), ".") {
+			continue
+		}
+		if file.IsDir() {
+			entries = SearchPath(fmt.Sprintf("%s/%s", path, file.Name()), name, entries)
+			continue
+		}
+		if file.Name() == name {
+			entries = append(entries, fmt.Sprintf("%s/%s", path, file.Name()))
+		}
+	}
+
+	return entries
 }

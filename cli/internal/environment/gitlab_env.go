@@ -22,7 +22,9 @@ const (
 	CI_MERGE_REQUEST_LABELS
 	CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
 	CI_PIPELINE_TOKEN
+	CI_PROJECT_DIR
 	CI_SERVER_HOST
+	CI_BUILDS_DIR
 	CI_SERVER_URL
 	GITLAB_TOKEN
 	LOS_AUTH_TOKEN
@@ -30,6 +32,7 @@ const (
 )
 
 var values = map[Variable]string{
+	CI_BUILDS_DIR:                       "CI_BUILDS_DIR",
 	CI_COMMIT_SHA:                       "CI_COMMIT_SHA",
 	CI_COMMIT_BRANCH:                    "CI_COMMIT_BRANCH",
 	CI_COMMIT_MESSAGE:                   "CI_COMMIT_MESSAGE",
@@ -38,6 +41,7 @@ var values = map[Variable]string{
 	CI_JOB_TOKEN:                        "CI_JOB_TOKEN",
 	CI_PROJECT_ID:                       "CI_PROJECT_ID",
 	CI_PIPELINE_TOKEN:                   "CI_PIPELINE_TOKEN",
+	CI_PROJECT_DIR:                      "CI_PROJECT_DIR",
 	CI_MERGE_REQUEST_ID:                 "CI_MERGE_REQUEST_ID",
 	CI_MERGE_REQUEST_LABELS:             "CI_MERGE_REQUEST_LABELS",
 	CI_MERGE_REQUEST_SOURCE_BRANCH_NAME: "CI_MERGE_REQUEST_SOURCE_BRANCH_NAME",

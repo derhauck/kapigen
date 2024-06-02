@@ -21,7 +21,6 @@ func (s *SlimDocker) DockerConfig() *Docker {
 		Dockerfile: s.Dockerfile,
 		Release:    &release,
 		BuildArgs:  s.BuildArgs,
-		Hash:       true,
 	}
 }
 
