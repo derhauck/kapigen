@@ -10,5 +10,6 @@ func SetLocalEnv() {
 	KAPIGEN_VERSION.SetIfEmpty("0.0.1")
 	CI_JOB_TOKEN.SetIfEmpty("invalid")
 	CI_SERVER_URL.SetIfEmpty("https://gitlab.com")
+	CI_BUILDS_DIR.SetIfEmpty("/app")
 
 }
