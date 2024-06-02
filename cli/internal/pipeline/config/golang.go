@@ -148,10 +148,10 @@ func (g *Golang) Rules() *job.Rules {
 
 func GolangAutoConfig() *Golang {
 	config := &Golang{}
-	files := SearchPath(environment.CI_BUILDS_DIR.Get(), "go.mod", []string{})
+	files := SearchPath(environment.CI_PROJECT_DIR.Get(), "go.mod", []string{})
 	for _, fileName := range files {
 		dir, _ := filepath.Split(fileName)
-		dir, found := strings.CutPrefix(dir, environment.CI_BUILDS_DIR.Get())
+		dir, found := strings.CutPrefix(dir, environment.CI_PROJECT_DIR.Get())
 		if found == false {
 			return nil
 		}
