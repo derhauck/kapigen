@@ -15,8 +15,8 @@ import (
 	"kapigen.kateops.com/internal/version"
 )
 
-var Cmd = &cobra.Command{
-	Use:              "pipeline",
+var GenerateCmd = &cobra.Command{
+	Use:              "generate",
 	Short:            "Generate pipeline",
 	TraverseChildren: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -116,9 +116,9 @@ var Cmd = &cobra.Command{
 }
 
 func init() {
-	Cmd.Flags().String("file", "pipeline.yaml", "output file")
-	Cmd.Flags().String("config", "config.kapigen.yaml", "config to use")
-	Cmd.Flags().Bool("no-merge", false, "disable dynamic job merge")
-	Cmd.Flags().String("mode", version.FILE.Name(), "mode used for versioning: file,gitlab")
+	GenerateCmd.Flags().String("file", "pipeline.yaml", "output file")
+	GenerateCmd.Flags().String("config", "config.kapigen.yaml", "config to use")
+	GenerateCmd.Flags().Bool("no-merge", false, "disable dynamic job merge")
+	GenerateCmd.Flags().String("mode", version.FILE.Name(), "mode used for versioning: file,gitlab")
 
 }

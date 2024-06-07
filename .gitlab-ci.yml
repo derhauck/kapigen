@@ -24,7 +24,7 @@ Build:
     - cd cli
   script:
     - go mod download
-    - go run . generate pipeline -v --mode gitlab
+    - go run . pipeline generate -v --mode gitlab
   artifacts:
     paths:
       - cli/pipeline.yaml

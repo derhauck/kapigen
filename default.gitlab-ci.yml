@@ -23,7 +23,7 @@ Build:
     name: registry.gitlab.com/kateops/kapigen/cli:${KAPIGEN_VERSION}
     entrypoint: [""]
   script:
-    - kapigen generate pipeline --config .kapigen/config.kapigen.yaml -v  --mode gitlab
+    - kapigen pipeline generate --config .kapigen/config.kapigen.yaml -v  --mode gitlab
   artifacts:
     paths:
       - pipeline.yaml
