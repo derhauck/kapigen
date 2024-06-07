@@ -40,8 +40,8 @@ Tests:
     - cd cli
   script:
     - go mod download
-    - go run . generate pipeline -v --config test.kapigen.yaml
-    - go run . generate pipeline -v --config test.kapigen.yaml --no-merge --file pipeline-no-merge.yaml
+    - go run . pipeline generate pipeline -v --config test.kapigen.yaml
+    - go run . pipeline generate  -v --config test.kapigen.yaml --no-merge --file pipeline-no-merge.yaml
   artifacts:
     paths:
       - cli/pipeline.yaml

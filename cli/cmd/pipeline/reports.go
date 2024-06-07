@@ -71,7 +71,7 @@ var ReportsCmd = &cobra.Command{
 				logger.DebugAny(bridge.DownstreamPipeline)
 			}
 		}
-		var reportJobs wrapper.Array[*gitlab2.Job]
+		var reportJobs wrapper.Array[gitlab2.Job]
 		for _, downstreamPipelineId := range downstreamPipelineIds {
 			jobs, res, err := gitlab.Jobs.ListPipelineJobs(environment.CI_PROJECT_ID.Get(), downstreamPipelineId, nil)
 			if res.StatusCode != 200 {
@@ -82,7 +82,7 @@ var ReportsCmd = &cobra.Command{
 				if job.Artifacts != nil {
 					for _, artifact := range job.Artifacts {
 						if artifact.FileType == "junit" {
-							reportJobs.Push(job)
+							reportJobs.Push(*job)
 							logger.DebugAny(artifact)
 						}
 					}
@@ -92,7 +92,6 @@ var ReportsCmd = &cobra.Command{
 		reportJobs.ForEach(func(e *gitlab2.Job) {
 			logger.DebugAny(e.Name)
 		})
-		logger.DebugAny(reportJobs)
 		return err
 	},
 }
