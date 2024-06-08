@@ -21,7 +21,13 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 		pipelineConfig types.PipelineConfig
 		configTypes    map[types.PipelineType]types.PipelineConfigInterface
 	}
-	environment.SetLocalEnv()
+
+	environment.CI_COMMIT_BRANCH.Set("feature/test")
+	environment.CI_DEFAULT_BRANCH.Set("main")
+	environment.CI_MERGE_REQUEST_LABELS.Set("version::patch")
+	environment.CI_MERGE_REQUEST_SOURCE_BRANCH_NAME.Set("feature/test")
+	environment.CI_SERVER_URL.Set("https://gitlab.com")
+	environment.CI_PROJECT_DIR.Set("/app")
 	mainFactory := factory.New(cli.NewSettings(
 		cli.SetMode(version.Gitlab),
 	))
@@ -79,7 +85,7 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 			},
 			want: &types.Jobs{
 				func() *types.Job {
-					job := docker.NewDaemonlessBuildkitBuild("testImage", ".", ".", "Dockerfile", []string{"${CI_REGISTRY_IMAGE}:0.13.4-feature-test"}, []string{})
+					job := docker.NewDaemonlessBuildkitBuild("testImage", ".", ".", "Dockerfile", []string{"${CI_REGISTRY_IMAGE}:0.0.0-feature-test"}, []string{})
 					return job
 				}(),
 			},
