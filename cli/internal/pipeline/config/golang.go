@@ -56,8 +56,11 @@ func (g *Golang) Validate() error {
 		g.Coverage = &GolangCoverage{}
 	}
 
-	if g.Docker != nil && g.Docker.Path == "" {
-		return types.NewMissingArgError("docker.path")
+	if g.Docker != nil {
+		if g.Docker.Path == "" {
+			return types.NewMissingArgError("docker.path")
+		}
+		g.ImageName = "docker"
 	}
 
 	if err := g.Services.Validate(); err != nil {
