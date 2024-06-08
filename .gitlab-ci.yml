@@ -122,6 +122,7 @@ Reports - Junit:
   script:
     - go mod download
     - go run . pipeline reports -v
+  coverage: "/INFO:.+: ([0-9.]+)/"
   artifacts:
     reports:
       junit: '**/junit.xml'

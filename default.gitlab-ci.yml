@@ -53,6 +53,7 @@ Reports - Junit:
     - cd cli
   script:
     - kapigen pipeline reports --config .kapigen/config.kapigen.yaml -v
+  coverage: "/INFO:.+: ([0-9.]+)/"
   artifacts:
     reports:
       junit: '**/junit.xml'
