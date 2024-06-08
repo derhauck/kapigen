@@ -1,7 +1,6 @@
 workflow:
   rules:
     - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
-    - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train"
     - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_PIPELINE_SOURCE == "web"
@@ -24,7 +23,7 @@ Build:
     name: registry.gitlab.com/kateops/kapigen/cli:${KAPIGEN_VERSION}
     entrypoint: [""]
   script:
-    - kapigen pipeline generate --config .kapigen/config.kapigen.yaml -v  --mode gitlab
+    - kapigen pipeline generate -v  --mode gitlab
   artifacts:
     paths:
       - pipeline.yaml
@@ -52,7 +51,7 @@ Reports - Junit:
   before_script:
     - cd cli
   script:
-    - kapigen pipeline reports --config .kapigen/config.kapigen.yaml -v
+    - kapigen pipeline reports -v
   coverage: "/INFO:.+: ([0-9.]+)/"
   artifacts:
     reports:
