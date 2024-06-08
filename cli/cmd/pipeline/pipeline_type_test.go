@@ -86,7 +86,7 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 			},
 			want: &types.Jobs{
 				func() *types.Job {
-					job := docker.NewDaemonlessBuildkitBuild("testImage", ".", ".", "Dockerfile", []string{"${CI_REGISTRY_IMAGE}:1.0.0", "${CI_REGISTRY_IMAGE}:latest"}, []string{})
+					job, _ := docker.NewDaemonlessBuildkitBuild("testImage", ".", ".", "Dockerfile", []string{"${CI_REGISTRY_IMAGE}:1.0.0", "${CI_REGISTRY_IMAGE}:latest"}, []string{})
 					return job
 				}(),
 			},

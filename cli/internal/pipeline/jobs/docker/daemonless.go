@@ -10,9 +10,12 @@ import (
 	"kapigen.kateops.com/internal/pipeline/types"
 )
 
-func NewDaemonlessBuildkitBuild(imageName string, path string, context string, dockerfile string, destination []string, buildArgs []string) *types.Job {
+func NewDaemonlessBuildkitBuild(imageName string, path string, context string, dockerfile string, destination []string, buildArgs []string) (*types.Job, error) {
 	if imageName == "" {
 		imageName = docker.BUILDKIT_ROTLESS.String()
+	}
+	if len(destination) == 0 {
+		return nil, types.DetailedErrorf("destination must be set")
 	}
 	return types.NewJob("Daemonless Build", imageName, func(ciJob *job.CiJob) {
 		ciJob.Image.Entrypoint.
@@ -72,5 +75,5 @@ func NewDaemonlessBuildkitBuild(imageName string, path string, context string, d
 			AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}").
 			AddVariable("BUILDCTL_CONNECT_RETRIES_MAX", "52")
 		ciJob.Tags.Add(tags.PRESSURE_EXCLUSIVE)
-	})
+	}), nil
 }

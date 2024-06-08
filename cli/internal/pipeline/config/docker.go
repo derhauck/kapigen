@@ -80,7 +80,7 @@ func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, Id st
 		buildargs = append(buildargs, fmt.Sprintf("%s=\"%s\"", key, value))
 	}
 
-	build := docker.NewDaemonlessBuildkitBuild(
+	build, err := docker.NewDaemonlessBuildkitBuild(
 		d.ImageName,
 		d.Path,
 		d.Context,
@@ -88,6 +88,9 @@ func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, Id st
 		destination,
 		buildargs,
 	)
+	if err != nil {
+		return nil, err
+	}
 	build.AddName(Id)
 	return &types.Jobs{build}, nil
 }
