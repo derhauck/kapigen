@@ -25,12 +25,12 @@ test:
 
 .PHONY: pipeline
 pipeline:
-	$(MAKE) run ARGS="generate pipeline -v --mode gitlab"
+	$(MAKE) run ARGS="pipeline generate -v --mode gitlab"
 
 .PHONY: test-pipeline
 test-pipeline:
-	$(MAKE) run ARGS="generate pipeline -v --config test.kapigen.yaml"
+	$(MAKE) run ARGS="pipeline generate -v --config test.kapigen.yaml"
 
 .PHONY: test-pipeline-no-merge
 test-pipeline-no-merge:
-	$(MAKE) run ARGS="generate pipeline -v --config test.kapigen.yaml --no-merge --file pipeline-no-merge.yaml"
+	$(MAKE) run ARGS="pipeline generate -v --config test.kapigen.yaml --no-merge --file pipeline-no-merge.yaml"

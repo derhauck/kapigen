@@ -16,6 +16,7 @@ default:
 stages:
   - build
   - trigger
+  - collect
 
 Build:
   stage: build
@@ -23,7 +24,7 @@ Build:
     name: registry.gitlab.com/kateops/kapigen/cli:${KAPIGEN_VERSION}
     entrypoint: [""]
   script:
-    - kapigen generate pipeline --config .kapigen/config.kapigen.yaml -v  --mode gitlab
+    - kapigen pipeline generate --config .kapigen/config.kapigen.yaml -v  --mode gitlab
   artifacts:
     paths:
       - pipeline.yaml
@@ -38,3 +39,21 @@ Trigger Build:
 
     forward:
       pipeline_variables: true
+
+
+
+Reports - Junit:
+  stage: collect
+  allow_failure: true
+  image:
+    name: registry.gitlab.com/kateops/kapigen/cli:${KAPIGEN_VERSION}
+    entrypoint: [""]
+
+  before_script:
+    - cd cli
+  script:
+    - kapigen pipeline reports --config .kapigen/config.kapigen.yaml -v
+  coverage: "/INFO:.+: ([0-9.]+)/"
+  artifacts:
+    reports:
+      junit: '**/junit.xml'

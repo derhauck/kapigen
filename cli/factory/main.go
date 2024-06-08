@@ -17,19 +17,21 @@ func New(settings *cli.Settings) *MainFactory {
 		Settings: settings,
 	}
 }
+
+func (m *MainFactory) GetGitlabClient() *gitlab.Client {
+	if m.Settings.PrivateToken == "" {
+		return m.GetClients().GetGitlabJobClient()
+	} else {
+		return m.GetClients().GetGitlabClient(m.Settings.PrivateToken)
+	}
+}
 func (m *MainFactory) GetVersionController() *version.Controller {
 	if m.version == nil {
 		switch m.Settings.Mode {
 		case version.Gitlab:
-			var gitlabClient *gitlab.Client
-			if m.Settings.PrivateToken == "" {
-				gitlabClient = m.GetClients().GetGitlabJobClient()
-			} else {
-				gitlabClient = m.GetClients().GetGitlabClient(m.Settings.PrivateToken)
-			}
 			m.version = version.NewController(
 				m.Settings.Mode,
-				gitlabClient,
+				m.GetGitlabClient(),
 				version.NewFileReader(),
 			)
 		case version.FILE:

@@ -5,3 +5,27 @@ type Slice[T any] interface {
 	AddSeveral(strSlice []T) *Slice[T]
 	Get() []T
 }
+
+type Array[T any] struct {
+	slice []T
+}
+
+func (s *Array[T]) Push(str T) *Array[T] {
+	s.slice = append(s.slice, str)
+	return s
+}
+
+func (s *Array[T]) ForEach(fn func(element *T)) {
+	for _, element := range s.slice {
+		fn(&element)
+	}
+}
+
+func (s *Array[T]) Find(fn func(element *T) bool) (*T, int) {
+	for index, element := range s.slice {
+		if fn(&element) {
+			return &element, index
+		}
+	}
+	return nil, -1
+}

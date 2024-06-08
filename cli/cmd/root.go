@@ -13,7 +13,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(generateCmd)
+	rootCmd.AddCommand(pipelineCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "will log verbose output")
 	rootCmd.PersistentFlags().String("private-token", "", "ENV var name to use for private token")

@@ -6,3 +6,4 @@
 /**/pipeline.yaml
 /**/pipeline-no-merge.yaml
 /**/profile.cov
+/cli/.reports/

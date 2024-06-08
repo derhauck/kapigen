@@ -2,7 +2,7 @@ version: "3.7"
 services:
   app:
     image: golang:1.21
-    command: go run . generate pipeline -v --config test.kapigen.yaml
+    command: go run . pipeline generate -v --config test.kapigen.yaml
     working_dir: /app/cli
     environment:
       GOMODCACHE: /app/cli/.pkg
