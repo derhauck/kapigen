@@ -125,4 +125,4 @@ Reports - Junit:
   coverage: "/INFO:.+: ([0-9.]+)/"
   artifacts:
     reports:
-      junit: '**/junit.xml'
+      junit: '**/*.xml'
