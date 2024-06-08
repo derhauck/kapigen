@@ -11,7 +11,7 @@ import (
 func NewNoop() *types.Job {
 	return types.NewJob("Noop", docker.Alpine_3_18.String(), func(ciJob *job.CiJob) {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
-		ciJob.Script.Value.Add("echo \"successfully triggered\"")
+		ciJob.Script.Value.Push("echo \"successfully triggered\"")
 		ciJob.Rules.Add(&job.Rule{
 			When: job.NewWhen(when.OnSuccess),
 		})

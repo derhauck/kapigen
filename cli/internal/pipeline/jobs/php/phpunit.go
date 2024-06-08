@@ -33,20 +33,20 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpu
 			AddAfterScript("tail ${CI_PROJECT_DIR}/.status").
 			AddArtifact(job.Artifact{
 				Name:  "report",
-				Paths: *wrapper.NewStringSlice().Add("junit.xml"),
+				Paths: *wrapper.NewArray[string]().Push("junit.xml"),
 				Reports: artifact.NewReports().
 					SetJunit(artifact.NewJunitReport("junit.xml")).
 					SetCoverageReport(artifact.NewCoverageReport(reports.Cobertura, "coverage.cobertura.xml")),
 			})
 
 		listener := job.NewService(docker.Alpine_3_18.String(), "kapigen-listener", 0)
-		listener.Entrypoint().AddSeveral("sh", "-c")
+		listener.Entrypoint().Push("sh", "-c")
 		command := ""
 		for name, port := range listenerPorts {
 			command += fmt.Sprintf("while ! nc -vz -w 1 %s %d &> /dev/null; do echo \"waiting for %s\" >> ${CI_PROJECT_DIR}/.status; sleep 1; done; ", name, port, name)
 		}
 		command += "while :; do echo \"done\" > ${CI_PROJECT_DIR}/.ready; sleep 10; done"
-		listener.Command().Add(command)
+		listener.Command().Push(command)
 		ciJob.AddService(listener)
 	}), nil
 }

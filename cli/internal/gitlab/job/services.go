@@ -9,15 +9,15 @@ type Service struct {
 	alias      string
 	port       int32
 	variables  map[string]string
-	entrypoint wrapper.StringSlice
-	command    wrapper.StringSlice
+	entrypoint wrapper.Array[string]
+	command    wrapper.Array[string]
 }
 
-func (c *Service) Entrypoint() *wrapper.StringSlice {
+func (c *Service) Entrypoint() *wrapper.Array[string] {
 	return &c.entrypoint
 }
 
-func (c *Service) Command() *wrapper.StringSlice {
+func (c *Service) Command() *wrapper.Array[string] {
 	return &c.command
 }
 

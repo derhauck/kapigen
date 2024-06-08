@@ -1,15 +1,16 @@
 package job
 
 import (
+	"testing"
+
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 	"kapigen.kateops.com/internal/when"
-	"testing"
 )
 
 func TestArtifactsSerialization(t *testing.T) {
 	// Create an instance of the Ci struct
 	artifacts := &Artifact{
-		Paths:     *(wrapper.NewStringSlice().AddSlice([]string{"path1", "path2"})),
+		Paths:     *(wrapper.NewArray[string]().Push([]string{"path1", "path2"}...)),
 		ExpireIn:  "7 days",
 		ExposeAs:  "public",
 		Name:      "my-artifacts",

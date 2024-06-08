@@ -16,23 +16,23 @@ func NewDaemonlessBuildkitBuild(imageName string, path string, context string, d
 	}
 	return types.NewJob("Daemonless Build", imageName, func(ciJob *job.CiJob) {
 		ciJob.Image.Entrypoint.
-			Add("sh").
-			Add("-c")
+			Push("sh").
+			Push("-c")
 
 		timeout := job.NewService(docker.Alpine_3_18.String(), "failover", 5000)
 		timeout.Entrypoint().
-			Add("sh").
-			Add("-c")
+			Push("sh").
+			Push("-c")
 		timeout.Command().
-			Add("sleep 30; touch ${CI_PROJECT_DIR}/.status.auth")
+			Push("sleep 30; touch ${CI_PROJECT_DIR}/.status.auth")
 		ciJob.Services.Add(timeout)
 
 		auth := job.NewService(docker.CRANE_DEBUG.String(), "crane", 5000)
 		auth.Entrypoint().
-			Add("sh").
-			Add("-c")
+			Push("sh").
+			Push("-c")
 		auth.Command().
-			Add("while [ ! -f ${CI_PROJECT_DIR}/.status.init ]; do echo 'wait for init'; sleep 1; done; " +
+			Push("while [ ! -f ${CI_PROJECT_DIR}/.status.init ]; do echo 'wait for init'; sleep 1; done; " +
 				"export $(cat ${CI_PROJECT_DIR}/.env); " +
 				"crane auth login -u \"${CI_REGISTRY_USER}\" -p \"${CI_JOB_TOKEN}\" \"${CI_REGISTRY}\"; " +
 				"crane auth login -u \"${CI_DEPENDENCY_PROXY_USER}\" -p \"${CI_DEPENDENCY_PROXY_PASSWORD}\" \"${CI_DEPENDENCY_PROXY_SERVER}\"; " +
@@ -61,12 +61,12 @@ func NewDaemonlessBuildkitBuild(imageName string, path string, context string, d
 			push,
 		)
 		ciJob.BeforeScript.Value.
-			Add(`echo "CI_JOB_TOKEN=$CI_JOB_TOKEN" > .env`).
-			Add(`echo "CI_DEPENDENCY_PROXY_PASSWORD=$CI_DEPENDENCY_PROXY_PASSWORD" >> .env`).
-			Add("touch .status.init").
-			Add("while [ ! -f ${CI_PROJECT_DIR}/.status.auth ]; do echo 'wait for auth'; sleep 1; done")
+			Push(`echo "CI_JOB_TOKEN=$CI_JOB_TOKEN" > .env`).
+			Push(`echo "CI_DEPENDENCY_PROXY_PASSWORD=$CI_DEPENDENCY_PROXY_PASSWORD" >> .env`).
+			Push("touch .status.init").
+			Push("while [ ! -f ${CI_PROJECT_DIR}/.status.auth ]; do echo 'wait for auth'; sleep 1; done")
 		ciJob.Script.Value.
-			Add(command)
+			Push(command)
 		ciJob.AddVariable("KTC_PATH", path).
 			AddVariable("BUILDKITD_FLAGS", "--oci-worker-no-process-sandbox").
 			AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}").

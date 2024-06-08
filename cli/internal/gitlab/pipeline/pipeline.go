@@ -18,11 +18,11 @@ type CiPipelineWorkflow struct {
 }
 
 type CiPipeline struct {
-	Stages       *wrapper.StringSlice `yaml:"stages"`
-	Workflow     CiPipelineWorkflow   `yaml:"workflow,omitempty"`
-	AllowFailure job.AllowFailure     `yaml:"allow_failure,omitempty"`
-	Default      CiPipelineDefault    `yaml:"default,omitempty"`
-	Variables    map[string]string    `yaml:"variables,omitempty"`
+	Stages       *wrapper.Array[string] `yaml:"stages"`
+	Workflow     CiPipelineWorkflow     `yaml:"workflow,omitempty"`
+	AllowFailure job.AllowFailure       `yaml:"allow_failure,omitempty"`
+	Default      CiPipelineDefault      `yaml:"default,omitempty"`
+	Variables    map[string]string      `yaml:"variables,omitempty"`
 }
 
 func (c *CiPipeline) Render() *CiPipelineYaml {
@@ -31,7 +31,7 @@ func (c *CiPipeline) Render() *CiPipelineYaml {
 
 func NewDefaultCiPipeline() *CiPipeline {
 	return &CiPipeline{
-		Stages: wrapper.NewStringSlice().AddSlice(stages.GetAllStages()),
+		Stages: wrapper.NewArray[string]().Push(stages.GetAllStages()...),
 		Default: CiPipelineDefault{
 			AfterScript:  job.NewAfterScript(),
 			BeforeScript: job.NewBeforeScript(),

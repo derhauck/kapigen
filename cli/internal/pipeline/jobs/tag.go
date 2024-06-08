@@ -18,8 +18,8 @@ func NewTag(privateTokenName string) *types.Job {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
 		ciJob.Stage = stages.FINAL
 		ciJob.AddVariable("LOGGER_LEVEL", level.Info.String())
-		ciJob.SetImageEntrypoint(*wrapper.NewStringSlice().Add(""))
-		ciJob.Script.Value.Add(fmt.Sprintf("kapigen version new --mode gitlab --private-token '%s'", privateTokenName))
+		ciJob.SetImageEntrypoint(*wrapper.NewArray[string]().Push(""))
+		ciJob.Script.Value.Push(fmt.Sprintf("kapigen version new --mode gitlab --private-token '%s'", privateTokenName))
 		ciJob.Rules.Add(&job.Rule{
 			If:   "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
 			When: job.NewWhen(when.OnSuccess),
@@ -32,9 +32,9 @@ func NewTagKapigen(privateTokenName string) *types.Job {
 		ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
 		ciJob.Stage = stages.FINAL
 		ciJob.AddVariable("LOGGER_LEVEL", level.Info.String())
-		ciJob.BeforeScript.Value.Add("cd cli")
-		ciJob.Script.Value.Add("go mod download").
-			Add(fmt.Sprintf("go run . version new --mode gitlab --private-token '%s'", privateTokenName))
+		ciJob.BeforeScript.Value.Push("cd cli")
+		ciJob.Script.Value.Push("go mod download").
+			Push(fmt.Sprintf("go run . version new --mode gitlab --private-token '%s'", privateTokenName))
 		ciJob.Rules.Add(&job.Rule{
 			If:   "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
 			When: job.NewWhen(when.OnSuccess),

@@ -3,7 +3,7 @@ package job
 import "kapigen.kateops.com/internal/pipeline/wrapper"
 
 type BeforeScript struct {
-	Value *wrapper.StringSlice
+	Value *wrapper.Array[string]
 }
 
 func (a *BeforeScript) GetRenderedValue() []string {
@@ -15,6 +15,6 @@ func (a *BeforeScript) GetRenderedValue() []string {
 
 func NewBeforeScript() BeforeScript {
 	return BeforeScript{
-		Value: wrapper.NewStringSlice(),
+		Value: wrapper.NewArray[string](),
 	}
 }

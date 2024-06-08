@@ -37,7 +37,7 @@ func NewUnitTest(imageName string, path string, packages []string, source string
 			AddVariable("KTC_PATH", path).
 			AddArtifact(job.Artifact{
 				Name:  "report",
-				Paths: *(wrapper.NewStringSlice().Add(reportPath)),
+				Paths: *(wrapper.NewArray[string]().Push(reportPath)),
 				Reports: artifact.NewReports().
 					SetCoverageReport(artifact.NewCoverageReport(reports.Cobertura, reportPath)).
 					SetJunit(artifact.NewJunitReport(reportPath)),

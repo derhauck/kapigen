@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"fmt"
+
 	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/gitlab/cache"
@@ -14,8 +15,8 @@ import (
 func NewTerraformPlan(path string, state string, s3 bool) *types.Job {
 	return types.NewJob("Plan", docker.Terraform_Base.String(), func(ciJob *job.CiJob) {
 		ciJob.Script.Value.
-			Add(fmt.Sprintf("echo \"%s\"", state)).
-			Add("terraform plan")
+			Push(fmt.Sprintf("echo \"%s\"", state)).
+			Push("terraform plan")
 
 		project, err := environment.CI_PROJECT_ID.Lookup()
 		if err != nil {
@@ -26,7 +27,7 @@ func NewTerraformPlan(path string, state string, s3 bool) *types.Job {
 		ciJob.Stage = stages.BUILD
 		ciJob.Variables["TF_STATE_PROJECT"] = project
 		ciJob.Rules = *job.DefaultOnlyReleasePipelineRules()
-		ciJob.Cache.Paths.Add(fmt.Sprintf("%s/.terraform", path))
+		ciJob.Cache.Paths.Push(fmt.Sprintf("%s/.terraform", path))
 		ciJob.Cache.SetActive().
 			SetPolicy(cache.Pull)
 

@@ -9,7 +9,7 @@ import (
 
 type Image struct {
 	Name       string
-	Entrypoint wrapper.StringSlice
+	Entrypoint wrapper.Array[string]
 	PullPolicy images.PullPolicy
 }
 
