@@ -3,8 +3,6 @@
 
 ----
 
-
-
 ### Core
 * [cli](cli.md)
 * [versioning](versioning.md)

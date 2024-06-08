@@ -29,12 +29,11 @@ default:
 
 ### Pipelines Configuration
 
-[Kapigen Config](cli/config.kapigen.yaml):
 
 In order to get started with Kapigen you need to create a `config.kapigen.yaml` file inside your repository.
-For more detailed information visit the [docs](doc/index.md) inside the repository.
+For more detailed information and available pipeline types, visit the [docs](doc/index.md) inside the repository.
 
-From there you may be able to use default pipelines in your configuration like this:
+Example configuration:
 ```yaml
 noop: true
 versioning: true
@@ -60,3 +59,7 @@ pipelines:
       - cli-golang
 ```
 
+
+## Note
+**Eat your own dog food**:
+This project is being build via Kapigen, feel free to explore the [Kapigen Config](cli/config.kapigen.yaml) in this repository and examine the resulting pipelines.
