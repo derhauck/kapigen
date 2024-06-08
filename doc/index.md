@@ -2,8 +2,12 @@
 #### Kateops Pipeline Generator
 
 ----
+
+
+
 ### Core
 * [versioning](versioning.md)
+* [cli](cli.md)
 ### Available Pipeline Configurations
 * [docker](pipelines/docker.md)
 * [golang](pipelines/golang.md)
