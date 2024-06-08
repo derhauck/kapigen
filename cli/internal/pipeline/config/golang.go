@@ -67,7 +67,7 @@ func (g *Golang) Validate() error {
 		return types.DetailedErrorE(err)
 	}
 	if err := g.Coverage.Validate(); err != nil {
-		return err
+		return types.DetailedErrorE(err)
 	}
 
 	if g.ImageName == "" && g.Docker == nil {

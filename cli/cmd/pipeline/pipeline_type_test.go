@@ -79,7 +79,7 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 			},
 			want: &types.Jobs{
 				func() *types.Job {
-					job := docker.NewDaemonlessBuildkitBuild("testImage", ".", ".", "Dockerfile", []string{"defaultDestination"}, []string{})
+					job := docker.NewDaemonlessBuildkitBuild("testImage", ".", ".", "Dockerfile", []string{"${CI_REGISTRY_IMAGE}:0.13.4-feature-test"}, []string{})
 					return job
 				}(),
 			},
@@ -102,7 +102,7 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 					t.Errorf("LoadFromPipelineConfig() got job name %s, wanted %s", job.GetName(), tt.want.GetJobs()[i].GetName())
 				}
 
-				if reflect.DeepEqual(job.CiJob.Script, tt.want.GetJobs()[i].CiJob.Script) {
+				if !reflect.DeepEqual(job.CiJob.Script, tt.want.GetJobs()[i].CiJob.Script) {
 					t.Errorf("LoadFromPipelineConfig() got job script %v, wanted %v", job.CiJob.Script.GetRenderedValue(), tt.want.GetJobs()[i].CiJob.Script.GetRenderedValue())
 				}
 			}
