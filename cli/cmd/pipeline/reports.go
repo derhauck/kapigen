@@ -98,6 +98,10 @@ var ReportsCmd = &cobra.Command{
 				}
 			}
 		}
+		if reportJobs.Length() == 0 {
+			logger.Error("no reports found")
+			return nil
+		}
 		var totalCoverage float64 = 0
 		for _, coverageValue := range coverageValues {
 			totalCoverage += coverageValue
