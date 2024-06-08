@@ -28,14 +28,14 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpu
 			AddVariable("XDEBUG_MODE", "coverage").
 			AddBeforeScriptf("composer install --working-dir=%s %s", composerPath, composerArgs).
 			AddScript("while [ ! -f ${CI_PROJECT_DIR}/.ready ]; do sleep 1; done;").
-			AddScriptf("php %s -c %s/phpunit.xml --log-junit report.xml  --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml %s", phpUnitBin, phpunitXmlPath, phpunitArgs).
+			AddScriptf("php %s -c %s/phpunit.xml --log-junit junit.xml  --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml %s", phpUnitBin, phpunitXmlPath, phpunitArgs).
 			SetCodeCoverage(`/^\s*Lines:\s*\d+.\d+\%/`).
 			AddAfterScript("tail ${CI_PROJECT_DIR}/.status").
 			AddArtifact(job.Artifact{
 				Name:  "report",
-				Paths: *wrapper.NewStringSlice().Add("report.xml"),
+				Paths: *wrapper.NewStringSlice().Add("junit.xml"),
 				Reports: artifact.NewReports().
-					SetJunit(artifact.NewJunitReport("report.xml")).
+					SetJunit(artifact.NewJunitReport("junit.xml")).
 					SetCoverageReport(artifact.NewCoverageReport(reports.Cobertura, "coverage.cobertura.xml")),
 			})
 

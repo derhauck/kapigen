@@ -1,8 +1,13 @@
 package pipeline
 
 import (
+	"archive/zip"
+	"fmt"
+	"io"
 	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/spf13/cobra"
 	gitlab2 "github.com/xanzy/go-gitlab"
@@ -64,11 +69,11 @@ var ReportsCmd = &cobra.Command{
 			logger.Error(res.Status)
 			return err
 		}
-		downstreamPipelineIds := []int{}
+		var downstreamPipelineIds []int
 		for _, bridge := range bridges {
 			if bridge.DownstreamPipeline != nil {
 				downstreamPipelineIds = append(downstreamPipelineIds, bridge.DownstreamPipeline.ID)
-				logger.DebugAny(bridge.DownstreamPipeline)
+				logger.Debug(fmt.Sprintf("found trigger job: %s", bridge.Name))
 			}
 		}
 		var reportJobs wrapper.Array[gitlab2.Job]
@@ -83,14 +88,102 @@ var ReportsCmd = &cobra.Command{
 					for _, artifact := range job.Artifacts {
 						if artifact.FileType == "junit" {
 							reportJobs.Push(*job)
-							logger.DebugAny(artifact)
+							logger.Info(fmt.Sprintf("found reports in job: %s", job.Name))
 						}
 					}
 				}
 			}
 		}
+		_ = os.Mkdir(".reports", 0750)
+		logger.Info("unzipping archives")
 		reportJobs.ForEach(func(e *gitlab2.Job) {
-			logger.DebugAny(e.Name)
+			jobArtifact, res, err := gitlab.Jobs.GetJobArtifacts(environment.CI_PROJECT_ID.Get(), e.ID, nil)
+			artifactsDir := fmt.Sprintf(".reports/%d", e.ID)
+			_ = os.Mkdir(artifactsDir, 0750)
+			artifactFile := fmt.Sprintf("%s/reports.zip", artifactsDir)
+			if res.StatusCode != 200 {
+				logger.Error(res.Status)
+				logger.Error(e.Name)
+				logger.ErrorE(err)
+				return
+			}
+			fi, err := os.Create(artifactFile)
+			if err != nil {
+				logger.Error(e.Name)
+				logger.ErrorE(err)
+				return
+			}
+			defer func() {
+				_ = fi.Close()
+			}()
+			buffer := make([]byte, 1024)
+			for {
+				n, err := jobArtifact.Read(buffer)
+				if err != nil && err != io.EOF {
+					logger.Error(e.Name)
+					logger.Error(res.Status)
+					logger.ErrorE(err)
+					return
+				}
+				if _, err = fi.Write(buffer[:n]); err != nil {
+					logger.Error(e.Name)
+					logger.ErrorE(err)
+					return
+				}
+
+				if n == 0 {
+					break
+				}
+			}
+
+			archive, err := zip.OpenReader(artifactFile)
+			if err != nil {
+				panic(err)
+			}
+			defer func(archive *zip.ReadCloser) {
+				_ = archive.Close()
+			}(archive)
+
+			for _, f := range archive.File {
+				filePath := filepath.Join(artifactsDir, f.Name)
+
+				if !strings.HasPrefix(filePath, filepath.Clean(artifactsDir)+string(os.PathSeparator)) {
+					logger.Error(fmt.Sprintf("invalid file path: %s", filePath))
+					return
+				}
+				if f.FileInfo().IsDir() {
+					logger.Debug("creating directory: %s", filePath)
+					_ = os.MkdirAll(filePath, os.ModePerm)
+					continue
+				}
+
+				if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
+					logger.Error(e.Name)
+					logger.ErrorE(err)
+				}
+
+				dstFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+				logger.Debug(fmt.Sprintf("writing file: %s", filePath))
+				if err != nil {
+					logger.Error(e.Name)
+					logger.ErrorE(err)
+				}
+
+				fileInArchive, err := f.Open()
+				if err != nil {
+					logger.Error(e.Name)
+					logger.ErrorE(err)
+				}
+
+				if _, err := io.Copy(dstFile, fileInArchive); err != nil {
+					logger.Error(e.Name)
+					logger.ErrorE(err)
+				}
+
+				_ = dstFile.Close()
+				_ = fileInArchive.Close()
+			}
+
 		})
 		return err
 	},

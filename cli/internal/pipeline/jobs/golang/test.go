@@ -22,7 +22,7 @@ func NewUnitTest(imageName string, path string, packages []string, source string
 	}
 
 	return types.NewJob("Unit Test", imageName, func(ciJob *job.CiJob) {
-		var reportPath = fmt.Sprintf("%s/report.xml", path)
+		var reportPath = fmt.Sprintf("%s/junit.xml", path)
 		if path == "." {
 			reportPath = "report.xml"
 		}
