@@ -70,6 +70,7 @@ var ReportsCmd = &cobra.Command{
 			return err
 		}
 		var downstreamPipelineIds []int
+		var coverageValues []float64
 		for _, bridge := range bridges {
 			if bridge.DownstreamPipeline != nil {
 				downstreamPipelineIds = append(downstreamPipelineIds, bridge.DownstreamPipeline.ID)
@@ -92,7 +93,17 @@ var ReportsCmd = &cobra.Command{
 						}
 					}
 				}
+				if job.Coverage > 0 {
+					coverageValues = append(coverageValues, job.Coverage)
+				}
 			}
+		}
+		var totalCoverage float64 = 0
+		for _, coverageValue := range coverageValues {
+			totalCoverage += coverageValue
+		}
+		if totalCoverage > 0 {
+			logger.Info(fmt.Sprintf("coverage: %f", totalCoverage/float64(len(coverageValues))))
 		}
 		_ = os.Mkdir(".reports", 0750)
 		logger.Info("unzipping archives")
