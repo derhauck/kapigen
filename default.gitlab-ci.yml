@@ -44,6 +44,7 @@ Trigger Build:
 Reports - Junit:
   stage: collect
   allow_failure: true
+  when: always
   image:
     name: registry.gitlab.com/kateops/kapigen/cli:${KAPIGEN_VERSION}
     entrypoint: [""]
