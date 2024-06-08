@@ -32,7 +32,7 @@ func NewUnitTest(imageName string, path string, packages []string, source string
 			SetStage(stages.TEST).
 			AddBeforeScriptf("cd %s", path).
 			AddScript("go install github.com/jstemmer/go-junit-report/v2@latest").
-			AddScriptf("%s 2>&1 | go-junit-report -parser gojson -iocopy -out report.xml || (go tool cover -func profile.cov; exit 1)", testCmd).
+			AddScriptf("%s 2>&1 | go-junit-report -parser gojson -iocopy -out junit.xml || (go tool cover -func profile.cov; exit 1)", testCmd).
 			AddScript("go tool cover -func profile.cov").
 			AddVariable("KTC_PATH", path).
 			AddArtifact(job.Artifact{

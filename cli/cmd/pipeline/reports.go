@@ -54,7 +54,7 @@ var ReportsCmd = &cobra.Command{
 		if privateTokenName == "" {
 			privateTokenName = pipelineConfig.PrivateTokenName
 		}
-
+		logger.Debug("will use private token: " + privateTokenName)
 		settings := cli.NewSettings(
 			cli.SetMode(version.GetModeFromString(version.Gitlab.Name())),
 			cli.SetPrivateToken(privateTokenName),
@@ -104,7 +104,6 @@ var ReportsCmd = &cobra.Command{
 			if res.StatusCode != 200 {
 				logger.Error(res.Status)
 				logger.Error(e.Name)
-				logger.ErrorE(err)
 				return
 			}
 			fi, err := os.Create(artifactFile)
@@ -191,6 +190,4 @@ var ReportsCmd = &cobra.Command{
 
 func init() {
 	ReportsCmd.Flags().String("config", "config.kapigen.yaml", "config to use")
-	ReportsCmd.Flags().String("mode", version.FILE.Name(), "mode used for versioning: file,gitlab")
-
 }
