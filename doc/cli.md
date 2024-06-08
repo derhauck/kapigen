@@ -1,7 +1,7 @@
 
 ## CLI
 Kapigen CLI is a tool to generate Gitlab pipelines based on configuration files. 
-It is an abstraction of the `.gitlab-ci.yml` syntax Gitlab uses. The goal it so enable  developers to
+It is an abstraction of the `.gitlab-ci.yml` syntax Gitlab uses. The goal is to enable developers to
 leverage GitLab's CI/CD capabilities without needing extensive expertise in pipeline configuration.
 
 ### Commands

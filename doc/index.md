@@ -6,8 +6,8 @@
 
 
 ### Core
-* [versioning](versioning.md)
 * [cli](cli.md)
+* [versioning](versioning.md)
 ### Available Pipeline Configurations
 * [docker](pipelines/docker.md)
 * [golang](pipelines/golang.md)
