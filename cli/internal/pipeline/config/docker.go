@@ -30,7 +30,7 @@ func (d *Docker) New() types.PipelineConfigInterface {
 
 func (d *Docker) Validate() error {
 	if d.Path == "" {
-		logger.Info("no path set, defaulting to '.'")
+		logger.Debug("no path set, defaulting to '.'")
 		d.Path = "."
 	}
 
@@ -39,16 +39,16 @@ func (d *Docker) Validate() error {
 	}
 
 	if d.Context == "" {
-		logger.Info("no context set, defaulting to path")
+		logger.Debug("no context set, defaulting to path")
 		d.Context = d.Path
 	}
 
 	if d.Name == "" {
-		logger.Info("no name set, defaulting to container root registry")
+		logger.Debug("no name set, defaulting to container root registry")
 	}
 
 	if d.Release == nil {
-		logger.Info("no release set, defaulting to true")
+		logger.Debug("no release set, defaulting to true")
 		tmp := true
 		d.Release = &tmp
 	}

@@ -23,11 +23,11 @@ type GolangCoverage struct {
 
 func (g *GolangCoverage) Validate() error {
 	if len(g.Packages) == 0 {
-		logger.Info("no package declared, using./...")
+		logger.Debug("no package declared, using./...")
 		g.Packages = []string{"./..."}
 	}
 	if g.Source == "" {
-		logger.Info("no coverage source declared, using./...")
+		logger.Debug("no coverage source declared, using./...")
 		g.Source = "./..."
 	}
 	return nil
@@ -49,7 +49,7 @@ func (g *Golang) New() types.PipelineConfigInterface {
 func (g *Golang) Validate() error {
 
 	if g.Path == "" {
-		logger.Info("no path set, defaulting to '.'")
+		logger.Debug("no path set, defaulting to '.'")
 		g.Path = "."
 	}
 	if g.Coverage == nil {
