@@ -7,6 +7,7 @@ import (
 	"kapigen.kateops.com/internal/gitlab/job/artifact"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/pipeline/types"
+	"kapigen.kateops.com/internal/when"
 )
 
 func Lint(imageName string, path string) *types.Job {
@@ -19,10 +20,11 @@ func Lint(imageName string, path string) *types.Job {
 		ciJob.TagMediumPressure().
 			SetStage(stages.TEST).
 			AddBeforeScriptf("cd %s", path).
-			AddScriptf("golangci-lint run  --out-format=junit-xml:%s", report).
+			AddScriptf("golangci-lint run -v --out-format=junit-xml:%s", report).
 			AddArtifact(job.Artifact{
 				Reports: artifact.NewReports().
 					SetJunit(artifact.NewJunitReport(reportPath)),
+				When: job.NewWhen(when.Always),
 			})
 	})
 }
