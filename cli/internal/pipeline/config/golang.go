@@ -80,6 +80,9 @@ func (g *Golang) Validate() error {
 		g.ImageName = "docker"
 	}
 
+	if err := g.Lint.Validate(); err != nil {
+		return types.DetailedErrorE(err)
+	}
 	if err := g.Services.Validate(); err != nil {
 		return types.DetailedErrorE(err)
 	}
