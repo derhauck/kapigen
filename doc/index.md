@@ -2,7 +2,9 @@
 #### Kateops Pipeline Generator
 
 ----
+
 ### Core
+* [cli](cli.md)
 * [versioning](versioning.md)
 ### Available Pipeline Configurations
 * [docker](pipelines/docker.md)

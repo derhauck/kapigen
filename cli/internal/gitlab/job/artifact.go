@@ -6,8 +6,8 @@ import (
 )
 
 type Artifact struct {
-	Paths     wrapper.StringSlice
-	Exclude   wrapper.StringSlice
+	Paths     wrapper.Array[string]
+	Exclude   wrapper.Array[string]
 	ExpireIn  string
 	ExposeAs  string
 	Name      string
@@ -17,7 +17,7 @@ type Artifact struct {
 }
 
 func NewArtifact(name string, paths []string) Artifact {
-	artifactPaths := wrapper.NewStringSlice().AddSlice(paths)
+	artifactPaths := wrapper.NewArray[string]().Push(paths...)
 	return Artifact{
 		Name:  name,
 		Paths: *artifactPaths,

@@ -17,11 +17,11 @@ type PhpComposer struct {
 
 func (p *PhpComposer) Validate() error {
 	if p.Path == "" {
-		logger.Info("no composer.path set, defaulting to '.'")
+		logger.Debug("no composer.path set, defaulting to '.'")
 		p.Path = "."
 	}
 	if p.Args == "" {
-		logger.Info("no composer.args defaulting to '--no-progress --no-cache --no-interaction'")
+		logger.Debug("no composer.args defaulting to '--no-progress --no-cache --no-interaction'")
 		p.Args = "--no-progress --no-cache --no-interaction"
 	}
 	return nil
@@ -35,14 +35,14 @@ type Phpunit struct {
 
 func (p *Phpunit) Validate(composer *PhpComposer) error {
 	if p.Path == "" {
-		logger.Info("no phpunit.path set, defaulting to 'composer.path'")
+		logger.Debug("no phpunit.path set, defaulting to 'composer.path'")
 		p.Path = composer.Path
 	}
 	if p.Args == "" {
-		logger.Info("no phpunit.args set")
+		logger.Debug("no phpunit.args set")
 	}
 	if p.Bin == "" {
-		logger.Info("no phpunit.bin set, defaulting to '<composer.path>/vendor/bin/phpunit'")
+		logger.Debug("no phpunit.bin set, defaulting to '<composer.path>/vendor/bin/phpunit'")
 		p.Bin = fmt.Sprintf("%s/vendor/bin/phpunit", composer.Path)
 	}
 	return nil

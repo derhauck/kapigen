@@ -10,16 +10,16 @@ import (
 )
 
 type Rule struct {
-	If           string              `yaml:"if,omitempty"`
-	Changes      wrapper.StringSlice `yaml:"changes"`
-	AllowFailure wrapper.Bool        `yaml:"allow_failure"`
-	Variables    struct{}            `yaml:"variables"`
-	When         WhenWrapper         `yaml:"when"`
+	If           string                `yaml:"if,omitempty"`
+	Changes      wrapper.Array[string] `yaml:"changes"`
+	AllowFailure wrapper.Bool          `yaml:"allow_failure"`
+	Variables    struct{}              `yaml:"variables"`
+	When         WhenWrapper           `yaml:"when"`
 }
 
 func (r *Rule) AddChange(path string) *Rule {
 	if !r.Changes.Has(path) {
-		r.Changes.Add(path)
+		r.Changes.Push(path)
 	}
 
 	return r
@@ -46,7 +46,7 @@ type Rules []*Rule
 
 func (r *Rules) AddPathToChanges(path string) *Rules {
 	for _, rule := range r.Get() {
-		if len(rule.Changes.Get()) > 0 {
+		if rule.Changes.Length() > 0 {
 			rule.AddChange(path)
 		}
 	}

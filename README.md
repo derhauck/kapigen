@@ -1,29 +1,11 @@
 # Kapigen
 #### Kateops Pipeline Generator
 
+Kapigen CLI is a tool to generate Gitlab pipelines based on configuration files.
+It is an abstraction of the `.gitlab-ci.yml` syntax Gitlab uses. The goal is to enable developers to
+leverage GitLab's CI/CD capabilities without needing extensive expertise in pipeline configuration.
+
 ---- 
-
-## CLI
-
-### Commands
-
-#### Global Parameters
-
-```shell
--v  # Verbose log output
-```
-
-#### Generate
-
-`generate pipeline`
-
-```shell
-kapigen generate pipeline
-```
-
-### Parameters:
-- `--file 'output file'`: Specifies the output file. Default is `pipeline.yaml`.
-- `--config 'pipeline config'`: Specifies the pipeline configuration file. Default is `config.kapigen.yaml`.
 
 ## [Pipeline Generation Documentation](doc/index.md)
 
@@ -47,8 +29,11 @@ default:
 
 ### Pipelines Configuration
 
-[Kapigen Config](cli/config.kapigen.yaml):
 
+In order to get started with Kapigen you need to create a `config.kapigen.yaml` file inside your repository.
+For more detailed information and available pipeline types, visit the [docs](doc/index.md) inside the repository.
+
+Example configuration:
 ```yaml
 noop: true
 versioning: true
@@ -72,8 +57,9 @@ pipelines:
       name: cli
     needs:
       - cli-golang
-
-
 ```
 
-For more detailed information visit the [docs](doc/index.md) inside the repository.
+
+## Note
+**Eat your own dog food**:
+This project is being build via Kapigen, feel free to explore the [Kapigen Config](cli/config.kapigen.yaml) in this repository and examine the resulting pipelines.

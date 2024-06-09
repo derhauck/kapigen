@@ -11,5 +11,4 @@ func SetLocalEnv() {
 	CI_JOB_TOKEN.SetIfEmpty("invalid")
 	CI_SERVER_URL.SetIfEmpty("https://gitlab.com")
 	CI_PROJECT_DIR.SetIfEmpty("/app")
-
 }

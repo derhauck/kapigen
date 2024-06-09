@@ -1,6 +1,7 @@
 package types
 
 import (
+	"reflect"
 	"testing"
 
 	"kapigen.kateops.com/internal/gitlab/job"
@@ -281,4 +282,59 @@ func contains(slice []string, element string) bool {
 		}
 	}
 	return false
+}
+
+func TestJob_EvaluateName(t *testing.T) {
+	t.Run("do not create different names if they are already unique", func(t *testing.T) {
+		job1 := NewJob("Job 1", "golang:1.16", nil)
+		job2 := NewJob("Job 2", "golang:1.16", nil)
+		job3 := NewJob("Job 3", "golang:1.16", nil)
+		expected := &Jobs{job1, job2, job3}
+		jobs := *expected
+
+		result, err := jobs.EvaluateNames()
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+		if !reflect.DeepEqual(result, expected) {
+			t.Errorf("expected result to be: %v, got: %v", expected, result)
+		}
+	})
+	t.Run("create different names if they are not unique", func(t *testing.T) {
+		expected := &Jobs{
+			NewJob("Job 1", "golang:1.16", nil),
+			NewJob("Job 1", "golang:1.16", nil),
+			NewJob("Job 2", "golang:1.16", nil),
+		}
+		for _, currentJob := range expected.GetJobs() {
+			currentJob.AddName("test")
+			currentJob.AddName("test")
+		}
+		jobs := &Jobs{
+			NewJob("Job 1", "golang:1.16", nil),
+			NewJob("Job 1", "golang:1.16", nil),
+			NewJob("Job 2", "golang:1.16", nil),
+		}
+		for _, currentJob := range jobs.GetJobs() {
+			currentJob.AddName("test")
+			currentJob.AddName("test")
+		}
+		result, err := jobs.EvaluateNames()
+
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		if result.GetJobs()[0].GetName() == expected.GetJobs()[0].GetName() {
+			t.Errorf("expected job name: '%s', received: '%s'", expected.GetJobs()[0].GetName(), result.GetJobs()[0].GetName())
+		}
+
+		if result.GetJobs()[1].GetName() != expected.GetJobs()[1].GetName() {
+			t.Errorf("expected job name not to be identical received: '%s'", result.GetJobs()[1].GetName())
+		}
+
+		if result.GetJobs()[2].GetName() != expected.GetJobs()[2].GetName() {
+			t.Errorf("expected job name not to be identical received: '%s'", result.GetJobs()[2].GetName())
+		}
+	})
 }

@@ -1,6 +1,8 @@
 package job
 
 import (
+	"fmt"
+
 	"kapigen.kateops.com/internal/gitlab/images"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/gitlab/tags"
@@ -51,37 +53,37 @@ func NewCiJob(imageName string) *CiJob {
 	}
 }
 func (c *CiJob) AddScript(script string) *CiJob {
-	c.Script.Value.Add(script)
+	c.Script.Value.Push(script)
 
 	return c
 }
 func (c *CiJob) AddScriptf(script string, a ...any) *CiJob {
-	c.Script.Value.Addf(script, a...)
+	c.Script.Value.Push(fmt.Sprintf(script, a...))
 
 	return c
 }
 func (c *CiJob) AddScripts(scripts []string) *CiJob {
-	c.Script.Value.AddSlice(scripts)
+	c.Script.Value.Push(scripts...)
 
 	return c
 }
 func (c *CiJob) AddAfterScript(script string) *CiJob {
-	c.AfterScript.Value.Add(script)
+	c.AfterScript.Value.Push(script)
 
 	return c
 }
 func (c *CiJob) AddBeforeScript(script string) *CiJob {
-	c.BeforeScript.Value.Add(script)
+	c.BeforeScript.Value.Push(script)
 
 	return c
 }
 func (c *CiJob) AddBeforeScriptf(script string, a ...any) *CiJob {
-	c.BeforeScript.Value.Addf(script, a...)
+	c.BeforeScript.Value.Push(fmt.Sprintf(script, a...))
 
 	return c
 }
 func (c *CiJob) AddBeforeScripts(scripts []string) *CiJob {
-	c.BeforeScript.Value.AddSlice(scripts)
+	c.BeforeScript.Value.Push(scripts...)
 
 	return c
 }
@@ -92,7 +94,7 @@ func (c *CiJob) SetImageName(image string) *CiJob {
 	return c
 }
 
-func (c *CiJob) SetImageEntrypoint(entrypoint wrapper.StringSlice) *CiJob {
+func (c *CiJob) SetImageEntrypoint(entrypoint wrapper.Array[string]) *CiJob {
 	c.Image.Entrypoint = entrypoint
 
 	return c

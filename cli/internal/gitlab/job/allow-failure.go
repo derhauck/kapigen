@@ -3,7 +3,7 @@ package job
 import "kapigen.kateops.com/internal/pipeline/wrapper"
 
 type AllowFailure struct {
-	ExitCodes wrapper.IntSlice `yaml:"exit_codes"`
+	ExitCodes wrapper.Array[int32] `yaml:"exit_codes"`
 	Failure   bool
 }
 
@@ -12,12 +12,12 @@ func (a *AllowFailure) AllowAll() {
 }
 
 func (a *AllowFailure) add(code int32) *AllowFailure {
-	a.ExitCodes.Add(code)
+	a.ExitCodes.Push(code)
 	return a
 }
 
 func (a *AllowFailure) addSeveral(codes ...int32) *AllowFailure {
-	a.ExitCodes.AddSeveral(codes)
+	a.ExitCodes.Push(codes...)
 	return a
 }
 
@@ -30,7 +30,7 @@ type AllowFailureYaml struct {
 }
 
 func NewAllowFailureYaml(allowFailure *AllowFailure) any {
-	if len(allowFailure.ExitCodes.Get()) == 0 {
+	if allowFailure.ExitCodes.Length() == 0 {
 		return allowFailure.Failure
 	}
 

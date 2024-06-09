@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -24,8 +23,12 @@ type GolangCoverage struct {
 
 func (g *GolangCoverage) Validate() error {
 	if len(g.Packages) == 0 {
-		logger.Info("no package declared, using./...")
+		logger.Debug("no package declared, using./...")
 		g.Packages = []string{"./..."}
+	}
+	if g.Source == "" {
+		logger.Debug("no coverage source declared, using./...")
+		g.Source = "./..."
 	}
 	return nil
 }
@@ -46,64 +49,25 @@ func (g *Golang) New() types.PipelineConfigInterface {
 func (g *Golang) Validate() error {
 
 	if g.Path == "" {
-		logger.Info("no path set, defaulting to '.'")
+		logger.Debug("no path set, defaulting to '.'")
 		g.Path = "."
 	}
 	if g.Coverage == nil {
 		g.Coverage = &GolangCoverage{}
 	}
-	entries, err := os.ReadDir(g.Path)
-	if err != nil {
-		return err
-	}
-	var isGoMod = false
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
+
+	if g.Docker != nil {
+		if g.Docker.Path == "" {
+			return types.NewMissingArgError("docker.path")
 		}
-		if entry.Name() == "go.mod" {
-			file, err := os.ReadFile(fmt.Sprintf("%s/%s", g.Path, entry.Name()))
-			if err != nil {
-				return err
-			}
-			fileString := string(file)
-
-			re := regexp.MustCompile(`go (.*)`)
-			match := re.FindStringSubmatch(fileString)
-			if len(match) == 0 {
-				return fmt.Errorf("go.mod file should include go version")
-			}
-
-			g.ImageName = fmt.Sprintf("%s%s:%s", docker.DEPENDENCY_PROXY, "golang", match[1])
-
-			if len(g.Coverage.Packages) == 0 {
-				re := regexp.MustCompile(`module (.*)`)
-				match := re.FindStringSubmatch(fileString)
-				if len(match) == 0 {
-					return fmt.Errorf("go.mod file should include module name")
-				}
-				g.Coverage.Packages = []string{fmt.Sprintf("%s/...", match[1])}
-			}
-			if g.Coverage.Source == "" {
-				g.Coverage.Source = "./..."
-			}
-
-			isGoMod = true
-		}
-	}
-	if isGoMod == false {
-		return errors.New("could not find go.mod file in path")
-	}
-
-	if g.Docker != nil && g.Docker.Path == "" {
-		return types.NewMissingArgError("docker.path")
+		g.ImageName = "docker"
 	}
 
 	if err := g.Services.Validate(); err != nil {
 		return types.DetailedErrorE(err)
 	}
 	if err := g.Coverage.Validate(); err != nil {
-		return err
+		return types.DetailedErrorE(err)
 	}
 
 	if g.ImageName == "" && g.Docker == nil {

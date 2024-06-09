@@ -3,6 +3,7 @@ package job
 import (
 	"errors"
 	"fmt"
+
 	"kapigen.kateops.com/internal/environment"
 	"kapigen.kateops.com/internal/gitlab/cache"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
@@ -16,10 +17,10 @@ type CacheYaml struct {
 }
 
 type Cache struct {
-	Key       string              `yaml:"key"`
-	Paths     wrapper.StringSlice `yaml:"paths"`
-	Unprotect bool                `yaml:"unprotect"`
-	Policy    cache.Policy        `yaml:"policy"`
+	Key       string                `yaml:"key"`
+	Paths     wrapper.Array[string] `yaml:"paths"`
+	Unprotect bool                  `yaml:"unprotect"`
+	Policy    cache.Policy          `yaml:"policy"`
 	Active    bool
 }
 
@@ -37,9 +38,7 @@ func (c *Cache) SetDefaultCacheKey(path string, pipelineType string) {
 }
 func NewCache() Cache {
 	return Cache{
-		Paths: wrapper.StringSlice{
-			Value: nil,
-		},
+		Paths:     *wrapper.NewArray[string](),
 		Policy:    cache.PullPush,
 		Unprotect: true,
 	}

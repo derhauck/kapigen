@@ -1,7 +1,6 @@
 workflow:
   rules:
     - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
-    - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train"
     - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_PIPELINE_SOURCE == "web"
@@ -33,10 +32,6 @@ Build:
 Tests:
   stage: build
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21
-  rules:
-    - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
-    - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
-
   before_script:
     - cd cli
   script:
@@ -64,9 +59,6 @@ Trigger Tests:
   stage: trigger
   variables:
     KTC_TEST_PIPELINE: true
-  rules:
-    - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
-    - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
   trigger:
     strategy: depend
     include:
@@ -87,9 +79,6 @@ Start Big Pipeline:
 
 Trigger No-Merge Tests:
   stage: trigger
-  rules:
-    - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
-    - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
   parallel:
     matrix:
       - load:
@@ -115,8 +104,8 @@ Trigger No-Merge Tests:
 Reports - Junit:
   stage: collect
   allow_failure: true
+  when: always
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21
-
   before_script:
     - cd cli
   script:

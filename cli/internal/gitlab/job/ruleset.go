@@ -14,7 +14,7 @@ func DefaultPipelineRules(paths []string) *Rules {
 		AddRules(*DefaultMainBranchRules())
 }
 func DefaultMergeRequestRules(paths []string) *Rules {
-	changes := wrapper.NewStringSlice()
+	changes := wrapper.NewArray[string]()
 	change := "**/*"
 	for _, path := range paths {
 		if path != "." {
@@ -24,7 +24,7 @@ func DefaultMergeRequestRules(paths []string) *Rules {
 		if r != nil {
 			change = r.ReplaceAllString(change, "/")
 		}
-		changes.Add(change)
+		changes.Push(change)
 
 	}
 	return &Rules{

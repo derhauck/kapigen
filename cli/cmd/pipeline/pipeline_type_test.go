@@ -21,7 +21,14 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 		pipelineConfig types.PipelineConfig
 		configTypes    map[types.PipelineType]types.PipelineConfigInterface
 	}
-	environment.SetLocalEnv()
+
+	environment.CI_COMMIT_BRANCH.Set("feature/test")
+	environment.CI_DEFAULT_BRANCH.Set("main")
+	environment.CI_MERGE_REQUEST_LABELS.Set("version::patch")
+	environment.CI_MERGE_REQUEST_SOURCE_BRANCH_NAME.Set("feature/test")
+	environment.CI_SERVER_URL.Set("https://gitlab.com")
+	environment.CI_PROJECT_DIR.Set("/app")
+	environment.CI_COMMIT_TAG.Set("1.0.0")
 	mainFactory := factory.New(cli.NewSettings(
 		cli.SetMode(version.Gitlab),
 	))
@@ -79,7 +86,7 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 			},
 			want: &types.Jobs{
 				func() *types.Job {
-					job := docker.NewDaemonlessBuildkitBuild("testImage", ".", ".", "Dockerfile", []string{"defaultDestination"}, []string{})
+					job, _ := docker.NewDaemonlessBuildkitBuild("testImage", ".", ".", "Dockerfile", []string{"${CI_REGISTRY_IMAGE}:1.0.0", "${CI_REGISTRY_IMAGE}:latest"}, []string{})
 					return job
 				}(),
 			},
@@ -102,7 +109,7 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 					t.Errorf("LoadFromPipelineConfig() got job name %s, wanted %s", job.GetName(), tt.want.GetJobs()[i].GetName())
 				}
 
-				if reflect.DeepEqual(job.CiJob.Script, tt.want.GetJobs()[i].CiJob.Script) {
+				if !reflect.DeepEqual(job.CiJob.Script, tt.want.GetJobs()[i].CiJob.Script) {
 					t.Errorf("LoadFromPipelineConfig() got job script %v, wanted %v", job.CiJob.Script.GetRenderedValue(), tt.want.GetJobs()[i].CiJob.Script.GetRenderedValue())
 				}
 			}
