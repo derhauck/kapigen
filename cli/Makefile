@@ -34,3 +34,12 @@ test-pipeline:
 .PHONY: test-pipeline-no-merge
 test-pipeline-no-merge:
 	$(MAKE) run ARGS="pipeline generate -v --config test.kapigen.yaml --no-merge --file pipeline-no-merge.yaml"
+
+.PHONY: golangci
+golangci:
+	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run
+
+
+.PHONY: golangci-fix
+golangci-fix:
+	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run -v --fix
