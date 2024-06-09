@@ -43,3 +43,8 @@ golangci:
 .PHONY: golangci-fix
 golangci-fix:
 	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run -v --fix
+
+
+.PHONY: golangci-report
+golangci-report:
+	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run -v --out-format=junit-xml:junit.xml

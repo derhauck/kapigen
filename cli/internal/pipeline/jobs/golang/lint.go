@@ -7,7 +7,7 @@ import (
 	"kapigen.kateops.com/internal/gitlab/job/artifact"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/pipeline/types"
-	"kapigen.kateops.com/internal/when"
+	"kapigen.kateops.com/internal/pipeline/wrapper"
 )
 
 func Lint(imageName string, path string) *types.Job {
@@ -22,9 +22,10 @@ func Lint(imageName string, path string) *types.Job {
 			AddBeforeScriptf("cd %s", path).
 			AddScriptf("golangci-lint run -v --out-format=junit-xml:%s", report).
 			AddArtifact(job.Artifact{
+				Name:  "report",
+				Paths: *(wrapper.NewArray[string]().Push(reportPath)),
 				Reports: artifact.NewReports().
 					SetJunit(artifact.NewJunitReport(reportPath)),
-				When: job.NewWhen(when.Always),
 			})
 	})
 }
