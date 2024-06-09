@@ -67,7 +67,7 @@ func NewController(mode Mode, gitlabClient *gitlab.Client, reader *FileReader) *
 }
 
 func (c *Controller) getTagFromGitlab() string {
-	if c.refresh == false && c.current != "" {
+	if !c.refresh && c.current != "" {
 		return c.current
 	}
 	oderBy := "updated"

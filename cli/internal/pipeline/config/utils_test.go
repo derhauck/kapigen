@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"kapigen.kateops.com/internal/pipeline/types"
+	"kapigen.kateops.com/internal/types"
 )
 
 func TestService_Validate(t *testing.T) {

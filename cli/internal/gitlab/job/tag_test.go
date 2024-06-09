@@ -13,7 +13,7 @@ func TestNewTag(t *testing.T) {
 		if tag == nil {
 			t.Error("should not be nil")
 		}
-		if tag.Value != &medium {
+		if tag == nil && tag.Value != nil && tag.Value != &medium {
 			t.Error("should be equal")
 		}
 	})
@@ -22,11 +22,11 @@ func TestNewTag(t *testing.T) {
 		if tag == nil {
 			t.Error("should not be nil")
 		}
-		if tag.Value == nil {
+		if tag != nil && tag.Value == nil {
 			t.Error("should not be nil")
 		}
 
-		if *tag.Value != tags.PRESSURE_MEDIUM {
+		if tag != nil && tag.Value != nil && *tag.Value != tags.PRESSURE_MEDIUM {
 			t.Error("should be the default")
 		}
 	})

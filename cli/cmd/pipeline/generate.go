@@ -83,7 +83,7 @@ var GenerateCmd = &cobra.Command{
 			return err
 		}
 		var ciPipeline map[string]interface{}
-		if noMerge == false {
+		if !noMerge {
 			pipelineJobs, err = pipelineJobs.DynamicMerge()
 			if err != nil {
 				return err

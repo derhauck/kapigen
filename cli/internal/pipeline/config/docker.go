@@ -53,7 +53,7 @@ func (d *Docker) Validate() error {
 		d.Release = &tmp
 	}
 
-	if *d.Release == false {
+	if !*d.Release {
 		configRepresentation := fmt.Sprintf("%s-%s-%s-%s", d.Path, d.Context, d.Dockerfile, d.BuildArgs)
 		hasher := fnv.New32a()
 		_, err := hasher.Write([]byte(configRepresentation))

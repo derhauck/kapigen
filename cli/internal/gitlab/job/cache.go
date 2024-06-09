@@ -45,7 +45,7 @@ func NewCache() Cache {
 }
 
 func (c *Cache) GetRenderedValue() (*CacheYaml, error) {
-	if c.Key == "" || c.Active == false {
+	if c.Key == "" || !c.Active {
 		return nil, nil
 	}
 

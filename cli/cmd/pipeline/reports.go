@@ -113,6 +113,11 @@ var ReportsCmd = &cobra.Command{
 		logger.Info("unzipping archives")
 		reportJobs.ForEach(func(e *gitlab2.Job) {
 			jobArtifact, res, err := gitlab.Jobs.GetJobArtifacts(environment.CI_PROJECT_ID.Get(), e.ID, nil)
+			if err != nil {
+				logger.Error(e.Name)
+				logger.ErrorE(err)
+				return
+			}
 			artifactsDir := fmt.Sprintf(".reports/%d", e.ID)
 			_ = os.Mkdir(artifactsDir, 0750)
 			artifactFile := fmt.Sprintf("%s/reports.zip", artifactsDir)

@@ -1,7 +1,6 @@
 package types
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
@@ -9,6 +8,7 @@ import (
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/logger"
+	"kapigen.kateops.com/internal/types"
 )
 
 type Job struct {
@@ -78,7 +78,7 @@ func (j *Job) UniqueName() error {
 		logger.Info(fmt.Sprintf("added unique name for Job: %s", j.GetName()))
 		return nil
 	}
-	return errors.New(fmt.Sprintf("job '%s' can not be more unique", j.GetName()))
+	return types.DetailedErrorf("job '%s' can not be more unique", j.GetName())
 }
 
 func (j *Job) DynamicMerge(jobs *Jobs) (*Job, error) {

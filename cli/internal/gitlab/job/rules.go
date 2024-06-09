@@ -2,10 +2,10 @@ package job
 
 import (
 	"errors"
-	"fmt"
 
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
+	errors2 "kapigen.kateops.com/internal/types"
 	"kapigen.kateops.com/internal/when"
 )
 
@@ -97,7 +97,7 @@ func validateWorkflowRule(rule *Rule) error {
 	if rule.When.Value != nil {
 		whenValue := *rule.When.Value
 		if whenValue.String() != when.Always.String() && whenValue.String() != when.Never.String() {
-			return errors.New(fmt.Sprintf("when is not supported: %s", whenValue.String()))
+			return errors2.DetailedErrorf("when is not supported: %s", whenValue.String())
 		}
 	}
 

@@ -4,6 +4,7 @@ import (
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/pipeline/types"
+	types2 "kapigen.kateops.com/internal/types"
 )
 
 type SlimDocker struct {
@@ -35,15 +36,15 @@ type Service struct {
 func (s *Service) Validate() error {
 
 	if s.Name == "" {
-		return types.NewMissingArgError("service.name")
+		return types2.NewMissingArgError("service.name")
 	}
 
 	if s.Port <= 0 {
-		return types.DetailedErrorf("service: '%s', invalid port %d (must be 1 - 65535)", s.Name, s.Port)
+		return types2.DetailedErrorf("service: '%s', invalid port %d (must be 1 - 65535)", s.Name, s.Port)
 	}
 
 	if s.ImageName == "" && s.Docker == nil {
-		return types.NewMissingArgsError("service.imageName", "service.docker")
+		return types2.NewMissingArgsError("service.imageName", "service.docker")
 	}
 
 	return nil
@@ -76,7 +77,7 @@ func (s *Services) Validate() error {
 			return err
 		}
 		if servicePorts[service.Port] {
-			return types.DetailedErrorf("service: '%s', referencing occupied port: %d", service.Name, service.Port)
+			return types2.DetailedErrorf("service: '%s', referencing occupied port: %d", service.Name, service.Port)
 		}
 		servicePorts[service.Port] = true
 	}
@@ -87,7 +88,7 @@ func (s *Services) AddToJob(factory *factory.MainFactory, pipelineType types.Pip
 	for _, service := range *s {
 		jobs, jobService, err := service.CreateService(factory, pipelineType, Id)
 		if err != nil {
-			return types.DetailedErrorf(err.Error())
+			return types2.DetailedErrorf(err.Error())
 		}
 		for _, serviceJob := range jobs.GetJobs() {
 			targetJob.AddJobAsNeed(serviceJob)

@@ -14,6 +14,7 @@ import (
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/jobs/golang"
 	"kapigen.kateops.com/internal/pipeline/types"
+	types2 "kapigen.kateops.com/internal/types"
 )
 
 type GolangCoverage struct {
@@ -75,23 +76,23 @@ func (g *Golang) Validate() error {
 
 	if g.Docker != nil {
 		if g.Docker.Path == "" {
-			return types.NewMissingArgError("docker.path")
+			return types2.NewMissingArgError("docker.path")
 		}
 		g.ImageName = "docker"
 	}
 
 	if err := g.Lint.Validate(); err != nil {
-		return types.DetailedErrorE(err)
+		return types2.DetailedErrorE(err)
 	}
 	if err := g.Services.Validate(); err != nil {
-		return types.DetailedErrorE(err)
+		return types2.DetailedErrorE(err)
 	}
 	if err := g.Coverage.Validate(); err != nil {
-		return types.DetailedErrorE(err)
+		return types2.DetailedErrorE(err)
 	}
 
 	if g.ImageName == "" && g.Docker == nil {
-		return types.NewMissingArgsError("imageName", "docker")
+		return types2.NewMissingArgsError("imageName", "docker")
 	}
 	return nil
 }
@@ -129,7 +130,7 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 }
 
 func (g *Golang) Rules() *job.Rules {
-	return &*job.DefaultPipelineRules(g.changes)
+	return job.DefaultPipelineRules(g.changes)
 }
 
 func GolangAutoConfig() *Golang {
@@ -138,11 +139,11 @@ func GolangAutoConfig() *Golang {
 	for _, fileName := range files {
 		dir, _ := filepath.Split(fileName)
 		dir, found := strings.CutPrefix(dir, fmt.Sprintf("%s/", environment.CI_PROJECT_DIR.Get()))
-		if found == false {
+		if !found {
 			return nil
 		}
 		dir, found = strings.CutSuffix(dir, "/")
-		if found == false {
+		if !found {
 			return nil
 		}
 		if dir == "" {

@@ -1,9 +1,6 @@
 package types
 
-import (
-	"errors"
-	"fmt"
-)
+import "kapigen.kateops.com/internal/types"
 
 type PipelineBuilderInterface interface {
 	Build(pipelineTypeConfig PipelineTypeConfig) (*Jobs, error)
@@ -17,7 +14,7 @@ type PipelineBuilderWrapper struct {
 func (p *PipelineBuilderWrapper) Build() (*Jobs, error) {
 
 	if p.Builder == nil {
-		return nil, errors.New(fmt.Sprintf("no Pipeline Builder set for type:%s", p.PipelineTypeConfig.GetType()))
+		return nil, types.DetailedErrorf("no Pipeline Builder set for type:%s", p.PipelineTypeConfig.GetType())
 	}
 
 	return p.Builder.Build(p.PipelineTypeConfig)

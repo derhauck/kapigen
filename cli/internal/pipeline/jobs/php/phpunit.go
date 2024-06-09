@@ -10,16 +10,17 @@ import (
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/pipeline/types"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
+	types2 "kapigen.kateops.com/internal/types"
 )
 
 func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpunitXmlPath string, phpunitArgs string, phpUnitBin string, listenerPorts map[string]int32) (*types.Job, error) {
 
 	if imageName == "" {
-		return nil, types.NewMissingArgError("imageName")
+		return nil, types2.NewMissingArgError("imageName")
 	}
 
 	if composerPath == "" {
-		return nil, types.NewMissingArgError("composerPath")
+		return nil, types2.NewMissingArgError("composerPath")
 	}
 	return types.NewJob("Unit Test", imageName, func(ciJob *job.CiJob) {
 		ciJob.
