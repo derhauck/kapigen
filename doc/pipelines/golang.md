@@ -36,9 +36,9 @@ Either by using `imageName` or the `docker` configuration. If both are set the `
 * `imageName: [optional]` The image name to use for running the tests.
 
 **coverage**
-* `coverage: [optional]` The coverage options
-* `coverage.packages: [optional | ]` The packages to consider for the coverage calculations
-* `coverage.source: [optional | default: './...' ]` The source code to consider for the coverage calculations
+* `coverage: [optional]` The coverage options.
+* `coverage.packages: [optional | ]` The packages to consider for the coverage calculations.
+* `coverage.source: [optional | default: './...' ]` The source code to consider for the coverage calculations.
 
 **lint**
 * `lint: [optional]` The linting options.
