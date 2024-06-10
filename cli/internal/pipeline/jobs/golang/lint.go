@@ -8,6 +8,7 @@ import (
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/pipeline/types"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
+	"kapigen.kateops.com/internal/when"
 )
 
 func Lint(imageName string, path string) *types.Job {
@@ -26,6 +27,7 @@ func Lint(imageName string, path string) *types.Job {
 				Paths: *(wrapper.NewArray[string]().Push(reportPath)),
 				Reports: artifact.NewReports().
 					SetJunit(artifact.NewJunitReport(reportPath)),
+				When: job.NewWhen(when.Always),
 			})
 	})
 }

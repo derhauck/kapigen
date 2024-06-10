@@ -11,6 +11,7 @@ import (
 	"kapigen.kateops.com/internal/pipeline/types"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 	types2 "kapigen.kateops.com/internal/types"
+	"kapigen.kateops.com/internal/when"
 )
 
 func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpunitXmlPath string, phpunitArgs string, phpUnitBin string, listenerPorts map[string]int32) (*types.Job, error) {
@@ -38,6 +39,7 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpu
 				Reports: artifact.NewReports().
 					SetJunit(artifact.NewJunitReport("junit.xml")).
 					SetCoverageReport(artifact.NewCoverageReport(reports.Cobertura, "coverage.cobertura.xml")),
+				When: job.NewWhen(when.Always),
 			})
 
 		listener := job.NewService(docker.Alpine_3_18.String(), "kapigen-listener", 0)
