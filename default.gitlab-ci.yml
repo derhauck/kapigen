@@ -48,9 +48,6 @@ Reports - Junit:
   image:
     name: registry.gitlab.com/kateops/kapigen/cli:${KAPIGEN_VERSION}
     entrypoint: [""]
-
-  before_script:
-    - cd cli
   script:
     - kapigen pipeline reports -v
   coverage: "/INFO:.+: ([0-9.]+)/"
