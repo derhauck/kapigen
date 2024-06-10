@@ -99,3 +99,33 @@ func (s *Services) AddToJob(factory *factory.MainFactory, pipelineType types.Pip
 
 	return nil
 }
+
+type JobMode int
+
+const (
+	Enabled JobMode = iota
+	Permissive
+	Disabled
+)
+
+var jobModes = map[JobMode]string{
+	Enabled:    "enabled",
+	Permissive: "permissive",
+	Disabled:   "disabled",
+}
+
+func (j JobMode) String() string {
+	if value, ok := jobModes[j]; ok {
+		return value
+	}
+	return jobModes[0]
+}
+
+func JobModeFromString(value string) (JobMode, error) {
+	for key, mode := range jobModes {
+		if mode == value {
+			return key, nil
+		}
+	}
+	return -1, types2.DetailedErrorf("Not a valid job mode: %s", value)
+}

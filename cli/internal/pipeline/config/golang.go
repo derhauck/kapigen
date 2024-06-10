@@ -35,24 +35,35 @@ func (g *GolangCoverage) Validate() error {
 }
 
 type GolangLint struct {
-	Packages  []string `yaml:"packages"`
-	imageName string   `yaml:"imageName"`
+	imageName string `yaml:"imageName"`
+	Mode      string `yaml:"mode"`
+	JobMode   JobMode
 }
 
 func (g *GolangLint) Validate() error {
 	if g.imageName == "" {
 		g.imageName = docker.GOLANG_GOLANGCI_LINT.String()
 	}
+	if g.Mode == "" {
+		logger.Debug("no coverage mode declared, using set")
+		g.Mode = Enabled.String()
+	}
+	mode, err := JobModeFromString(g.Mode)
+	if err != nil {
+		return types2.DetailedErrorE(err)
+	}
+	g.JobMode = mode
+
 	return nil
 }
 
 type Golang struct {
 	ImageName string          `yaml:"imageName"`
 	Path      string          `yaml:"path"`
-	Docker    *SlimDocker     `yaml:"docker"`
 	Coverage  *GolangCoverage `yaml:"coverage,omitempty"`
 	Lint      *GolangLint     `yaml:"lint,omitempty"`
 	Services  Services        `yaml:"services"`
+	Docker    *SlimDocker     `yaml:"docker"`
 	changes   []string
 }
 
@@ -119,14 +130,20 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 		allJobs = append(allJobs, jobs.GetJobs()...)
 		g.changes = append(g.changes, dockerPipeline.Context)
 	}
+	if g.Lint.JobMode == Permissive {
+		golangLint.CiJob.AllowFailure.AllowAll()
+	}
+
+	if g.Lint.JobMode != Disabled {
+		allJobs.AddJob(golangLint)
+	}
 
 	err = g.Services.AddToJob(factory, PHPPipeline, Id, &allJobs, golangUnitTestJob)
 	if err != nil {
 		return nil, err
 	}
 	return allJobs.
-		AddJob(golangUnitTestJob).
-		AddJob(golangLint), nil
+		AddJob(golangUnitTestJob), nil
 }
 
 func (g *Golang) Rules() *job.Rules {

@@ -1,10 +1,12 @@
 package config
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 
 	"kapigen.kateops.com/internal/environment"
+	"kapigen.kateops.com/internal/types"
 )
 
 func TestGolangAutoConfig(t *testing.T) {
@@ -54,5 +56,29 @@ func TestGolang_Validate(t *testing.T) {
 			t.Error("should have error")
 		}
 
+	})
+}
+
+func TestGolangLint_Validate(t *testing.T) {
+	t.Run("can validate golang lint", func(t *testing.T) {
+		config := &GolangLint{}
+		if err := config.Validate(); err != nil {
+			t.Errorf("should not have error: %s", err)
+		}
+	})
+	t.Run("can not validate golang lint", func(t *testing.T) {
+		config := &GolangLint{
+			Mode: "test",
+		}
+
+		if err := config.Validate(); err == nil {
+			var detailed *types.DetailedError
+			if errors.As(err, &detailed) {
+				if detailed.Filename != "golang.go" {
+					t.Errorf("should have error in 'golang.go' file, received: %s", detailed.Filename)
+				}
+			}
+			t.Error("should have error")
+		}
 	})
 }
