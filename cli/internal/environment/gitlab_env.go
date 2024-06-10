@@ -1,11 +1,11 @@
 package environment
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
 	"kapigen.kateops.com/internal/logger"
+	"kapigen.kateops.com/internal/types"
 )
 
 type Variable int
@@ -92,7 +92,7 @@ func (v Variable) Lookup() (string, error) {
 	if set {
 		return value, nil
 	}
-	return value, errors.New(fmt.Sprintf("env var '%s' is not set", v.Key()))
+	return value, types.DetailedErrorf("env var '%s' is not set", v.Key())
 }
 
 func (v Variable) Unset() {

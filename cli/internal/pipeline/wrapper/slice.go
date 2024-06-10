@@ -23,9 +23,7 @@ func (s *Array[T]) Get() []T {
 }
 
 func (s *Array[T]) Push(elements ...T) *Array[T] {
-	for _, element := range elements {
-		s.slice = append(s.slice, element)
-	}
+	s.slice = append(s.slice, elements...)
 	return s
 }
 

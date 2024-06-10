@@ -8,6 +8,7 @@ import (
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/jobs/php"
 	"kapigen.kateops.com/internal/pipeline/types"
+	types2 "kapigen.kateops.com/internal/types"
 )
 
 type PhpComposer struct {
@@ -69,7 +70,7 @@ func (p *Php) Validate() error {
 		return err
 	}
 	if err := p.Services.Validate(); err != nil {
-		return types.DetailedErrorE(err)
+		return types2.DetailedErrorE(err)
 	}
 	p.listenerPorts = make(map[string]int32)
 	for _, service := range p.Services {
@@ -78,13 +79,13 @@ func (p *Php) Validate() error {
 
 	if p.Docker != nil {
 		if p.Docker.Path == "" {
-			return types.NewMissingArgError("docker.path")
+			return types2.NewMissingArgError("docker.path")
 		}
 		p.ImageName = "docker"
 	}
 
 	if p.ImageName == "" && p.Docker == nil {
-		return types.NewMissingArgsError("imageName", "docker")
+		return types2.NewMissingArgsError("imageName", "docker")
 	}
 	return nil
 }
@@ -119,5 +120,5 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 }
 
 func (p *Php) Rules() *job.Rules {
-	return &(*job.DefaultPipelineRules(p.changes))
+	return job.DefaultPipelineRules(p.changes)
 }

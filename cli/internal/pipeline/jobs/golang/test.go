@@ -11,6 +11,7 @@ import (
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/pipeline/types"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
+	"kapigen.kateops.com/internal/when"
 )
 
 func NewUnitTest(imageName string, path string, packages []string, source string) (*types.Job, error) {
@@ -41,6 +42,7 @@ func NewUnitTest(imageName string, path string, packages []string, source string
 				Reports: artifact.NewReports().
 					SetCoverageReport(artifact.NewCoverageReport(reports.Cobertura, reportPath)).
 					SetJunit(artifact.NewJunitReport(reportPath)),
+				When: job.NewWhen(when.Always),
 			}).
 			SetCodeCoverage(`/\(statements\)(?:\s+)?(\d+(?:\.\d+)?%)/`)
 

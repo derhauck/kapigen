@@ -54,6 +54,8 @@ pipelines:
     config:
       imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
       path: cli
+      lint:
+        mode: permissive
   - type: docker
     id: test-cli3
     config:
@@ -78,6 +80,8 @@ pipelines:
       coverage:
         packages:
           - ./...
+      lint:
+        mode: disabled
   - type: php
     id: php-integration
     config:

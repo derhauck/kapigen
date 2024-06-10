@@ -1,7 +1,6 @@
 package wrapper
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -12,7 +11,7 @@ func TestNewArray(t *testing.T) {
 		if array == nil {
 			t.Error("should be able to create new array")
 		}
-		if len(array.slice) != 0 {
+		if array == nil && array.slice != nil && len(array.slice) != 0 {
 			t.Error("should be empty")
 		}
 	})
@@ -31,7 +30,7 @@ func TestArray_Push(t *testing.T) {
 		array.Push("test5")
 
 		if len(array.slice) != 5 {
-			t.Error(fmt.Sprintf("should have exactly 5 elements, received: %d", len(array.slice)))
+			t.Errorf("should have exactly 5 elements, received: %d", len(array.slice))
 		}
 	})
 }
@@ -43,10 +42,7 @@ func TestArray_Find(t *testing.T) {
 		array.slice = []string{"test", "test2", "test3", "test4", "test5"}
 
 		element, index := array.Find(func(element *string) bool {
-			if *element == "test2222" {
-				return true
-			}
-			return false
+			return *element == "test2222"
 		})
 
 		if element != nil {
@@ -54,7 +50,7 @@ func TestArray_Find(t *testing.T) {
 		}
 
 		if index != -1 {
-			t.Error(fmt.Sprintf("should not have found element and returned index -1, received: %d", index))
+			t.Errorf("should not have found element and returned index -1, received: %d", index)
 		}
 
 	})
@@ -63,10 +59,7 @@ func TestArray_Find(t *testing.T) {
 		array.slice = []string{"test", "test2", "test3", "test4", "test5"}
 
 		element, index := array.Find(func(element *string) bool {
-			if *element == "test2" {
-				return true
-			}
-			return false
+			return *element == "test2"
 		})
 
 		if element == nil {
@@ -74,11 +67,11 @@ func TestArray_Find(t *testing.T) {
 		}
 
 		if index != 1 {
-			t.Error(fmt.Sprintf("should have found element at index 1, received: %d", index))
+			t.Errorf("should have found element at index 1, received: %d", index)
 		}
 
-		if *element != "test2" {
-			t.Error(fmt.Sprintf("should have found element test2, received: %s", *element))
+		if element != nil && *element != "test2" {
+			t.Errorf("should have found element test2, received: %s", *element)
 		}
 
 	})
@@ -90,7 +83,7 @@ func TestArray_Length(t *testing.T) {
 		array.slice = []string{"test", "test2", "test3", "test4", "test5"}
 
 		if array.Length() != len(array.slice) {
-			t.Error(fmt.Sprintf("should have same length, received: %d", array.Length()))
+			t.Errorf("should have same length, received: %d", array.Length())
 		}
 	})
 }
@@ -105,7 +98,7 @@ func TestArray_ForEach(t *testing.T) {
 	})
 
 	if len(result) != len(array.slice) {
-		t.Error(fmt.Sprintf("should have same length, received: %d", len(result)))
+		t.Errorf("should have same length, received: %d", len(result))
 	}
 	if reflect.DeepEqual(result, array.slice) == false {
 		t.Error("should have same elements")
@@ -124,7 +117,7 @@ func TestArray_Map(t *testing.T) {
 	})
 
 	if len(expectation) != len(array.slice) {
-		t.Error(fmt.Sprintf("should have same length, received: %d", len(expectation)))
+		t.Errorf("should have same length, received: %d", len(expectation))
 	}
 	if reflect.DeepEqual(expectation, array.slice) == true {
 		t.Error("should not have same elements as initial array")

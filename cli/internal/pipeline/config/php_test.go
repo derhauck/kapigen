@@ -7,7 +7,7 @@ import (
 
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/cli"
-	"kapigen.kateops.com/internal/pipeline/types"
+	errors2 "kapigen.kateops.com/internal/types"
 	"kapigen.kateops.com/internal/version"
 )
 
@@ -56,7 +56,7 @@ func TestPhpValidate(t *testing.T) {
 		if err == nil {
 			t.Error("Expected error when phpunit job creation fails, but got nil")
 		}
-		var re *types.DetailedError
+		var re *errors2.DetailedError
 		if !errors.As(err, &re) {
 			t.Errorf("Expected error to be of type 'DetailedError', got '%s'", err.Error())
 		}
@@ -103,14 +103,14 @@ func TestPhpRules(t *testing.T) {
 }
 
 func TestPhpBuild(t *testing.T) {
-	factory := factory.New(&cli.Settings{Mode: version.Gitlab})
+	mainFactory := factory.New(&cli.Settings{Mode: version.Gitlab})
 	pipelineType := PHPPipeline
 
 	t.Run("returns error when phpunit job creation fails", func(t *testing.T) {
 		php := &Php{
 			ImageName: "",
 		}
-		_, err := php.Build(factory, pipelineType, "test-id")
+		_, err := php.Build(mainFactory, pipelineType, "test-id")
 		if err == nil {
 			t.Error("Expected error when phpunit job creation fails, but got nil")
 		}
@@ -129,7 +129,7 @@ func TestPhpBuild(t *testing.T) {
 			},
 		}
 		_ = php.Validate()
-		jobs, err := php.Build(factory, pipelineType, "test-id")
+		jobs, err := php.Build(mainFactory, pipelineType, "test-id")
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -158,7 +158,7 @@ func TestPhpBuild(t *testing.T) {
 			},
 		}
 		_ = php.Validate()
-		jobs, err := php.Build(factory, pipelineType, "test-id")
+		jobs, err := php.Build(mainFactory, pipelineType, "test-id")
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}

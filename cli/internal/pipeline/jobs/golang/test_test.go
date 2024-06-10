@@ -59,15 +59,15 @@ func TestCreate(t *testing.T) {
 			t.Errorf("expected image name %s, got %s", expectedImageName, job.CiJob.Image.Name)
 		}
 
-		if job.CiJob.Artifact.Reports.CoverageReport.Path == "" {
-			// t.Error("missing coverage report path")
-			// t.Error(job.Render())
-		}
-		// expectedReportPath := expectedPath + "/report.xml"
-		actualReportPath := job.CiJob.Artifact.Reports.CoverageReport.Path
-		if actualReportPath != "coverage.html" {
-			// t.Errorf("expexted coverage report path %s, got %s", expectedReportPath, actualReportPath)
-		}
+		//if job.CiJob.Artifact.Reports.CoverageReport.Path == "" {
+		//	t.Error("missing coverage report path")
+		//	t.Error(job.Render())
+		//}
+		//expectedReportPath := expectedPath + "/report.xml"
+		//actualReportPath := job.CiJob.Artifact.Reports.CoverageReport.Path
+		//if actualReportPath != "coverage.html" {
+		//	t.Errorf("expexted coverage report path %s, got %s", expectedReportPath, actualReportPath)
+		//}
 
 	})
 }

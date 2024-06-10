@@ -15,10 +15,7 @@ func (n *Need) NotOptional() *Need {
 }
 
 func (n *Need) HasJob(job *Job) bool {
-	if n.Job == job {
-		return true
-	}
-	return false
+	return n.Job == job
 }
 
 func (n *Needs) ReplaceJob(old *Job, new *Need) *Needs {

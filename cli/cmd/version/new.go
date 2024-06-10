@@ -17,6 +17,9 @@ var NewCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cli.PreparePersistentFlags(cmd)
 		mode, err := cmd.Flags().GetString("mode")
+		if err != nil {
+			return err
+		}
 		privateTokenName, err := cmd.Flags().GetString("private-token")
 		if err != nil {
 			return err

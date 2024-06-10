@@ -78,9 +78,9 @@ config:
     path: tests
     args: --testsuite unit
   services:
-    name: mysql
-    port: 3306
-    imageName: mysql:8
+    - name: mysql
+      port: 3306
+      imageName: mysql:8
   imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/php:8.1-cli-alpine3.15'
 ```
 **Docker only**
@@ -95,14 +95,14 @@ config:
     path: tests
     args: --testsuite unit
   services:
-    name: mysql
-    port: 3306
-    docker:
-      path: cli/database
-      context: cli
-      dockerfile: Dockerfile
-      buildArgs:
-        FOO: bar
+    - name: mysql
+      port: 3306
+      docker:
+        path: cli/database
+        context: cli
+        dockerfile: Dockerfile
+        buildArgs:
+          FOO: bar
   docker:
     path: cli
     context: .

@@ -11,15 +11,10 @@ func (a *AllowFailure) AllowAll() {
 	a.Failure = true
 }
 
-func (a *AllowFailure) add(code int32) *AllowFailure {
-	a.ExitCodes.Push(code)
-	return a
-}
-
-func (a *AllowFailure) addSeveral(codes ...int32) *AllowFailure {
-	a.ExitCodes.Push(codes...)
-	return a
-}
+//func (a *AllowFailure) add(codes ...int32) *AllowFailure {
+//	a.ExitCodes.Push(codes...)
+//	return a
+//}
 
 func (a *AllowFailure) Get() any {
 	return NewAllowFailureYaml(a)

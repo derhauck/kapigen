@@ -9,6 +9,7 @@ import (
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/logger"
+	errors2 "kapigen.kateops.com/internal/types"
 )
 
 type PipelineTypeConfig struct {
@@ -23,7 +24,7 @@ func (p *PipelineTypeConfig) Decode(factory *factory.MainFactory, configTypes ma
 	logger.Info(fmt.Sprintf("decoding pipeline type %s, id: %s", p.Type, p.PipelineId))
 	var pipelineConfig = configTypes[p.Type].New()
 	if pipelineConfig == nil {
-		return nil, errors.New(fmt.Sprintf("no pipeline definition found for type: '%s'", p.Type))
+		return nil, errors2.DetailedErrorf("no pipeline definition found for type: '%s'", p.Type)
 	}
 	err := mapstructure.Decode(p.Config, pipelineConfig)
 	if err != nil {
@@ -63,37 +64,37 @@ type PipelineConfig struct {
 	Versioning       bool                 `yaml:"versioning,omitempty"`
 	Tags             []string             `yaml:"tags"`
 	DependencyProxy  string               `yaml:"dependencyProxy"`
-	Pipelines        []PipelineTypeConfig `yaml:"pipelines" yaml:"pipelines"`
+	Pipelines        []PipelineTypeConfig `yaml:"pipelines"`
 	PrivateTokenName string               `yaml:"privateTokenName"`
 }
 
 func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterface, pipelineType PipelineType, pipelineId string) (*Jobs, error) {
 	err := config.Validate()
 	if err != nil {
-		var re *DetailedError
+		var re *errors2.DetailedError
 		if errors.As(err, &re) {
 			logger.Debug(re.Full())
 		}
-		return nil, errors.New(fmt.Sprintf(
+		return nil, fmt.Errorf(
 			"pipeline type: %s, id: %s, encountered validation error: %s",
 			pipelineType,
 			pipelineId,
 			err.Error(),
-		))
+		)
 	}
 
 	jobs, err := config.Build(factory, pipelineType, pipelineId)
 	if err != nil {
-		var re *DetailedError
+		var re *errors2.DetailedError
 		if errors.As(err, &re) {
 			logger.Debug(re.Full())
 		}
-		return nil, errors.New(fmt.Sprintf(
+		return nil, fmt.Errorf(
 			"pipeline type: %s, id: %s, encountered build error: %s",
 			pipelineType,
 			pipelineId,
 			err.Error(),
-		))
+		)
 	}
 	for _, currentJob := range jobs.GetJobs() {
 		currentJob.PipelineId = pipelineId
@@ -120,11 +121,11 @@ func (p *PipelineConfig) Decode(factory *factory.MainFactory, configTypes map[Pi
 		configuration := p.Pipelines[i]
 		if configuration.PipelineId == "" {
 			value, _ := yaml.Marshal(configuration)
-			return nil, errors.New(fmt.Sprintf("no pipeline id set for pipeline %v", string(value)))
+			return nil, errors2.DetailedErrorf("no pipeline id set for pipeline %v", string(value))
 		}
 		if configuration.Type == "" {
 			value, _ := yaml.Marshal(configuration)
-			return nil, errors.New(fmt.Sprintf("no pipeline type set for pipeline %v", string(value)))
+			return nil, errors2.DetailedErrorf("no pipeline type set for pipeline %v", string(value))
 		}
 		jobs, err := configuration.Decode(factory, configTypes)
 		if err != nil {

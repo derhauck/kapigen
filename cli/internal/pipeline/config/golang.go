@@ -14,6 +14,7 @@ import (
 	"kapigen.kateops.com/internal/logger"
 	"kapigen.kateops.com/internal/pipeline/jobs/golang"
 	"kapigen.kateops.com/internal/pipeline/types"
+	types2 "kapigen.kateops.com/internal/types"
 )
 
 type GolangCoverage struct {
@@ -33,12 +34,36 @@ func (g *GolangCoverage) Validate() error {
 	return nil
 }
 
+type GolangLint struct {
+	imageName string `yaml:"imageName"`
+	Mode      string `yaml:"mode"`
+	JobMode   JobMode
+}
+
+func (g *GolangLint) Validate() error {
+	if g.imageName == "" {
+		g.imageName = docker.GOLANG_GOLANGCI_LINT.String()
+	}
+	if g.Mode == "" {
+		logger.Debug("no coverage mode declared, using set")
+		g.Mode = Enabled.String()
+	}
+	mode, err := JobModeFromString(g.Mode)
+	if err != nil {
+		return types2.DetailedErrorE(err)
+	}
+	g.JobMode = mode
+
+	return nil
+}
+
 type Golang struct {
 	ImageName string          `yaml:"imageName"`
 	Path      string          `yaml:"path"`
-	Docker    *SlimDocker     `yaml:"docker"`
 	Coverage  *GolangCoverage `yaml:"coverage,omitempty"`
+	Lint      *GolangLint     `yaml:"lint,omitempty"`
 	Services  Services        `yaml:"services"`
+	Docker    *SlimDocker     `yaml:"docker"`
 	changes   []string
 }
 
@@ -56,22 +81,29 @@ func (g *Golang) Validate() error {
 		g.Coverage = &GolangCoverage{}
 	}
 
+	if g.Lint == nil {
+		g.Lint = &GolangLint{}
+	}
+
 	if g.Docker != nil {
 		if g.Docker.Path == "" {
-			return types.NewMissingArgError("docker.path")
+			return types2.NewMissingArgError("docker.path")
 		}
 		g.ImageName = "docker"
 	}
 
+	if err := g.Lint.Validate(); err != nil {
+		return types2.DetailedErrorE(err)
+	}
 	if err := g.Services.Validate(); err != nil {
-		return types.DetailedErrorE(err)
+		return types2.DetailedErrorE(err)
 	}
 	if err := g.Coverage.Validate(); err != nil {
-		return types.DetailedErrorE(err)
+		return types2.DetailedErrorE(err)
 	}
 
 	if g.ImageName == "" && g.Docker == nil {
-		return types.NewMissingArgsError("imageName", "docker")
+		return types2.NewMissingArgsError("imageName", "docker")
 	}
 	return nil
 }
@@ -80,6 +112,7 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 	var allJobs = types.Jobs{}
 
 	golangUnitTestJob, err := golang.NewUnitTest(g.ImageName, g.Path, g.Coverage.Packages, g.Coverage.Source)
+	golangLint := golang.Lint(g.Lint.imageName, g.Path)
 	if err != nil {
 		return nil, err
 	}
@@ -97,17 +130,24 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 		allJobs = append(allJobs, jobs.GetJobs()...)
 		g.changes = append(g.changes, dockerPipeline.Context)
 	}
+	if g.Lint.JobMode == Permissive {
+		golangLint.CiJob.AllowFailure.AllowAll()
+	}
+
+	if g.Lint.JobMode != Disabled {
+		allJobs.AddJob(golangLint)
+	}
 
 	err = g.Services.AddToJob(factory, PHPPipeline, Id, &allJobs, golangUnitTestJob)
 	if err != nil {
 		return nil, err
 	}
-	allJobs.AddJob(golangUnitTestJob)
-	return &allJobs, nil
+	return allJobs.
+		AddJob(golangUnitTestJob), nil
 }
 
 func (g *Golang) Rules() *job.Rules {
-	return &*job.DefaultPipelineRules(g.changes)
+	return job.DefaultPipelineRules(g.changes)
 }
 
 func GolangAutoConfig() *Golang {
@@ -116,11 +156,11 @@ func GolangAutoConfig() *Golang {
 	for _, fileName := range files {
 		dir, _ := filepath.Split(fileName)
 		dir, found := strings.CutPrefix(dir, fmt.Sprintf("%s/", environment.CI_PROJECT_DIR.Get()))
-		if found == false {
+		if !found {
 			return nil
 		}
 		dir, found = strings.CutSuffix(dir, "/")
-		if found == false {
+		if !found {
 			return nil
 		}
 		if dir == "" {

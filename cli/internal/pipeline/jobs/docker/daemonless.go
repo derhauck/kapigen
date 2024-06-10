@@ -8,6 +8,7 @@ import (
 	"kapigen.kateops.com/internal/gitlab/job"
 	"kapigen.kateops.com/internal/gitlab/tags"
 	"kapigen.kateops.com/internal/pipeline/types"
+	types2 "kapigen.kateops.com/internal/types"
 )
 
 func NewDaemonlessBuildkitBuild(imageName string, path string, context string, dockerfile string, destination []string, buildArgs []string) (*types.Job, error) {
@@ -15,7 +16,7 @@ func NewDaemonlessBuildkitBuild(imageName string, path string, context string, d
 		imageName = docker.BUILDKIT_ROTLESS.String()
 	}
 	if len(destination) == 0 {
-		return nil, types.DetailedErrorf("destination must be set")
+		return nil, types2.DetailedErrorf("destination must be set")
 	}
 	return types.NewJob("Daemonless Build", imageName, func(ciJob *job.CiJob) {
 		ciJob.Image.Entrypoint.
