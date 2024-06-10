@@ -13,7 +13,7 @@ func escalate(level level.Level) bool {
 func log(level level.Level, msg ...string) {
 	if escalate(level) {
 		for i := 0; i < len(msg); i++ {
-			fmt.Printf("%s:\t%s", level, msg[i])
+			fmt.Printf("%s:\t%s\n", level, msg[i])
 		}
 	}
 
@@ -21,7 +21,7 @@ func log(level level.Level, msg ...string) {
 
 func logAny(level level.Level, msg any) {
 	if escalate(level) {
-		fmt.Printf("%s:\t%s", level, fmt.Sprint(msg))
+		fmt.Printf("%s:\t%s\n", level, fmt.Sprint(msg))
 	}
 }
 
