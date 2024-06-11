@@ -9,7 +9,7 @@ import (
 
 func TestArtifactsSerialization(t *testing.T) {
 	// Create an instance of the Ci struct
-	artifacts := &Artifact{
+	artifacts := &Artifacts{
 		Paths:     *(wrapper.NewArray[string]().Push([]string{"path1", "path2"}...)),
 		ExpireIn:  "7 days",
 		ExposeAs:  "public",

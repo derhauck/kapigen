@@ -22,7 +22,7 @@ func Lint(imageName string, path string) *types.Job {
 			SetStage(stages.TEST).
 			AddBeforeScriptf("cd %s", path).
 			AddScriptf("golangci-lint run -v --out-format=junit-xml:%s", report).
-			AddArtifact(job.Artifact{
+			AddArtifact(job.Artifacts{
 				Name:  "report",
 				Paths: *(wrapper.NewArray[string]().Push(reportPath)),
 				Reports: artifact.NewReports().

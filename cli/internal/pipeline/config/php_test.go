@@ -71,7 +71,7 @@ func TestPhpValidate(t *testing.T) {
 func TestPhpRules(t *testing.T) {
 	t.Run("returns default pipeline rules based on changes", func(t *testing.T) {
 		php := &Php{
-			changes: []string{"/path/to/composer", "/path/to/context"},
+			InternalChanges: []string{"/path/to/composer", "/path/to/context"},
 		}
 
 		rules := php.Rules()
@@ -88,7 +88,7 @@ func TestPhpRules(t *testing.T) {
 			changes := rule.Changes.Get()
 			for _, change := range changes {
 				found := false
-				for _, expectedChange := range php.changes {
+				for _, expectedChange := range php.InternalChanges {
 					if strings.Contains(change, expectedChange) {
 						found = true
 						break

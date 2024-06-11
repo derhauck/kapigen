@@ -42,6 +42,15 @@ func (s Stage) String() string {
 	return values[DYNAMIC]
 }
 
+func FromString(value string) (Stage, error) {
+	for k, v := range values {
+		if v == value {
+			return k, nil
+		}
+	}
+	return DYNAMIC, fmt.Errorf("stage not found for value: '%s'", value)
+}
+
 func GetAllStages() []string {
 	var stages []string
 	for _, value := range values {

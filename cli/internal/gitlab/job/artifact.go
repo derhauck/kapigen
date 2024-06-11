@@ -5,7 +5,7 @@ import (
 	"kapigen.kateops.com/internal/pipeline/wrapper"
 )
 
-type Artifact struct {
+type Artifacts struct {
 	Paths     wrapper.Array[string]
 	Exclude   wrapper.Array[string]
 	ExpireIn  string
@@ -16,14 +16,14 @@ type Artifact struct {
 	When      WhenWrapper
 }
 
-func NewArtifact(name string, paths []string) Artifact {
+func NewArtifact(name string, paths []string) Artifacts {
 	artifactPaths := wrapper.NewArray[string]().Push(paths...)
-	return Artifact{
+	return Artifacts{
 		Name:  name,
 		Paths: *artifactPaths,
 	}
 }
-func (a *Artifact) validate() (bool, error) {
+func (a *Artifacts) validate() (bool, error) {
 	if len(a.Paths.Get()) == 0 {
 		return false, nil
 	}
@@ -31,7 +31,7 @@ func (a *Artifact) validate() (bool, error) {
 	return true, nil
 }
 
-func (a *Artifact) Render() (*ArtifactYaml, error) {
+func (a *Artifacts) Render() (*ArtifactsYaml, error) {
 	if ok, err := a.validate(); !ok {
 		if err != nil {
 			return nil, err
@@ -41,7 +41,7 @@ func (a *Artifact) Render() (*ArtifactYaml, error) {
 	return NewArtifactsYaml(a), nil
 }
 
-type ArtifactYaml struct {
+type ArtifactsYaml struct {
 	Paths     []string              `yaml:"paths"`
 	Exclude   []string              `yaml:"exclude,omitempty"`
 	ExpireIn  string                `yaml:"expire_in,omitempty"`
@@ -52,9 +52,9 @@ type ArtifactYaml struct {
 	When      string                `yaml:"when"`
 }
 
-func NewArtifactsYaml(artifacts *Artifact) *ArtifactYaml {
+func NewArtifactsYaml(artifacts *Artifacts) *ArtifactsYaml {
 
-	return &ArtifactYaml{
+	return &ArtifactsYaml{
 		Paths:     artifacts.Paths.Get(),
 		Exclude:   artifacts.Exclude.Get(),
 		ExpireIn:  artifacts.ExpireIn,

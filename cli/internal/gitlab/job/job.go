@@ -9,7 +9,7 @@ import (
 )
 
 type CiJob struct {
-	Artifact     Artifact          `yaml:"artifacts"`
+	Artifact     Artifacts         `yaml:"artifacts"`
 	AfterScript  AfterScript       `yaml:"after_script"`
 	BeforeScript BeforeScript      `yaml:"before_script"`
 	Script       Script            `yaml:"script"`
@@ -31,7 +31,7 @@ func (c *CiJob) Render(needs *NeedsYaml, externalTags []string) (*CiJobYaml, err
 type CiJobs []*CiJob
 
 type CiJobYaml struct {
-	Artifact     *ArtifactYaml     `yaml:"artifacts,omitempty" json:"artifacts,omitempty"`
+	Artifacts    *ArtifactsYaml    `yaml:"artifacts,omitempty" json:"artifacts,omitempty"`
 	AfterScript  []string          `yaml:"after_script,omitempty" json:"after_script,omitempty"`
 	AllowFailure any               `yaml:"allow_failure,omitempty" json:"allow_failure,omitempty"`
 	BeforeScript []string          `yaml:"before_script,omitempty" json:"before_script,omitempty"`
@@ -85,7 +85,7 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml, externalTags []string) (*CiJobYa
 	}
 
 	return &CiJobYaml{
-		Artifact:     artifact,
+		Artifacts:    artifact,
 		AfterScript:  job.AfterScript.GetRenderedValue(),
 		AllowFailure: job.AllowFailure.Get(),
 		BeforeScript: job.BeforeScript.GetRenderedValue(),

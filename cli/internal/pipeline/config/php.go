@@ -50,13 +50,13 @@ func (p *Phpunit) Validate(composer *PhpComposer) error {
 }
 
 type Php struct {
-	Composer      PhpComposer `yaml:"composer"`
-	ImageName     string      `yaml:"ImageName"`
-	Phpunit       Phpunit     `yaml:"phpunit"`
-	Services      Services    `yaml:"services"`
-	Docker        *SlimDocker `yaml:"docker,omitempty"`
-	changes       []string
-	listenerPorts map[string]int32
+	Composer              PhpComposer `yaml:"composer"`
+	ImageName             string      `yaml:"ImageName"`
+	Phpunit               Phpunit     `yaml:"phpunit"`
+	Services              Services    `yaml:"services"`
+	Docker                *SlimDocker `yaml:"docker,omitempty"`
+	InternalChanges       []string
+	InternalListenerPorts map[string]int32
 }
 
 func (p *Php) New() types.PipelineConfigInterface {
@@ -72,9 +72,9 @@ func (p *Php) Validate() error {
 	if err := p.Services.Validate(); err != nil {
 		return types2.DetailedErrorE(err)
 	}
-	p.listenerPorts = make(map[string]int32)
+	p.InternalListenerPorts = make(map[string]int32)
 	for _, service := range p.Services {
-		p.listenerPorts[service.Name] = service.Port
+		p.InternalListenerPorts[service.Name] = service.Port
 	}
 
 	if p.Docker != nil {
@@ -92,8 +92,8 @@ func (p *Php) Validate() error {
 
 func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
 	var jobs = &types.Jobs{}
-	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.Path, p.Phpunit.Args, p.Phpunit.Bin, p.listenerPorts)
-	p.changes = []string{p.Composer.Path}
+	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.Path, p.Phpunit.Args, p.Phpunit.Bin, p.InternalListenerPorts)
+	p.InternalChanges = []string{p.Composer.Path}
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 			phpUnitJob.AddJobAsNeed(currentJob)
 		}
 		phpUnitJob.CiJob.Image.Name = dockerPipeline.GetFinalImageName()
-		p.changes = append(p.changes, dockerPipeline.Context)
+		p.InternalChanges = append(p.InternalChanges, dockerPipeline.Context)
 	}
 	err = p.Services.AddToJob(factory, PHPPipeline, Id, jobs, phpUnitJob)
 	if err != nil {
@@ -120,5 +120,5 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 }
 
 func (p *Php) Rules() *job.Rules {
-	return job.DefaultPipelineRules(p.changes)
+	return job.DefaultPipelineRules(p.InternalChanges)
 }

@@ -33,7 +33,7 @@ func NewPhpUnit(imageName string, composerPath string, composerArgs string, phpu
 			AddScriptf("php %s -c %s/phpunit.xml --log-junit junit.xml  --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml %s", phpUnitBin, phpunitXmlPath, phpunitArgs).
 			SetCodeCoverage(`/^\s*Lines:\s*\d+.\d+\%/`).
 			AddAfterScript("tail ${CI_PROJECT_DIR}/.status").
-			AddArtifact(job.Artifact{
+			AddArtifact(job.Artifacts{
 				Name:  "report",
 				Paths: *wrapper.NewArray[string]().Push("junit.xml"),
 				Reports: artifact.NewReports().
