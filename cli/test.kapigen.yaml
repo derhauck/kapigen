@@ -106,3 +106,8 @@ pipelines:
         args: --testsuite unit
       docker:
         path: cli/tests/php
+  - type: generic
+    id: generic-job
+    config:
+      scripts:
+        - 'echo " \"hello ${HOST}"'

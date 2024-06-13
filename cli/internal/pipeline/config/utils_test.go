@@ -111,36 +111,25 @@ func TestServices_Validate(t *testing.T) {
 func TestJobMode_String(t *testing.T) {
 	t.Run("can find job mode permissive", func(t *testing.T) {
 		expectation := "permissive"
-		value, err := JobModeFromString(expectation)
+		value, err := JobModeEnum.Value(expectation)
 		if err != nil {
 			t.Errorf("should be nil, received %s", err)
 		}
-		if value.String() != expectation {
+		if JobModeEnum.KeySafe(*value) != expectation {
 			t.Errorf("should be equal")
 		}
-		if value.String() != Permissive.String() {
+		if *value != Permissive {
 			t.Errorf("should be equal")
 		}
 	})
 	t.Run("can not find job mode", func(t *testing.T) {
 		var mode JobMode = -1
-		if mode.String() == "" {
-			t.Errorf("should not be empty")
+		if JobModeEnum.KeySafe(mode) != "" {
+			t.Errorf("should be empty")
 		}
 
-		if value, ok := jobModes[mode]; ok {
-			t.Errorf("should not be found, received %s", value)
-		}
-	})
-	t.Run("can not find job mode from string", func(t *testing.T) {
-		expectation := "test"
-		value, err := JobModeFromString(expectation)
-		if err == nil {
-			t.Errorf("should not be nil, received %s", value)
-		}
-
-		if value != -1 {
-			t.Errorf("should be equal")
+		if _, err := JobModeEnum.Key(mode); err == nil {
+			t.Error("should not be found return error, received nil")
 		}
 	})
 }
