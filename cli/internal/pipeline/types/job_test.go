@@ -338,3 +338,50 @@ func TestJob_EvaluateName(t *testing.T) {
 		}
 	})
 }
+
+func TestJobs_OverwriteTags(t *testing.T) {
+	t.Run("overwrite tags", func(t *testing.T) {
+		expectation := []string{"overwritten"}
+		oldTags := []string{"tag1", "tag2"}
+		jobs := Jobs{
+			&Job{CiJobYaml: &job.CiJobYaml{Tags: oldTags}},
+			&Job{CiJobYaml: &job.CiJobYaml{Tags: oldTags}},
+			&Job{CiJobYaml: &job.CiJobYaml{Tags: oldTags}},
+		}
+
+		jobs.OverwriteTags(expectation)
+		for _, finalJob := range jobs.GetJobs() {
+			if !reflect.DeepEqual(finalJob.CiJobYaml.Tags, expectation) {
+				t.Errorf("expected job to have tags: ['overwritten'], but it does not have %v", expectation)
+			}
+			if reflect.DeepEqual(finalJob.CiJobYaml.Tags, oldTags) {
+				t.Error("expected job to not have old tags")
+			}
+		}
+	})
+}
+
+func TestJob_RenderNeeds(t *testing.T) {
+	t.Run("render needs", func(t *testing.T) {
+		job1 := NewJob("Job 1", "golang:1.16", func(ciJob *job.CiJob) {
+			ciJob.TagMediumPressure().
+				AddScript("hello world").
+				SetStage(stages.TEST)
+		})
+
+		result := job1.RenderNeeds()
+		if result.CiJobYaml == nil {
+			t.Error("expected CiJobYaml, received nil")
+		}
+		if contains(result.CiJobYaml.Tags, stages.DYNAMIC.String()) {
+			t.Error("expected stage to be set to dynamic")
+		}
+		if result.CiJobYaml.Needs.GetNeeds() != nil {
+			t.Error("expected needs to be empty, received nil")
+		}
+		if len(result.CiJobYaml.Needs.GetNeeds()) != 0 {
+			t.Errorf("expected needs to be empty, received %v", result.CiJobYaml.Needs.GetNeeds())
+		}
+
+	})
+}

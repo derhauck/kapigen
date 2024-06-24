@@ -1,6 +1,8 @@
 package types
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestNeeds_RemoveNeed(t *testing.T) {
 	t.Parallel()
@@ -80,5 +82,54 @@ func TestNeeds_HasJob(t *testing.T) {
 			t.Error("should be able to find nil job")
 		}
 
+	})
+}
+
+func TestNeeds_HasNeed(t *testing.T) {
+	t.Run("has need", func(t *testing.T) {
+		jobOne := Job{}
+		jobTwo := Job{}
+		jobThree := Job{}
+
+		needOne := Need{Job: &jobOne}
+		needTwo := Need{Job: &jobTwo}
+		needThree := Need{Job: &jobThree}
+		needs := Needs{
+			&needOne,
+			&needTwo,
+		}
+
+		if !needs.HasNeed(&needOne) {
+			t.Error("list 'needs' should have 'needOne'")
+		}
+		if !needs.HasNeed(&needTwo) {
+			t.Error("list 'needs' should have 'needTwo'")
+		}
+		if needs.HasNeed(&needThree) {
+			t.Error("list 'needs' should not have 'needThree'")
+		}
+
+	})
+}
+
+func TestNeed_NotOptional(t *testing.T) {
+	t.Run("not optional", func(t *testing.T) {
+		need := Need{
+			Job:      &Job{},
+			Optional: true,
+		}
+		need.NotOptional()
+		if need.Optional {
+			t.Error("should not be optional")
+		}
+	})
+	t.Run("stays not optional", func(t *testing.T) {
+		need := Need{
+			Job:      &Job{},
+			Optional: false,
+		}
+		if need.Optional {
+			t.Error("should not be optional")
+		}
 	})
 }
