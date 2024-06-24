@@ -37,6 +37,10 @@ func TestEnum(t *testing.T) {
 		if result != "" {
 			t.Errorf("expected empty string, received %s", result)
 		}
+		result = enum.KeySafe(keyB)
+		if result != "b" {
+			t.Errorf("expected 'b', received %s", result)
+		}
 		value, err := enum.Key(keyA)
 		if err != nil {
 			t.Errorf("expected nil, received %s", err)
