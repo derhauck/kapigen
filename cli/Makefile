@@ -22,6 +22,10 @@ test: DOCKER_ARGS=$(GO_ARGS)
 test:
 	$(DOCKER_RUN)  -w $(GO_SRC_PATH) $(GO_IMAGE) go test ./...  -coverpkg=kapigen.kateops.com/internal/... -coverprofile=profile.cov
 	$(DOCKER_RUN)  -w $(GO_SRC_PATH) $(GO_IMAGE) go tool cover -func profile.cov
+.PHONY: test-report
+test-report: DOCKER_ARGS=$(GO_ARGS)
+test-report:
+	$(DOCKER_RUN) --entrypoint=/bin/sh -w $(GO_SRC_PATH) $(GO_IMAGE) -c "go-junit-report -parser gojson -iocopy -out junit.xml"
 
 .PHONY: pipeline
 pipeline:
@@ -35,16 +39,16 @@ test-pipeline:
 test-pipeline-no-merge:
 	$(MAKE) run ARGS="pipeline generate -v --config test.kapigen.yaml --no-merge --file pipeline-no-merge.yaml"
 
-.PHONY: golangci
-golangci:
+.PHONY: lint
+lint:
 	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run
 
 
-.PHONY: golangci-fix
-golangci-fix:
+.PHONY: lint-fix
+lint-fix:
 	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run -v --fix
 
 
-.PHONY: golangci-report
-golangci-report:
-	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run -v --out-format=junit-xml:junit.xml
+.PHONY: lint-report
+lint-report:
+	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golaps ngci-lint:v1.59.1 golangci-lint run -v --out-format=junit-xml:junit.xml

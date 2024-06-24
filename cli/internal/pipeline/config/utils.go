@@ -108,10 +108,9 @@ const (
 	Disabled
 )
 
-var jobModes = map[string]JobMode{
-	"enabled":    Enabled,
-	"permissive": Permissive,
-	"disabled":   Disabled,
+var jobModes = map[JobMode]string{
+	Enabled:    "enabled",
+	Permissive: "permissive",
+	Disabled:   "disabled",
 }
-
-var JobModeEnum = types.NewEnum(jobModes)
+var JobModeEnum, _ = types.NewEnum[JobMode](jobModes)

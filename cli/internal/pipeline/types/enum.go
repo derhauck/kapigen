@@ -6,43 +6,62 @@ import (
 	"kapigen.kateops.com/internal/types"
 )
 
-type Enum[T any] struct {
-	Values map[string]T
+type Enumeration interface {
+	comparable
+}
+type Enum[K Enumeration, V any] struct {
+	Values map[K]V
 }
 
-func NewEnum[T any](value map[string]T) Enum[T] {
-	return Enum[T]{
-		Values: value,
+func NewEnum[K Enumeration, V string](value interface{}) (*Enum[K, V], error) {
+
+	final, ok := value.(map[K]V)
+	if !ok {
+		return nil, types.ErrorHandler("value not of type byte(iota)", 3)
 	}
+
+	return &Enum[K, V]{
+		Values: final,
+	}, nil
 }
-func (e *Enum[T]) Validate() error {
-	if e.Values == nil {
+func (e *Enum[K, V]) Validate() error {
+	if e.Values == nil || len(e.Values) == 0 {
 		return types.ErrorHandler("should have values", 3)
 	}
 
 	return nil
 }
 
-func (e *Enum[T]) Value(key string) (*T, error) {
-	if value, ok := e.Values[key]; ok {
-		return &value, nil
-	}
-	return nil, types.ErrorHandler("value not found", 3)
-}
-
-func (e *Enum[T]) Key(value T) (string, error) {
+func (e *Enum[K, V]) KeyFromValue(value V) (K, error) {
 	for k, v := range e.Values {
 		if reflect.DeepEqual(v, value) {
 			return k, nil
 		}
 	}
-	return "", types.ErrorHandler("value not found", 3)
+	var inf interface{}
+	inf = nil
+	empty, _ := inf.(K)
+	return empty, types.ErrorHandler("value not found", 3)
 }
 
-func (e *Enum[T]) KeySafe(value T) string {
-	if key, err := e.Key(value); err == nil {
+func (e *Enum[K, V]) Key(key K) (V, error) {
+	if v, ok := e.Values[key]; ok {
+		return v, nil
+	}
+	var inf interface{}
+	inf = nil
+	empty, _ := inf.(V)
+	return empty, types.ErrorHandler("value not found", 3)
+}
+
+func (e *Enum[K, V]) KeySafe(key K) V {
+	if key, err := e.Key(key); err == nil {
 		return key
 	}
-	return ""
+
+	var inf interface{}
+	inf = nil
+	empty, _ := inf.(V)
+	return empty
 
 }

@@ -111,14 +111,15 @@ func TestServices_Validate(t *testing.T) {
 func TestJobMode_String(t *testing.T) {
 	t.Run("can find job mode permissive", func(t *testing.T) {
 		expectation := "permissive"
-		value, err := JobModeEnum.Value(expectation)
+		value, err := JobModeEnum.Key(Permissive)
 		if err != nil {
-			t.Errorf("should be nil, received %s", err)
+			t.Error(err)
 		}
-		if JobModeEnum.KeySafe(*value) != expectation {
+
+		if value != expectation {
 			t.Errorf("should be equal")
 		}
-		if *value != Permissive {
+		if JobModeEnum.KeySafe(Permissive) != expectation {
 			t.Errorf("should be equal")
 		}
 	})
