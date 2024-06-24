@@ -39,7 +39,6 @@ func (e *Enum[K, V]) KeyFromValue(value V) (K, error) {
 		}
 	}
 	var inf interface{}
-	inf = nil
 	empty, _ := inf.(K)
 	return empty, types.ErrorHandler("value not found", 3)
 }
@@ -49,7 +48,6 @@ func (e *Enum[K, V]) Key(key K) (V, error) {
 		return v, nil
 	}
 	var inf interface{}
-	inf = nil
 	empty, _ := inf.(V)
 	return empty, types.ErrorHandler("value not found", 3)
 }
@@ -60,7 +58,6 @@ func (e *Enum[K, V]) KeySafe(key K) V {
 	}
 
 	var inf interface{}
-	inf = nil
 	empty, _ := inf.(V)
 	return empty
 
