@@ -22,7 +22,7 @@ func TestGeneric_Build(t *testing.T) {
 			Mode:         version.Gitlab,
 			PrivateToken: "",
 		})
-		err := generic.Validate()
+		_ = generic.Validate()
 		jobs, err := generic.Build(main, "generic", "generic")
 		if err != nil {
 			t.Error(err)
@@ -32,15 +32,15 @@ func TestGeneric_Build(t *testing.T) {
 			t.Fail()
 		}
 		genericJob := jobs.GetJobs()[0]
-		if genericJob == nil {
-			t.Error("genericJob is nil")
-			t.Fail()
-		}
 		err = genericJob.Render()
 		if err != nil {
 			t.Error(err)
 		}
-		if genericJob.CiJob.Image.Name != docker.Alpine_3_18.String() {
+		if genericJob.CiJobYaml == nil {
+			t.Error("genericJob.CiJobYaml is nil")
+			t.Fail()
+		}
+		if genericJob.CiJobYaml.Image.Name != docker.Alpine_3_18.String() {
 			t.Errorf("expected image name to be %s, received %s", docker.Alpine_3_18.String(), genericJob.CiJob.Image.Name)
 		}
 		if !reflect.DeepEqual(genericJob.CiJobYaml.Script, expectedScripts) {
