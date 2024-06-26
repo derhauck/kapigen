@@ -4,6 +4,7 @@ import (
 	"kapigen.kateops.com/factory"
 	"kapigen.kateops.com/internal/docker"
 	"kapigen.kateops.com/internal/gitlab/job"
+	artifact2 "kapigen.kateops.com/internal/gitlab/job/artifact"
 	"kapigen.kateops.com/internal/gitlab/stages"
 	"kapigen.kateops.com/internal/pipeline/types"
 	"kapigen.kateops.com/internal/pipeline/wrapper"
@@ -11,14 +12,14 @@ import (
 )
 
 type Generic struct {
-	ImageName       string            `yaml:"imageName"`
-	Mode            string            `yaml:"mode"`
-	Scripts         []string          `yaml:"scripts"`
-	Variables       map[string]string `yaml:"variables"`
-	Stage           string            `yaml:"stage"`
-	Artifacts       job.ArtifactsYaml `yaml:"artifacts"`
-	Changes         []string          `yaml:"changes"`
-	RuleSet         job.RulesYaml     `yaml:"rules"`
+	ImageName       string             `yaml:"imageName"`
+	Mode            string             `yaml:"mode"`
+	Scripts         []string           `yaml:"scripts"`
+	Variables       map[string]string  `yaml:"variables"`
+	Stage           string             `yaml:"stage"`
+	Artifacts       *job.ArtifactsYaml `yaml:"artifacts,omitempty"`
+	Changes         []string           `yaml:"changes"`
+	RuleSet         job.RulesYaml      `yaml:"rules"`
 	InternalStage   stages.Stage
 	InternalChanges []string
 }
@@ -41,12 +42,22 @@ func (g *Generic) Validate() error {
 	return nil
 }
 
-func (g *Generic) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
+func (g *Generic) Build(_ *factory.MainFactory, _ types.PipelineType, _ string) (*types.Jobs, error) {
 	var allJobs types.Jobs
 	generic := types.NewJob("Generic Job", g.ImageName, func(ciJob *job.CiJob) {
 		ciJob.SetStage(g.InternalStage).
 			AddScripts(g.Scripts).
 			TagMediumPressure()
+
+		if g.Artifacts != nil {
+			artifact := job.Artifacts{
+				Name:    g.Artifacts.Name,
+				Paths:   *wrapper.NewArray[string]().Push(g.Artifacts.Paths...),
+				Reports: artifact2.Reports{},
+			}
+			ciJob.AddArtifact(artifact)
+		}
+
 	})
 	return allJobs.AddJob(generic), nil
 }

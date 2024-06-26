@@ -24,11 +24,15 @@ func NewArtifact(name string, paths []string) Artifacts {
 	}
 }
 func (a *Artifacts) validate() (bool, error) {
-	if len(a.Paths.Get()) == 0 {
-		return false, nil
+	if len(a.Paths.Get()) > 0 {
+		return true, nil
 	}
 
-	return true, nil
+	if a.Reports.CoverageReport.Path != "" {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func (a *Artifacts) Render() (*ArtifactsYaml, error) {

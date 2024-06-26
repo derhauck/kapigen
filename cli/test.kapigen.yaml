@@ -110,4 +110,8 @@ pipelines:
     id: generic-job
     config:
       scripts:
-        - 'echo " \"hello ${HOST}"'
+        - 'echo " \"hello ${HOST}" > test.txt'
+      artifacts:
+        name: test
+        paths:
+          - test.txt
