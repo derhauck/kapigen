@@ -58,6 +58,10 @@ func (g *Generic) Build(_ *factory.MainFactory, _ types.PipelineType, _ string) 
 			ciJob.AddArtifact(artifact)
 		}
 
+		for key, value := range g.Variables {
+			ciJob.AddVariable(key, value)
+		}
+
 	})
 	return allJobs.AddJob(generic), nil
 }
