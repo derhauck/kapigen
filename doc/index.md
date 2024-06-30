@@ -10,6 +10,7 @@
 * [docker](pipelines/docker.md)
 * [golang](pipelines/golang.md)
 * [php](pipelines/php.md)
+* [generic](pipelines/generic.md)
 ---
 ## Pipelines
 ### Get Started
@@ -48,6 +49,7 @@ noop: bool
 tags: Array<string>
 pipelines: Array<Pipeline>
 ```
+
 * `versioning: [optional | default: false]` Will automatically create a tag with the version increase from the merge request. See [versioning](versioning.md)
   for more information.
 * `privateTokenName [optional]` Will use the ENV variable for authenticating with Gitlab API instead of CI_JOB_TOKEN

@@ -9,6 +9,7 @@ pipelines:
     config:
       path: cli
       name: test-cli
+
   - type: docker
     id: test-file
     config:
@@ -17,12 +18,14 @@ pipelines:
       dockerfile: test.Dockerfile
       buildArgs:
         TEST: "Has set Var"
+
   - type: docker
     id: duplicate-test
     config:
       path: cli
       dockerfile: Dockerfile
       name: test-cli
+
   - type: golang
     id: test-go
     config:
@@ -33,22 +36,26 @@ pipelines:
         name: test-go
         buildArgs:
           TEST: "Has set Var"
+
   - type: docker
     id: test-cli2
     config:
       path: cli
       name: test-cli
+
   - type: docker
     id: test-file2
     config:
       path: cli
       name: test-file
+
   - type: docker
     id: duplicate-test2
     config:
       path: cli
       dockerfile: Dockerfile
       name: test-cli
+
   - type: golang
     id: test-go2
     config:
@@ -56,22 +63,26 @@ pipelines:
       path: cli
       lint:
         mode: permissive
+
   - type: docker
     id: test-cli3
     config:
       path: cli
       name: test-cli
+
   - type: docker
     id: test-file3
     config:
       path: cli
       name: test-file
+
   - type: docker
     id: duplicate-test3
     config:
       path: cli
       dockerfile: Dockerfile
       name: test-cli
+
   - type: golang
     id: test-go3
     config:
@@ -82,6 +93,7 @@ pipelines:
           - ./...
       lint:
         mode: disabled
+
   - type: php
     id: php-integration
     config:
@@ -106,12 +118,33 @@ pipelines:
         args: --testsuite unit
       docker:
         path: cli/tests/php
+
   - type: generic
-    id: generic-job
+    id: generic-job-image
     config:
       scripts:
-        - 'echo " \"hello ${HOST}" > test.txt'
+        - 'echo " \"hello ${HOST}!" > test.txt'
+      variables:
+        HOST: "vm-private-ci-1"
       artifacts:
         name: test
         paths:
           - test.txt
+
+  - type: generic
+    id: generic-job-docker
+    config:
+      scripts:
+        - 'echo " \"hello ${HOST}!" > test.txt'
+      variables:
+        HOST: "vm-private-ci-1"
+      artifacts:
+        name: test
+        paths:
+          - test.txt
+      docker:
+        path: cli
+        context: .
+        dockerfile: test.Dockerfile
+        buildArgs:
+          FOO: bar
