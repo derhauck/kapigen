@@ -1,9 +1,8 @@
 package stages
 
 import (
-	"fmt"
-
 	"kapigen.kateops.com/internal/logger"
+	"kapigen.kateops.com/internal/types"
 )
 
 type Stage int
@@ -30,31 +29,22 @@ var values = map[Stage]string{
 	FINAL:   "final",
 }
 
+func Enum() *types.Enum[Stage, string] {
+	enum, err := types.NewEnum[Stage](values)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	return enum
+}
+
 func NewStage() Stage {
 	return DYNAMIC
 }
 
-func (s Stage) String() string {
-	if value, ok := values[s]; ok {
-		return value
-	}
-	logger.Error(fmt.Sprintf("Stage not found for id: '%d'", s))
-	return values[DYNAMIC]
-}
-
-func FromString(value string) (Stage, error) {
-	for k, v := range values {
-		if v == value {
-			return k, nil
-		}
-	}
-	return DYNAMIC, fmt.Errorf("stage not found for value: '%s'", value)
-}
-
-func GetAllStages() []string {
-	var stages []string
-	for _, value := range values {
-		stages = append(stages, value)
-	}
-	return stages
-}
+//func (s Stage) String() string {
+//	if value, ok := values[s]; ok {
+//		return value
+//	}
+//	logger.Error(fmt.Sprintf("Stage not found for id: '%d'", s))
+//	return values[DYNAMIC]
+//}

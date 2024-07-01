@@ -24,24 +24,24 @@ func TestEnum(t *testing.T) {
 			t.Errorf("expected nil, received %s", err)
 		}
 
-		if result, err := enum.Key(keyA); err != nil {
+		if result, err := enum.Value(keyA); err != nil {
 			t.Errorf("expected nil, received %s", err)
 		} else if result != "a" {
 			t.Errorf("expected a, received %s", result)
 		}
 
-		result, err := enum.Key(keyC)
+		result, err := enum.Value(keyC)
 		if err == nil {
 			t.Error("expected error, received nil")
 		}
 		if result != "" {
 			t.Errorf("expected empty string, received %s", result)
 		}
-		result = enum.KeySafe(keyB)
+		result = enum.ValueSafe(keyB)
 		if result != "b" {
 			t.Errorf("expected 'b', received %s", result)
 		}
-		value, err := enum.Key(keyA)
+		value, err := enum.Value(keyA)
 		if err != nil {
 			t.Errorf("expected nil, received %s", err)
 		}

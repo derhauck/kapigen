@@ -95,7 +95,7 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml, externalTags []string) (*CiJobYa
 		Variables:    job.Variables,
 		Image:        image,
 		Rules:        job.Rules.GetRenderedValue(),
-		Stage:        stage.String(),
+		Stage:        stages.Enum().ValueSafe(stage),
 		Services:     job.Services.Render(),
 		Tags:         tags,
 		Coverage:     job.Coverage,

@@ -125,7 +125,7 @@ pipelines:
       scripts:
         - 'echo " \"hello ${HOST}!" > test.txt'
       variables:
-        HOST: "vm-private-ci-1"
+        HOST: "vm-private-ci-image"
       artifacts:
         name: test
         paths:
@@ -137,7 +137,7 @@ pipelines:
       scripts:
         - 'echo " \"hello ${HOST}!" > test.txt'
       variables:
-        HOST: "vm-private-ci-1"
+        HOST: "vm-private-ci-docker"
       artifacts:
         name: test
         paths:

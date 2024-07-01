@@ -113,4 +113,4 @@ var jobModes = map[JobMode]string{
 	Permissive: "permissive",
 	Disabled:   "disabled",
 }
-var JobModeEnum, _ = types.NewEnum[JobMode](jobModes)
+var JobModeEnum, _ = types2.NewEnum[JobMode](jobModes)

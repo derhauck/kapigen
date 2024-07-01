@@ -2,8 +2,6 @@ package types
 
 import (
 	"reflect"
-
-	"kapigen.kateops.com/internal/types"
 )
 
 type Enumeration interface {
@@ -17,7 +15,7 @@ func NewEnum[K Enumeration, V string](value interface{}) (*Enum[K, V], error) {
 
 	final, ok := value.(map[K]V)
 	if !ok {
-		return nil, types.ErrorHandler("value not of type byte(iota)", 3)
+		return nil, ErrorHandler("value not of type byte(iota)", 3)
 	}
 
 	return &Enum[K, V]{
@@ -26,7 +24,7 @@ func NewEnum[K Enumeration, V string](value interface{}) (*Enum[K, V], error) {
 }
 func (e *Enum[K, V]) Validate() error {
 	if e.Values == nil || len(e.Values) == 0 {
-		return types.ErrorHandler("should have values", 3)
+		return ErrorHandler("should have values", 3)
 	}
 
 	return nil
@@ -40,25 +38,32 @@ func (e *Enum[K, V]) KeyFromValue(value V) (K, error) {
 	}
 	var inf interface{}
 	empty, _ := inf.(K)
-	return empty, types.ErrorHandler("value not found", 3)
+	return empty, ErrorHandler("value not found", 3)
 }
 
-func (e *Enum[K, V]) Key(key K) (V, error) {
+func (e *Enum[K, V]) Value(key K) (V, error) {
 	if v, ok := e.Values[key]; ok {
 		return v, nil
 	}
 	var inf interface{}
 	empty, _ := inf.(V)
-	return empty, types.ErrorHandler("value not found", 3)
+	return empty, ErrorHandler("value not found", 3)
 }
 
-func (e *Enum[K, V]) KeySafe(key K) V {
-	if key, err := e.Key(key); err == nil {
+func (e *Enum[K, V]) ValueSafe(key K) V {
+	if key, err := e.Value(key); err == nil {
 		return key
 	}
 
 	var inf interface{}
 	empty, _ := inf.(V)
 	return empty
+}
 
+func (e *Enum[K, V]) GetValues() []V {
+	var list []V
+	for _, value := range e.Values {
+		list = append(list, value)
+	}
+	return list
 }

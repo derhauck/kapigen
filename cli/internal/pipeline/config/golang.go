@@ -46,7 +46,7 @@ func (g *GolangLint) Validate() error {
 	}
 	if g.Mode == "" {
 		logger.Debug("no coverage mode declared, using set")
-		g.Mode = JobModeEnum.KeySafe(Enabled)
+		g.Mode = JobModeEnum.ValueSafe(Enabled)
 	}
 	mode, err := JobModeEnum.KeyFromValue(g.Mode)
 	if err != nil {

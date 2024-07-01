@@ -164,7 +164,7 @@ func TestJob_Render(t *testing.T) {
 		if len(newJob.CiJobYaml.Tags) != 1 {
 			t.Errorf("unexpected number of tags: %d", len(newJob.CiJobYaml.Tags))
 		}
-		if newJob.CiJobYaml.Stage != stages.DYNAMIC.String() {
+		if newJob.CiJobYaml.Stage != stages.Enum().ValueSafe(stages.DYNAMIC) {
 			t.Errorf("unexpected stage: %s", newJob.CiJobYaml.Stage)
 		}
 	})
@@ -373,7 +373,7 @@ func TestJob_RenderNeeds(t *testing.T) {
 		if result.CiJobYaml == nil {
 			t.Error("expected CiJobYaml, received nil")
 		}
-		if contains(result.CiJobYaml.Tags, stages.DYNAMIC.String()) {
+		if contains(result.CiJobYaml.Tags, stages.Enum().ValueSafe(stages.DYNAMIC)) {
 			t.Error("expected stage to be set to dynamic")
 		}
 		if result.CiJobYaml.Needs.GetNeeds() != nil {

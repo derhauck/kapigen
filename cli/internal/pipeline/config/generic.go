@@ -33,7 +33,7 @@ func (g *Generic) Validate() error {
 	if g.ImageName == "" {
 		g.ImageName = docker.Alpine_3_18.String()
 	}
-	g.InternalStage, _ = stages.FromString(g.Stage)
+	g.InternalStage, _ = stages.Enum().KeyFromValue(g.Stage)
 	if len(g.Changes) == 0 {
 		g.Changes = append(g.Changes, ".")
 	}

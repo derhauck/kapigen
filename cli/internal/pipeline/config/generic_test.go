@@ -17,7 +17,7 @@ func TestGeneric_Build(t *testing.T) {
 	t.Run("can build a slim generic pipeline", func(t *testing.T) {
 		expectedScripts := []string{"ls", "pwd"}
 		generic := &Generic{
-			Stage:   stages.TEST.String(),
+			Stage:   stages.Enum().ValueSafe(stages.TEST),
 			Scripts: expectedScripts,
 		}
 		main := factory.New(&cli.Settings{
@@ -52,7 +52,7 @@ func TestGeneric_Build(t *testing.T) {
 	t.Run("can build a generic pipeline with artifacts", func(t *testing.T) {
 		expectedScripts := []string{"ls", "pwd"}
 		generic := &Generic{
-			Stage:   stages.TEST.String(),
+			Stage:   stages.Enum().ValueSafe(stages.TEST),
 			Scripts: expectedScripts,
 			Artifacts: &job.ArtifactsYaml{
 				Name: "artifacts",
