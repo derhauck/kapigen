@@ -1,5 +1,5 @@
-# PHP Pipeline
-This pipeline allows you to run php tests
+# Generic Pipeline
+This pipeline allows you to run custom scripts inside a docker image.
 
 ### Parameters:
 ```yaml
@@ -18,9 +18,9 @@ config:
 ```
 
 ### Description:
-The pipeline will run php tests. In order to execute those it will run the jobs inside the specified image. 
+The pipeline will run the shell commands specified in the scripts section. In order to execute those it will run the jobs inside the specified image. 
 Either by using `imageName` or the `docker` configuration. If both are set the `docker` config takes precedence.
-* `imageName: [optional]` The image name to use for running the tests.
+* `imageName: [optional | default: 'alpine:3.18']` The image name to use for running the tests.
 
 * `variables: [optional]` Additional variables to set for the pipeline.
 * `changes: [optional | default: '.']` The changes to watch for in the pipeline
@@ -50,7 +50,8 @@ Pipeline will execute for the following types:
 ### Example:
 **Image only**
 ```yaml
-id: php
+type: generic
+id: generic
 config:
   scripts:
      - 'echo " \"hello ${HOST}!" > test.txt'
@@ -60,12 +61,12 @@ config:
     name: test
     paths:
       - test.txt
-  imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/php:8.1-cli-alpine3.15'
+  imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:3.18'
 ```
 **Docker only**
 ```yaml
-type: php
-id: php
+type: generic
+id: generic
 config:
   scripts:
     - 'echo " \"hello ${HOST}!" > test.txt'
