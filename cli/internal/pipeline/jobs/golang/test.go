@@ -36,7 +36,7 @@ func NewUnitTest(imageName string, path string, packages []string, source string
 			AddScriptf("%s 2>&1 | go-junit-report -parser gojson -iocopy -out junit.xml || (go tool cover -func profile.cov; exit 1)", testCmd).
 			AddScript("go tool cover -func profile.cov").
 			AddVariable("KTC_PATH", path).
-			AddArtifact(job.Artifact{
+			AddArtifact(job.Artifacts{
 				Name:  "report",
 				Paths: *(wrapper.NewArray[string]().Push(reportPath)),
 				Reports: artifact.NewReports().

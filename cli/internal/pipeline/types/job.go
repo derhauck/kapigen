@@ -55,7 +55,7 @@ func (j *Job) RenderNeeds() *Job {
 	if j.Needs != nil {
 		j.CiJobYaml.Needs = j.Needs.NeedsYaml()
 	}
-	if j.CiJobYaml.Stage != stages.DYNAMIC.String() {
+	if j.CiJobYaml.Stage != stages.Enum().ValueSafe(stages.DYNAMIC) {
 		if len(j.CiJobYaml.Needs.GetNeeds()) == 0 {
 			j.CiJobYaml.Needs = nil
 		}

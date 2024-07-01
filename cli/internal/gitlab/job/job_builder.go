@@ -20,7 +20,7 @@ func (c *CiJob) SetCodeCoverage(regex string) *CiJob {
 
 	return c
 }
-func (c *CiJob) AddArtifact(artifact Artifact) *CiJob {
+func (c *CiJob) AddArtifact(artifact Artifacts) *CiJob {
 	c.Artifact = artifact
 
 	return c

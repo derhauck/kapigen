@@ -113,19 +113,4 @@ var jobModes = map[JobMode]string{
 	Permissive: "permissive",
 	Disabled:   "disabled",
 }
-
-func (j JobMode) String() string {
-	if value, ok := jobModes[j]; ok {
-		return value
-	}
-	return jobModes[0]
-}
-
-func JobModeFromString(value string) (JobMode, error) {
-	for key, mode := range jobModes {
-		if mode == value {
-			return key, nil
-		}
-	}
-	return -1, types2.DetailedErrorf("Not a valid job mode: %s", value)
-}
+var JobModeEnum, _ = types2.NewEnum[JobMode](jobModes)

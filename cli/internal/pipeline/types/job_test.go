@@ -164,7 +164,7 @@ func TestJob_Render(t *testing.T) {
 		if len(newJob.CiJobYaml.Tags) != 1 {
 			t.Errorf("unexpected number of tags: %d", len(newJob.CiJobYaml.Tags))
 		}
-		if newJob.CiJobYaml.Stage != stages.DYNAMIC.String() {
+		if newJob.CiJobYaml.Stage != stages.Enum().ValueSafe(stages.DYNAMIC) {
 			t.Errorf("unexpected stage: %s", newJob.CiJobYaml.Stage)
 		}
 	})
@@ -336,5 +336,52 @@ func TestJob_EvaluateName(t *testing.T) {
 		if result.GetJobs()[2].GetName() != expected.GetJobs()[2].GetName() {
 			t.Errorf("expected job name not to be identical received: '%s'", result.GetJobs()[2].GetName())
 		}
+	})
+}
+
+func TestJobs_OverwriteTags(t *testing.T) {
+	t.Run("overwrite tags", func(t *testing.T) {
+		expectation := []string{"overwritten"}
+		oldTags := []string{"tag1", "tag2"}
+		jobs := Jobs{
+			&Job{CiJobYaml: &job.CiJobYaml{Tags: oldTags}},
+			&Job{CiJobYaml: &job.CiJobYaml{Tags: oldTags}},
+			&Job{CiJobYaml: &job.CiJobYaml{Tags: oldTags}},
+		}
+
+		jobs.OverwriteTags(expectation)
+		for _, finalJob := range jobs.GetJobs() {
+			if !reflect.DeepEqual(finalJob.CiJobYaml.Tags, expectation) {
+				t.Errorf("expected job to have tags: ['overwritten'], but it does not have %v", expectation)
+			}
+			if reflect.DeepEqual(finalJob.CiJobYaml.Tags, oldTags) {
+				t.Error("expected job to not have old tags")
+			}
+		}
+	})
+}
+
+func TestJob_RenderNeeds(t *testing.T) {
+	t.Run("render needs", func(t *testing.T) {
+		job1 := NewJob("Job 1", "golang:1.16", func(ciJob *job.CiJob) {
+			ciJob.TagMediumPressure().
+				AddScript("hello world").
+				SetStage(stages.TEST)
+		})
+
+		result := job1.RenderNeeds()
+		if result.CiJobYaml == nil {
+			t.Error("expected CiJobYaml, received nil")
+		}
+		if contains(result.CiJobYaml.Tags, stages.Enum().ValueSafe(stages.DYNAMIC)) {
+			t.Error("expected stage to be set to dynamic")
+		}
+		if result.CiJobYaml.Needs.GetNeeds() != nil {
+			t.Error("expected needs to be empty, received nil")
+		}
+		if len(result.CiJobYaml.Needs.GetNeeds()) != 0 {
+			t.Errorf("expected needs to be empty, received %v", result.CiJobYaml.Needs.GetNeeds())
+		}
+
 	})
 }
