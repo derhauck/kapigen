@@ -40,11 +40,3 @@ func Enum() *types.Enum[Stage, string] {
 func NewStage() Stage {
 	return DYNAMIC
 }
-
-//func (s Stage) String() string {
-//	if value, ok := values[s]; ok {
-//		return value
-//	}
-//	logger.Error(fmt.Sprintf("Stage not found for id: '%d'", s))
-//	return values[DYNAMIC]
-//}
