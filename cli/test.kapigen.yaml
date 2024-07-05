@@ -1,8 +1,8 @@
 noop: true
 versioning: false
 dependencyProxy: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}
-#tags:
-#  - saas-linux-medium-amd64
+tags:
+  - ${KAPIGEN_DEFAULT_RUNNER_TAG}
 pipelines:
   - type: docker
     id: test-cli

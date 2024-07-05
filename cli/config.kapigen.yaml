@@ -2,8 +2,8 @@ noop: true
 versioning: true
 dependencyProxy: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}
 privateTokenName: CI_PIPELINE_TOKEN
-#tags:
-#  - saas-linux-medium-amd64
+tags:
+  - ${KAPIGEN_DEFAULT_RUNNER_TAG}
 pipelines:
   - type: golang
     id: cli-golang
