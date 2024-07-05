@@ -8,9 +8,11 @@ workflow:
     - if: $CI_COMMIT_TAG
     - when: never
 
+variables:
+  KAPIGEN_DEFAULT_RUNNER_TAG: pressure:medium
 default:
   tags:
-    - pressure:medium
+    - ${KAPIGEN_DEFAULT_RUNNER_TAG}
 stages:
   - build
   - trigger
