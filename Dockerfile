@@ -7,6 +7,7 @@ ENV GOCACHE=/app/.cache
 COPY cli/cmd /app/cmd
 COPY cli/internal /app/internal
 COPY cli/factory /app/factory
+COPY cli/types /app/types
 COPY cli/go.mod cli/go.sum cli/main.go /app/
 COPY dsl /dsl
 #COPY .cache /app/.cache
