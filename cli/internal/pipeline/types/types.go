@@ -1,8 +1,8 @@
 package types
 
 import (
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/gitlab/job"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
 )
 
 type PipelineType string

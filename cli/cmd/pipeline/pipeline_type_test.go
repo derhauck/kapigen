@@ -5,14 +5,14 @@ import (
 	"strings"
 	"testing"
 
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/cli"
-	"kapigen.kateops.com/internal/environment"
-	"kapigen.kateops.com/internal/pipeline/config"
-	"kapigen.kateops.com/internal/pipeline/jobs/docker"
-	"kapigen.kateops.com/internal/pipeline/jobs/php"
-	"kapigen.kateops.com/internal/pipeline/types"
-	"kapigen.kateops.com/internal/version"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/cli/internal/cli"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/config"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/jobs/docker"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/jobs/php"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/types"
+	"gitlab.com/kateops/kapigen/cli/internal/version"
+	"gitlab.com/kateops/kapigen/dsl/environment"
 )
 
 func TestLoadJobsFromPipelineConfig(t *testing.T) {

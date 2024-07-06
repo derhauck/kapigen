@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"kapigen.kateops.com/internal/environment"
-	"kapigen.kateops.com/internal/types"
+	"gitlab.com/kateops/kapigen/dsl/environment"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
 func TestGolangAutoConfig(t *testing.T) {
@@ -18,11 +18,12 @@ func TestGolangAutoConfig(t *testing.T) {
 			name: "Can get golang auto config",
 			want: &Golang{
 				ImageName: "golang:1.21",
-				Path:      "cli",
+				Path:      "dsl",
 			},
 		},
 	}
 	environment.SetLocalEnv()
+	environment.CI_PROJECT_DIR.Set("/app")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := GolangAutoConfig(); !reflect.DeepEqual(got, tt.want) {
@@ -72,7 +73,7 @@ func TestGolangLint_Validate(t *testing.T) {
 		}
 
 		if err := config.Validate(); err == nil {
-			var detailed *types.DetailedError
+			var detailed *wrapper.DetailedError
 			if errors.As(err, &detailed) {
 				if detailed.Filename != "golang.go" {
 					t.Errorf("should have error in 'golang.go' file, received: %s", detailed.Filename)

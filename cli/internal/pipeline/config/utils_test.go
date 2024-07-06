@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"kapigen.kateops.com/internal/types"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
 func TestService_Validate(t *testing.T) {
@@ -27,7 +27,7 @@ func TestService_Validate(t *testing.T) {
 				Port:      8080,
 				ImageName: "test-image",
 			},
-			expected: types.NewMissingArgError("service.name"),
+			expected: wrapper.NewMissingArgError("service.name"),
 		},
 		{
 			name: "Invalid port",
@@ -36,7 +36,7 @@ func TestService_Validate(t *testing.T) {
 				Port:      0,
 				ImageName: "test-image",
 			},
-			expected: types.DetailedErrorf("service: 'test-service', invalid port %d (must be 1 - 65535)", 0),
+			expected: wrapper.DetailedErrorf("service: 'test-service', invalid port %d (must be 1 - 65535)", 0),
 		},
 		{
 			name: "Missing image name and docker",
@@ -44,7 +44,7 @@ func TestService_Validate(t *testing.T) {
 				Name: "test-service",
 				Port: 8080,
 			},
-			expected: types.NewMissingArgsError("service.imageName", "service.docker"),
+			expected: wrapper.NewMissingArgsError("service.imageName", "service.docker"),
 		},
 	}
 
@@ -82,7 +82,7 @@ func TestServices_Validate(t *testing.T) {
 				{Name: "service1", Port: 8080, ImageName: "test-image"},
 				{Name: "service2", Port: 8080, ImageName: "test-image"},
 			},
-			expected: types.DetailedErrorf("service: 'service2', referencing occupied port: %d", 8080),
+			expected: wrapper.DetailedErrorf("service: 'service2', referencing occupied port: %d", 8080),
 		},
 		{
 			name: "Invalid service",
@@ -90,7 +90,7 @@ func TestServices_Validate(t *testing.T) {
 				{Name: "service1", Port: 8080, ImageName: "test-image"},
 				{Name: "", Port: 8081, ImageName: "test-image"},
 			},
-			expected: types.NewMissingArgError("service.name"),
+			expected: wrapper.NewMissingArgError("service.name"),
 		},
 	}
 

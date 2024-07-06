@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/xanzy/go-gitlab"
-	"kapigen.kateops.com/internal/environment"
-	"kapigen.kateops.com/internal/logger"
+	"gitlab.com/kateops/kapigen/dsl/environment"
+	"gitlab.com/kateops/kapigen/dsl/logger"
 )
 
 const EmptyTag = "0.0.0"

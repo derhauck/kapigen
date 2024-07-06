@@ -1,6 +1,6 @@
 package config
 
-import "kapigen.kateops.com/internal/pipeline/types"
+import "gitlab.com/kateops/kapigen/cli/internal/pipeline/types"
 
 const (
 	DockerPipeline types.PipelineType = "docker"

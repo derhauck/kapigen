@@ -3,12 +3,12 @@ package config
 import (
 	"fmt"
 
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/gitlab/job"
-	"kapigen.kateops.com/internal/logger"
-	"kapigen.kateops.com/internal/pipeline/jobs/php"
-	"kapigen.kateops.com/internal/pipeline/types"
-	types2 "kapigen.kateops.com/internal/types"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/jobs/php"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/types"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
+	"gitlab.com/kateops/kapigen/dsl/logger"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
 type PhpComposer struct {
@@ -70,7 +70,7 @@ func (p *Php) Validate() error {
 		return err
 	}
 	if err := p.Services.Validate(); err != nil {
-		return types2.DetailedErrorE(err)
+		return wrapper.DetailedErrorE(err)
 	}
 	p.InternalListenerPorts = make(map[string]int32)
 	for _, service := range p.Services {
@@ -79,13 +79,13 @@ func (p *Php) Validate() error {
 
 	if p.Docker != nil {
 		if p.Docker.Path == "" {
-			return types2.NewMissingArgError("docker.path")
+			return wrapper.NewMissingArgError("docker.path")
 		}
 		p.ImageName = "docker"
 	}
 
 	if p.ImageName == "" && p.Docker == nil {
-		return types2.NewMissingArgsError("imageName", "docker")
+		return wrapper.NewMissingArgsError("imageName", "docker")
 	}
 	return nil
 }

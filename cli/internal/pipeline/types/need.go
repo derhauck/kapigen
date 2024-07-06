@@ -1,7 +1,7 @@
 package types
 
 import (
-	"kapigen.kateops.com/internal/gitlab/job"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
 )
 
 type Need struct {

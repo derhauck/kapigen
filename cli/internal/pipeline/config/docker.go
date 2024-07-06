@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"hash/fnv"
 
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/environment"
-	"kapigen.kateops.com/internal/gitlab/job"
-	"kapigen.kateops.com/internal/logger"
-	"kapigen.kateops.com/internal/pipeline/jobs/docker"
-	"kapigen.kateops.com/internal/pipeline/types"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/jobs/docker"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/types"
+	"gitlab.com/kateops/kapigen/dsl/environment"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
+	"gitlab.com/kateops/kapigen/dsl/logger"
 )
 
 type Docker struct {

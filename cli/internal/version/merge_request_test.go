@@ -3,7 +3,7 @@ package version
 import (
 	"testing"
 
-	"kapigen.kateops.com/internal/environment"
+	"gitlab.com/kateops/kapigen/dsl/environment"
 )
 
 func TestController_GetMergeRequestId(t *testing.T) {

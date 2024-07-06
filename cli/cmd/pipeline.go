@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"kapigen.kateops.com/cmd/pipeline"
+	"gitlab.com/kateops/kapigen/cli/cmd/pipeline"
 )
 
 var pipelineCmd = &cobra.Command{

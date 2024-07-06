@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	"github.com/mitchellh/mapstructure"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/cli/internal/docker"
+	"gitlab.com/kateops/kapigen/dsl/logger"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 	"gopkg.in/yaml.v3"
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/docker"
-	"kapigen.kateops.com/internal/logger"
-	errors2 "kapigen.kateops.com/internal/types"
 )
 
 type PipelineTypeConfig struct {
@@ -24,7 +24,7 @@ func (p *PipelineTypeConfig) Decode(factory *factory.MainFactory, configTypes ma
 	logger.Info(fmt.Sprintf("decoding pipeline type %s, id: %s", p.Type, p.PipelineId))
 	var pipelineConfig = configTypes[p.Type].New()
 	if pipelineConfig == nil {
-		return nil, errors2.DetailedErrorf("no pipeline definition found for type: '%s'", p.Type)
+		return nil, wrapper.DetailedErrorf("no pipeline definition found for type: '%s'", p.Type)
 	}
 	err := mapstructure.Decode(p.Config, pipelineConfig)
 	if err != nil {
@@ -71,7 +71,7 @@ type PipelineConfig struct {
 func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterface, pipelineType PipelineType, pipelineId string) (*Jobs, error) {
 	err := config.Validate()
 	if err != nil {
-		var re *errors2.DetailedError
+		var re *wrapper.DetailedError
 		if errors.As(err, &re) {
 			logger.Debug(re.Full())
 		}
@@ -85,7 +85,7 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 
 	jobs, err := config.Build(factory, pipelineType, pipelineId)
 	if err != nil {
-		var re *errors2.DetailedError
+		var re *wrapper.DetailedError
 		if errors.As(err, &re) {
 			logger.Debug(re.Full())
 		}
@@ -121,11 +121,11 @@ func (p *PipelineConfig) Decode(factory *factory.MainFactory, configTypes map[Pi
 		configuration := p.Pipelines[i]
 		if configuration.PipelineId == "" {
 			value, _ := yaml.Marshal(configuration)
-			return nil, errors2.DetailedErrorf("no pipeline id set for pipeline %v", string(value))
+			return nil, wrapper.DetailedErrorf("no pipeline id set for pipeline %v", string(value))
 		}
 		if configuration.Type == "" {
 			value, _ := yaml.Marshal(configuration)
-			return nil, errors2.DetailedErrorf("no pipeline type set for pipeline %v", string(value))
+			return nil, wrapper.DetailedErrorf("no pipeline type set for pipeline %v", string(value))
 		}
 		jobs, err := configuration.Decode(factory, configTypes)
 		if err != nil {

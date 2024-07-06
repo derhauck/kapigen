@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"kapigen.kateops.com/cmd"
-	"kapigen.kateops.com/internal/environment"
+	"gitlab.com/kateops/kapigen/cli/cmd"
+	"gitlab.com/kateops/kapigen/dsl/environment"
 )
 
 func main() {

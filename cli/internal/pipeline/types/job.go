@@ -5,10 +5,10 @@ import (
 	"os"
 
 	"github.com/kylelemons/godebug/diff"
-	"kapigen.kateops.com/internal/gitlab/job"
-	"kapigen.kateops.com/internal/gitlab/stages"
-	"kapigen.kateops.com/internal/logger"
-	"kapigen.kateops.com/internal/types"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/stages"
+	"gitlab.com/kateops/kapigen/dsl/logger"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
 type Job struct {
@@ -78,7 +78,7 @@ func (j *Job) UniqueName() error {
 		logger.Info(fmt.Sprintf("added unique name for Job: %s", j.GetName()))
 		return nil
 	}
-	return types.DetailedErrorf("job '%s' can not be more unique", j.GetName())
+	return wrapper.DetailedErrorf("job '%s' can not be more unique", j.GetName())
 }
 
 func (j *Job) DynamicMerge(jobs *Jobs) (*Job, error) {

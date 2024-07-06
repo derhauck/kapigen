@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"kapigen.kateops.com/internal/gitlab/job"
-	"kapigen.kateops.com/internal/gitlab/stages"
-	"kapigen.kateops.com/internal/gitlab/tags"
+	"gitlab.com/kateops/kapigen/dsl/enum"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/stages"
 )
 
 func TestJobs_FindJobsByPipelineId(t *testing.T) {
@@ -143,7 +143,7 @@ func TestJob_Render(t *testing.T) {
 
 	t.Run("renders job correctly", func(t *testing.T) {
 		newJob := NewJob("Test Job", "golang:1.16", func(ciJob *job.CiJob) {
-			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+			ciJob.Tags.Add(enum.TagPressureMedium)
 		})
 		err := newJob.Render()
 		if err != nil {
@@ -157,8 +157,8 @@ func TestJob_Render(t *testing.T) {
 			t.Errorf("unexpected image name: %s", newJob.CiJobYaml.Image.Name)
 		}
 
-		if !contains(newJob.CiJobYaml.Tags, tags.PRESSURE_MEDIUM.String()) {
-			t.Errorf("expected to contain tag: %s", tags.PRESSURE_MEDIUM.String())
+		if !contains(newJob.CiJobYaml.Tags, enum.TagPressureMedium.String()) {
+			t.Errorf("expected to contain tag: %s", enum.TagPressureMedium.String())
 		}
 
 		if len(newJob.CiJobYaml.Tags) != 1 {
@@ -174,10 +174,10 @@ func TestJob_DynamicMerge(t *testing.T) {
 
 	t.Run("merges job with compatible job", func(t *testing.T) {
 		job1 := NewJob("Job 1", "golang:1.16", func(ciJob *job.CiJob) {
-			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+			ciJob.Tags.Add(enum.TagPressureMedium)
 		})
 		job2 := NewJob("Job 2", "golang:1.16", func(ciJob *job.CiJob) {
-			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+			ciJob.Tags.Add(enum.TagPressureMedium)
 		})
 		jobs := Jobs{job1, job2}
 		job2.AddJobAsNeed(job1)
@@ -205,10 +205,10 @@ func TestJob_DynamicMerge(t *testing.T) {
 
 	t.Run("does not merge job with incompatible job", func(t *testing.T) {
 		job1 := NewJob("Job 1", "golang:1.16", func(ciJob *job.CiJob) {
-			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+			ciJob.Tags.Add(enum.TagPressureMedium)
 		})
 		job2 := NewJob("Job 2", "node:14", func(ciJob *job.CiJob) {
-			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+			ciJob.Tags.Add(enum.TagPressureMedium)
 		})
 		jobs := Jobs{job1, job2}
 
@@ -236,13 +236,13 @@ func TestJobs_DynamicMerge(t *testing.T) {
 
 	t.Run("merges compatible jobs", func(t *testing.T) {
 		job1 := NewJob("Job 1", "golang:1.16", func(ciJob *job.CiJob) {
-			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+			ciJob.Tags.Add(enum.TagPressureMedium)
 		})
 		job2 := NewJob("Job 2", "golang:1.16", func(ciJob *job.CiJob) {
-			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+			ciJob.Tags.Add(enum.TagPressureMedium)
 		})
 		job3 := NewJob("Job 3", "node:14", func(ciJob *job.CiJob) {
-			ciJob.Tags.Add(tags.PRESSURE_MEDIUM)
+			ciJob.Tags.Add(enum.TagPressureMedium)
 		})
 		jobs := Jobs{job1, job2, job3}
 		job3.AddJobAsNeed(job1)

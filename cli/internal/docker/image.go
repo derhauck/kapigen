@@ -3,7 +3,7 @@ package docker
 import (
 	"fmt"
 
-	"kapigen.kateops.com/internal/logger"
+	"gitlab.com/kateops/kapigen/dsl/logger"
 )
 
 type Image int

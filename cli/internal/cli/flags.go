@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"kapigen.kateops.com/internal/logger"
-	"kapigen.kateops.com/internal/logger/level"
+	"gitlab.com/kateops/kapigen/dsl/logger"
+	"gitlab.com/kateops/kapigen/dsl/logger/level"
 )
 
 type PersistentConfig struct {

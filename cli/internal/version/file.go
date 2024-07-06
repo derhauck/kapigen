@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"kapigen.kateops.com/internal/logger"
+	"gitlab.com/kateops/kapigen/dsl/logger"
 )
 
 const DefaultTagFile = ".version"

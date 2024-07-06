@@ -3,7 +3,7 @@ package cli
 import (
 	"testing"
 
-	"kapigen.kateops.com/internal/version"
+	"gitlab.com/kateops/kapigen/cli/internal/version"
 )
 
 func TestSetMode(t *testing.T) {

@@ -2,10 +2,11 @@ package version
 
 import (
 	"fmt"
-	"github.com/Masterminds/semver/v3"
-	"kapigen.kateops.com/internal/logger"
 	"regexp"
 	"strings"
+
+	"github.com/Masterminds/semver/v3"
+	"gitlab.com/kateops/kapigen/dsl/logger"
 )
 
 func GetFeatureBranchVersion(tag string, branch string) string {

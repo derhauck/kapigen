@@ -1,14 +1,14 @@
 package config
 
 import (
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/docker"
-	"kapigen.kateops.com/internal/gitlab/job"
-	artifact2 "kapigen.kateops.com/internal/gitlab/job/artifact"
-	"kapigen.kateops.com/internal/gitlab/stages"
-	"kapigen.kateops.com/internal/pipeline/types"
-	"kapigen.kateops.com/internal/pipeline/wrapper"
-	"kapigen.kateops.com/internal/when"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/cli/internal/docker"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/types"
+	"gitlab.com/kateops/kapigen/dsl/enum"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
+	artifact2 "gitlab.com/kateops/kapigen/dsl/gitlab/job/artifact"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/stages"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
 type Generic struct {
@@ -76,9 +76,9 @@ func (g *Generic) Rules() *job.Rules {
 		rules = append(rules, &job.Rule{
 			If:           rule.If,
 			Changes:      *wrapper.NewArray[string]().Push(rule.Changes...),
-			AllowFailure: wrapper.Bool{Value: allowFailure},
+			AllowFailure: allowFailure,
 			Variables:    rule.Variables,
-			When:         job.NewWhen(when.OnSuccess),
+			When:         job.NewWhen(enum.WhenOnSuccess),
 		})
 	}
 	if len(g.RuleSet) > 0 {
