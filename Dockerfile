@@ -4,10 +4,11 @@ FROM gitlab.com/kateops/dependency_proxy/containers/golang:1.21.3-alpine3.18 as 
 ENV GOMODCACHE=/app/.pkg
 ENV GOCACHE=/app/.cache
 
-COPY cmd /app/cmd
-COPY internal /app/internal
-COPY factory /app/factory
-COPY go.mod go.sum main.go /app/
+COPY cli/cmd /app/cmd
+COPY cli/internal /app/internal
+COPY cli/factory /app/factory
+COPY cli/go.mod cli/go.sum cli/main.go /app/
+COPY dsl /dsl
 #COPY .cache /app/.cache
 #COPY .pkg /app/.pkg
 WORKDIR /app

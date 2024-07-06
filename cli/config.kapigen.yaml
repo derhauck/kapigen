@@ -16,7 +16,8 @@ pipelines:
   - type: docker
     id: cli-docker
     config:
-      path: cli
+      path: .
+      context: .
       name: cli
     needs:
       - cli-golang
