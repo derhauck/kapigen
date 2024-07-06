@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.com/kateops/kapigen/cli/internal/docker"
-	"gitlab.com/kateops/kapigen/cli/internal/pipeline/types"
+	"gitlab.com/kateops/kapigen/cli/types"
 	"gitlab.com/kateops/kapigen/dsl/enum"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/job/artifact"

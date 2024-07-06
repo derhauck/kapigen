@@ -5,7 +5,7 @@ import (
 
 	"gitlab.com/kateops/kapigen/cli/factory"
 	"gitlab.com/kateops/kapigen/cli/internal/pipeline/jobs/php"
-	"gitlab.com/kateops/kapigen/cli/internal/pipeline/types"
+	types2 "gitlab.com/kateops/kapigen/cli/types"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
 	"gitlab.com/kateops/kapigen/dsl/logger"
 	"gitlab.com/kateops/kapigen/dsl/wrapper"
@@ -59,7 +59,7 @@ type Php struct {
 	InternalListenerPorts map[string]int32
 }
 
-func (p *Php) New() types.PipelineConfigInterface {
+func (p *Php) New() types2.PipelineConfigInterface {
 	return &Php{}
 }
 func (p *Php) Validate() error {
@@ -90,8 +90,8 @@ func (p *Php) Validate() error {
 	return nil
 }
 
-func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
-	var jobs = &types.Jobs{}
+func (p *Php) Build(factory *factory.MainFactory, pipelineType types2.PipelineType, Id string) (*types2.Jobs, error) {
+	var jobs = &types2.Jobs{}
 	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.Path, p.Phpunit.Args, p.Phpunit.Bin, p.InternalListenerPorts)
 	p.InternalChanges = []string{p.Composer.Path}
 	if err != nil {
@@ -99,7 +99,7 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 	}
 	if p.Docker != nil {
 		dockerPipeline := p.Docker.DockerConfig()
-		jobs, err = types.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
+		jobs, err = types2.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
 		if err != nil {
 			return nil, err
 		}

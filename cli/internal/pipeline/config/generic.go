@@ -3,7 +3,7 @@ package config
 import (
 	"gitlab.com/kateops/kapigen/cli/factory"
 	"gitlab.com/kateops/kapigen/cli/internal/docker"
-	"gitlab.com/kateops/kapigen/cli/internal/pipeline/types"
+	types2 "gitlab.com/kateops/kapigen/cli/types"
 	"gitlab.com/kateops/kapigen/dsl/enum"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
 	artifact2 "gitlab.com/kateops/kapigen/dsl/gitlab/job/artifact"
@@ -24,7 +24,7 @@ type Generic struct {
 	InternalChanges []string
 }
 
-func (g *Generic) New() types.PipelineConfigInterface {
+func (g *Generic) New() types2.PipelineConfigInterface {
 	return &Generic{}
 }
 
@@ -42,9 +42,9 @@ func (g *Generic) Validate() error {
 	return nil
 }
 
-func (g *Generic) Build(_ *factory.MainFactory, _ types.PipelineType, _ string) (*types.Jobs, error) {
-	var allJobs types.Jobs
-	generic := types.NewJob("Generic Job", g.ImageName, func(ciJob *job.CiJob) {
+func (g *Generic) Build(_ *factory.MainFactory, _ types2.PipelineType, _ string) (*types2.Jobs, error) {
+	var allJobs types2.Jobs
+	generic := types2.NewJob("Generic Job", g.ImageName, func(ciJob *job.CiJob) {
 		ciJob.SetStage(g.InternalStage).
 			AddScripts(g.Scripts).
 			TagMediumPressure()

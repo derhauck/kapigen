@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gitlab.com/kateops/kapigen/cli/internal/pipeline/types"
+	"gitlab.com/kateops/kapigen/cli/types"
 	"gitlab.com/kateops/kapigen/dsl/enum"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/job/artifact"

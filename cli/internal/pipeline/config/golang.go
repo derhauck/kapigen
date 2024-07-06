@@ -10,7 +10,7 @@ import (
 	"gitlab.com/kateops/kapigen/cli/factory"
 	"gitlab.com/kateops/kapigen/cli/internal/docker"
 	"gitlab.com/kateops/kapigen/cli/internal/pipeline/jobs/golang"
-	"gitlab.com/kateops/kapigen/cli/internal/pipeline/types"
+	types2 "gitlab.com/kateops/kapigen/cli/types"
 	"gitlab.com/kateops/kapigen/dsl/environment"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
 	"gitlab.com/kateops/kapigen/dsl/logger"
@@ -67,7 +67,7 @@ type Golang struct {
 	changes   []string
 }
 
-func (g *Golang) New() types.PipelineConfigInterface {
+func (g *Golang) New() types2.PipelineConfigInterface {
 	return &Golang{}
 }
 
@@ -108,8 +108,8 @@ func (g *Golang) Validate() error {
 	return nil
 }
 
-func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
-	var allJobs = types.Jobs{}
+func (g *Golang) Build(factory *factory.MainFactory, pipelineType types2.PipelineType, Id string) (*types2.Jobs, error) {
+	var allJobs = types2.Jobs{}
 
 	golangUnitTestJob, err := golang.NewUnitTest(g.ImageName, g.Path, g.Coverage.Packages, g.Coverage.Source)
 	golangLint := golang.Lint(g.Lint.imageName, g.Path)
@@ -119,7 +119,7 @@ func (g *Golang) Build(factory *factory.MainFactory, pipelineType types.Pipeline
 	g.changes = []string{g.Path}
 	if g.Docker != nil {
 		dockerPipeline := g.Docker.DockerConfig()
-		jobs, err := types.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
+		jobs, err := types2.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
 		if err != nil {
 			return nil, err
 		}

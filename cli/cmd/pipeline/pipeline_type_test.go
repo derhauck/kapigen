@@ -10,16 +10,16 @@ import (
 	"gitlab.com/kateops/kapigen/cli/internal/pipeline/config"
 	"gitlab.com/kateops/kapigen/cli/internal/pipeline/jobs/docker"
 	"gitlab.com/kateops/kapigen/cli/internal/pipeline/jobs/php"
-	"gitlab.com/kateops/kapigen/cli/internal/pipeline/types"
 	"gitlab.com/kateops/kapigen/cli/internal/version"
+	types2 "gitlab.com/kateops/kapigen/cli/types"
 	"gitlab.com/kateops/kapigen/dsl/environment"
 )
 
 func TestLoadJobsFromPipelineConfig(t *testing.T) {
 	type args struct {
 		factory        *factory.MainFactory
-		pipelineConfig types.PipelineConfig
-		configTypes    map[types.PipelineType]types.PipelineConfigInterface
+		pipelineConfig types2.PipelineConfig
+		configTypes    map[types2.PipelineType]types2.PipelineConfigInterface
 	}
 
 	environment.CI_COMMIT_BRANCH.Set("feature/test")
@@ -36,7 +36,7 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *types.Jobs
+		want    *types2.Jobs
 		wantErr bool
 	}{
 		{
@@ -44,10 +44,10 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 			args: args{
 				factory:     mainFactory,
 				configTypes: configTypes,
-				pipelineConfig: types.PipelineConfig{
-					Pipelines: []types.PipelineTypeConfig{
+				pipelineConfig: types2.PipelineConfig{
+					Pipelines: []types2.PipelineTypeConfig{
 						{
-							Type: types.PipelineType("php"),
+							Type: types2.PipelineType("php"),
 							Config: config.Php{
 								Composer: config.PhpComposer{
 									Path: ".",
@@ -59,8 +59,8 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 					},
 				},
 			},
-			want: &types.Jobs{
-				func() *types.Job {
+			want: &types2.Jobs{
+				func() *types2.Job {
 					job, _ := php.NewPhpUnit("testImage", ".", "", ".", "", "./vendor/bin/phpunit", map[string]int32{})
 					return job
 				}(),
@@ -71,10 +71,10 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 			args: args{
 				factory:     mainFactory,
 				configTypes: configTypes,
-				pipelineConfig: types.PipelineConfig{
-					Pipelines: []types.PipelineTypeConfig{
+				pipelineConfig: types2.PipelineConfig{
+					Pipelines: []types2.PipelineTypeConfig{
 						{
-							Type: types.PipelineType("docker"),
+							Type: types2.PipelineType("docker"),
 							Config: config.Docker{
 								Path:      ".",
 								ImageName: "testImage",
@@ -84,8 +84,8 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 					},
 				},
 			},
-			want: &types.Jobs{
-				func() *types.Job {
+			want: &types2.Jobs{
+				func() *types2.Job {
 					job, _ := docker.NewDaemonlessBuildkitBuild("testImage", ".", ".", "Dockerfile", []string{"${CI_REGISTRY_IMAGE}:1.0.0", "${CI_REGISTRY_IMAGE}:latest"}, []string{})
 					return job
 				}(),
@@ -95,7 +95,7 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := types.LoadJobsFromPipelineConfig(tt.args.factory, tt.args.pipelineConfig, tt.args.configTypes)
+			got, err := types2.LoadJobsFromPipelineConfig(tt.args.factory, tt.args.pipelineConfig, tt.args.configTypes)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("LoadJobsFromPipelineConfig() error = %v, wantErr %v", err, tt.wantErr)
 				return

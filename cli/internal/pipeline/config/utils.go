@@ -2,7 +2,7 @@ package config
 
 import (
 	"gitlab.com/kateops/kapigen/cli/factory"
-	"gitlab.com/kateops/kapigen/cli/internal/pipeline/types"
+	types2 "gitlab.com/kateops/kapigen/cli/types"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
 	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
@@ -50,10 +50,10 @@ func (s *Service) Validate() error {
 	return nil
 }
 
-func (s *Service) CreateService(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, *job.Service, error) {
+func (s *Service) CreateService(factory *factory.MainFactory, pipelineType types2.PipelineType, Id string) (*types2.Jobs, *job.Service, error) {
 	if s.Docker != nil {
 		dockerPipeline := s.Docker.DockerConfig()
-		jobs, err := types.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
+		jobs, err := types2.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -63,7 +63,7 @@ func (s *Service) CreateService(factory *factory.MainFactory, pipelineType types
 	} else {
 		service := job.NewService(s.ImageName, s.Name, s.Port)
 
-		return &types.Jobs{}, service, nil
+		return &types2.Jobs{}, service, nil
 	}
 }
 
@@ -84,7 +84,7 @@ func (s *Services) Validate() error {
 	return nil
 }
 
-func (s *Services) AddToJob(factory *factory.MainFactory, pipelineType types.PipelineType, Id string, pipelineJobs *types.Jobs, targetJob *types.Job) error {
+func (s *Services) AddToJob(factory *factory.MainFactory, pipelineType types2.PipelineType, Id string, pipelineJobs *types2.Jobs, targetJob *types2.Job) error {
 	for _, service := range *s {
 		jobs, jobService, err := service.CreateService(factory, pipelineType, Id)
 		if err != nil {
