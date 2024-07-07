@@ -1,4 +1,3 @@
-version: "3.7"
 services:
   app:
     image: golang:1.21
@@ -9,4 +8,4 @@ services:
       GOCACHE: /app/cli/.cache
       ENVIRONMENT: DEV
     volumes:
-      - .:/app/cli
+      - ../:/app

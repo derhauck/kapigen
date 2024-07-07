@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	cmd "kapigen.kateops.com/cmd/version"
+	cmd "gitlab.com/kateops/kapigen/cli/cmd/version"
 )
 
 var versionCmd = &cobra.Command{

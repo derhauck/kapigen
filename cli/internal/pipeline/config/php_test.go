@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/cli"
-	errors2 "kapigen.kateops.com/internal/types"
-	"kapigen.kateops.com/internal/version"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/cli/internal/cli"
+	"gitlab.com/kateops/kapigen/cli/internal/version"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
 func TestPhpComposerValidate(t *testing.T) {
@@ -56,7 +56,7 @@ func TestPhpValidate(t *testing.T) {
 		if err == nil {
 			t.Error("Expected error when phpunit job creation fails, but got nil")
 		}
-		var re *errors2.DetailedError
+		var re *wrapper.DetailedError
 		if !errors.As(err, &re) {
 			t.Errorf("Expected error to be of type 'DetailedError', got '%s'", err.Error())
 		}

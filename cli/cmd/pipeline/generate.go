@@ -4,15 +4,14 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/cli/internal/cli"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/config"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/jobs"
+	"gitlab.com/kateops/kapigen/cli/internal/version"
+	"gitlab.com/kateops/kapigen/cli/types"
+	"gitlab.com/kateops/kapigen/dsl/logger"
 	"gopkg.in/yaml.v3"
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/cli"
-	"kapigen.kateops.com/internal/gitlab/pipeline"
-	"kapigen.kateops.com/internal/logger"
-	"kapigen.kateops.com/internal/pipeline/config"
-	"kapigen.kateops.com/internal/pipeline/jobs"
-	"kapigen.kateops.com/internal/pipeline/types"
-	"kapigen.kateops.com/internal/version"
 )
 
 var GenerateCmd = &cobra.Command{
@@ -82,7 +81,6 @@ var GenerateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		var ciPipeline map[string]interface{}
 		if !noMerge {
 			pipelineJobs, err = pipelineJobs.DynamicMerge()
 			if err != nil {
@@ -97,21 +95,8 @@ var GenerateCmd = &cobra.Command{
 		}
 		pipelineJobs.OverwriteTags(pipelineConfig.Tags)
 		logger.Info("ci jobs named to be unique")
-		ciPipeline = types.JobsToMap(pipelineJobs)
-		logger.Info("ci job list converted to map")
-		pipeline.NewDefaultCiPipeline().Render().AddToMap(ciPipeline)
-		logger.Info("ci jobs rendered")
+		return types.JobsToYamLFile(pipelineJobs, pipelineFile)
 
-		data, err := yaml.Marshal(ciPipeline)
-		if err != nil {
-			return err
-		}
-		logger.Info("converted pipeline to yaml")
-
-		err = os.WriteFile(pipelineFile, data, 0666)
-		logger.Info("wrote yaml to file: " + pipelineFile)
-
-		return err
 	},
 }
 

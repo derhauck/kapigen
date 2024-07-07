@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/dsl.iml" filepath="$PROJECT_DIR$/dsl.iml" />
       <module fileurl="file://$PROJECT_DIR$/kapigen.iml" filepath="$PROJECT_DIR$/kapigen.iml" />
     </modules>
   </component>

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"kapigen.kateops.com/internal/docker"
-	"kapigen.kateops.com/internal/gitlab/job"
-	"kapigen.kateops.com/internal/gitlab/tags"
-	"kapigen.kateops.com/internal/pipeline/types"
-	types2 "kapigen.kateops.com/internal/types"
+	"gitlab.com/kateops/kapigen/cli/internal/docker"
+	"gitlab.com/kateops/kapigen/cli/types"
+	"gitlab.com/kateops/kapigen/dsl/enum"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
 func NewDaemonlessBuildkitBuild(imageName string, path string, context string, dockerfile string, destination []string, buildArgs []string) (*types.Job, error) {
@@ -16,7 +16,7 @@ func NewDaemonlessBuildkitBuild(imageName string, path string, context string, d
 		imageName = docker.BUILDKIT_ROTLESS.String()
 	}
 	if len(destination) == 0 {
-		return nil, types2.DetailedErrorf("destination must be set")
+		return nil, wrapper.DetailedErrorf("destination must be set")
 	}
 	return types.NewJob("Daemonless Build", imageName, func(ciJob *job.CiJob) {
 		ciJob.Image.Entrypoint.
@@ -75,6 +75,6 @@ func NewDaemonlessBuildkitBuild(imageName string, path string, context string, d
 			AddVariable("BUILDKITD_FLAGS", "--oci-worker-no-process-sandbox").
 			AddVariable("DOCKER_CONFIG", "${CI_PROJECT_DIR}").
 			AddVariable("BUILDCTL_CONNECT_RETRIES_MAX", "52")
-		ciJob.Tags.Add(tags.PRESSURE_EXCLUSIVE)
+		ciJob.Tags.Add(enum.TagPressureExclusive)
 	}), nil
 }

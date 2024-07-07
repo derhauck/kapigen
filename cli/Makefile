@@ -1,29 +1,27 @@
 include ../Makefile
 GO_SRC_PATH=/app/cli
-GO_ARGS=-it -e GOMODCACHE=/app/cli/.pkg -e GOCACHE=/app/cli/.cache -e ENVIRONMENT=DEV
+DOCKER_ARGS=-it -e GOMODCACHE=/app/cli/.pkg -e GOCACHE=/app/cli/.cache -e ENVIRONMENT=DEV -w /app/cli
+
 .PHONY: cli
 cli: DOCKER_ARGS=$(GO_ARGS)
 cli:
 	$(DOCKER_RUN) $(GO_IMAGE) bash
 
 .PHONY: run
-run: DOCKER_ARGS=$(GO_ARGS)
 run:
 	$(DOCKER_RUN) -w $(GO_SRC_PATH) $(GO_IMAGE) go run . $(ARGS)
 
 .PHONY: build
-build: DOCKER_ARGS=$(GO_ARGS)
 build:
 	$(DOCKER_RUN) -w $(GO_SRC_PATH) $(GO_IMAGE) go build -o .bin/kapigen .
 	chmod +x bin/kapigen
 
 .PHONY: test
-test: DOCKER_ARGS=$(GO_ARGS)
 test:
-	$(DOCKER_RUN)  -w $(GO_SRC_PATH) $(GO_IMAGE) go test ./...  -coverpkg=kapigen.kateops.com/internal/... -coverprofile=profile.cov
+	$(DOCKER_RUN)  -w $(GO_SRC_PATH) $(GO_IMAGE) go test ./...  -coverpkg=gitlab.com/kateops/kapigen/cli/internal/... -coverprofile=profile.cov
 	$(DOCKER_RUN)  -w $(GO_SRC_PATH) $(GO_IMAGE) go tool cover -func profile.cov
+
 .PHONY: test-report
-test-report: DOCKER_ARGS=$(GO_ARGS)
 test-report:
 	$(DOCKER_RUN) --entrypoint=/bin/sh -w $(GO_SRC_PATH) $(GO_IMAGE) -c "go-junit-report -parser gojson -iocopy -out junit.xml"
 

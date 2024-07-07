@@ -1,14 +1,14 @@
 package config
 
 import (
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/docker"
-	"kapigen.kateops.com/internal/gitlab/job"
-	artifact2 "kapigen.kateops.com/internal/gitlab/job/artifact"
-	"kapigen.kateops.com/internal/gitlab/stages"
-	"kapigen.kateops.com/internal/pipeline/types"
-	"kapigen.kateops.com/internal/pipeline/wrapper"
-	"kapigen.kateops.com/internal/when"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/cli/internal/docker"
+	types2 "gitlab.com/kateops/kapigen/cli/types"
+	"gitlab.com/kateops/kapigen/dsl/enum"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
+	artifact2 "gitlab.com/kateops/kapigen/dsl/gitlab/job/artifact"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/stages"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
 type Generic struct {
@@ -24,7 +24,7 @@ type Generic struct {
 	InternalChanges []string
 }
 
-func (g *Generic) New() types.PipelineConfigInterface {
+func (g *Generic) New() types2.PipelineConfigInterface {
 	return &Generic{}
 }
 
@@ -42,9 +42,9 @@ func (g *Generic) Validate() error {
 	return nil
 }
 
-func (g *Generic) Build(_ *factory.MainFactory, _ types.PipelineType, _ string) (*types.Jobs, error) {
-	var allJobs types.Jobs
-	generic := types.NewJob("Generic Job", g.ImageName, func(ciJob *job.CiJob) {
+func (g *Generic) Build(_ *factory.MainFactory, _ types2.PipelineType, _ string) (*types2.Jobs, error) {
+	var allJobs types2.Jobs
+	generic := types2.NewJob("Generic Job", g.ImageName, func(ciJob *job.CiJob) {
 		ciJob.SetStage(g.InternalStage).
 			AddScripts(g.Scripts).
 			TagMediumPressure()
@@ -76,9 +76,9 @@ func (g *Generic) Rules() *job.Rules {
 		rules = append(rules, &job.Rule{
 			If:           rule.If,
 			Changes:      *wrapper.NewArray[string]().Push(rule.Changes...),
-			AllowFailure: wrapper.Bool{Value: allowFailure},
+			AllowFailure: allowFailure,
 			Variables:    rule.Variables,
-			When:         job.NewWhen(when.OnSuccess),
+			When:         job.NewWhen(enum.WhenOnSuccess),
 		})
 	}
 	if len(g.RuleSet) > 0 {

@@ -4,13 +4,13 @@ import (
 	"reflect"
 	"testing"
 
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/cli"
-	"kapigen.kateops.com/internal/docker"
-	"kapigen.kateops.com/internal/gitlab/job"
-	"kapigen.kateops.com/internal/gitlab/job/artifact"
-	"kapigen.kateops.com/internal/gitlab/stages"
-	"kapigen.kateops.com/internal/version"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/cli/internal/cli"
+	"gitlab.com/kateops/kapigen/cli/internal/docker"
+	"gitlab.com/kateops/kapigen/cli/internal/version"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job/artifact"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/stages"
 )
 
 func TestGeneric_Build(t *testing.T) {

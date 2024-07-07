@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"kapigen.kateops.com/internal/gitlab/tags"
+	"gitlab.com/kateops/kapigen/dsl/enum"
 )
 
 var defaultCoveragePackages = []string{"./..."}
@@ -49,7 +49,7 @@ func TestCreate(t *testing.T) {
 			t.Error("job has wrong name")
 		}
 		for _, tag := range job.CiJob.Tags {
-			medium := tags.PRESSURE_MEDIUM
+			medium := enum.TagPressureMedium
 			if tag.Get() != medium.String() {
 				t.Error("job has wrong tags")
 			}

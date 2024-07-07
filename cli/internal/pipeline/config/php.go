@@ -3,12 +3,12 @@ package config
 import (
 	"fmt"
 
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/gitlab/job"
-	"kapigen.kateops.com/internal/logger"
-	"kapigen.kateops.com/internal/pipeline/jobs/php"
-	"kapigen.kateops.com/internal/pipeline/types"
-	types2 "kapigen.kateops.com/internal/types"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/jobs/php"
+	types2 "gitlab.com/kateops/kapigen/cli/types"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
+	"gitlab.com/kateops/kapigen/dsl/logger"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
 type PhpComposer struct {
@@ -59,7 +59,7 @@ type Php struct {
 	InternalListenerPorts map[string]int32
 }
 
-func (p *Php) New() types.PipelineConfigInterface {
+func (p *Php) New() types2.PipelineConfigInterface {
 	return &Php{}
 }
 func (p *Php) Validate() error {
@@ -70,7 +70,7 @@ func (p *Php) Validate() error {
 		return err
 	}
 	if err := p.Services.Validate(); err != nil {
-		return types2.DetailedErrorE(err)
+		return wrapper.DetailedErrorE(err)
 	}
 	p.InternalListenerPorts = make(map[string]int32)
 	for _, service := range p.Services {
@@ -79,19 +79,19 @@ func (p *Php) Validate() error {
 
 	if p.Docker != nil {
 		if p.Docker.Path == "" {
-			return types2.NewMissingArgError("docker.path")
+			return wrapper.NewMissingArgError("docker.path")
 		}
 		p.ImageName = "docker"
 	}
 
 	if p.ImageName == "" && p.Docker == nil {
-		return types2.NewMissingArgsError("imageName", "docker")
+		return wrapper.NewMissingArgsError("imageName", "docker")
 	}
 	return nil
 }
 
-func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, error) {
-	var jobs = &types.Jobs{}
+func (p *Php) Build(factory *factory.MainFactory, pipelineType types2.PipelineType, Id string) (*types2.Jobs, error) {
+	var jobs = &types2.Jobs{}
 	phpUnitJob, err := php.NewPhpUnit(p.ImageName, p.Composer.Path, p.Composer.Args, p.Phpunit.Path, p.Phpunit.Args, p.Phpunit.Bin, p.InternalListenerPorts)
 	p.InternalChanges = []string{p.Composer.Path}
 	if err != nil {
@@ -99,7 +99,7 @@ func (p *Php) Build(factory *factory.MainFactory, pipelineType types.PipelineTyp
 	}
 	if p.Docker != nil {
 		dockerPipeline := p.Docker.DockerConfig()
-		jobs, err = types.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
+		jobs, err = types2.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
 		if err != nil {
 			return nil, err
 		}

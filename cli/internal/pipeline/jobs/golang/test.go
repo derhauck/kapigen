@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"kapigen.kateops.com/internal/gitlab/job"
-	"kapigen.kateops.com/internal/gitlab/job/artifact"
-	"kapigen.kateops.com/internal/gitlab/job/artifact/reports"
-	"kapigen.kateops.com/internal/gitlab/stages"
-	"kapigen.kateops.com/internal/pipeline/types"
-	"kapigen.kateops.com/internal/pipeline/wrapper"
-	"kapigen.kateops.com/internal/when"
+	"gitlab.com/kateops/kapigen/cli/types"
+	"gitlab.com/kateops/kapigen/dsl/enum"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job/artifact"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job/artifact/reports"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/stages"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
 func NewUnitTest(imageName string, path string, packages []string, source string) (*types.Job, error) {
@@ -42,7 +42,7 @@ func NewUnitTest(imageName string, path string, packages []string, source string
 				Reports: artifact.NewReports().
 					SetCoverageReport(artifact.NewCoverageReport(reports.Cobertura, reportPath)).
 					SetJunit(artifact.NewJunitReport(reportPath)),
-				When: job.NewWhen(when.Always),
+				When: job.NewWhen(enum.WhenAlways),
 			}).
 			SetCodeCoverage(`/\(statements\)(?:\s+)?(\d+(?:\.\d+)?%)/`)
 

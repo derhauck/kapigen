@@ -11,12 +11,22 @@ pipelines:
       path: cli
       coverage:
         packages:
-          - kapigen.kateops.com/internal/...
+          - gitlab.com/kateops/kapigen/cli/internal/...
+      imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
+  - type: golang
+    id: dsl-golang
+    config:
+      path: dsl
+      coverage:
+        packages:
+          - gitlab.com/kateops/kapigen/dsl/...
       imageName: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.21.3-alpine3.18'
   - type: docker
     id: cli-docker
     config:
-      path: cli
+      path: .
+      context: .
       name: cli
     needs:
       - cli-golang
+      - dsl-golang

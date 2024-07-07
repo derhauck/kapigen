@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/cli"
-	"kapigen.kateops.com/internal/logger"
-	"kapigen.kateops.com/internal/version"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/cli/internal/cli"
+	"gitlab.com/kateops/kapigen/cli/internal/version"
+	"gitlab.com/kateops/kapigen/dsl/logger"
 )
 
 var NewCmd = &cobra.Command{

@@ -1,12 +1,9 @@
-NPM_IMAGE=node:current-alpine3.15
 GO_IMAGE=golang:1.21
-DOCKER_RUN=docker run --rm $(DOCKER_ARGS) -v ${PWD}:/app/cli -w /app/cli -u $(shell id -u):$(shell id -g)
-.PHONY: cli
-cli: DOCKER_ARGS=-it
-cli:
-	$(DOCKER_RUN) $(NPM_IMAGE) sh
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+mkfile_dir := $(dir $(mkfile_path))
+DOCKER_RUN=docker run --rm $(DOCKER_ARGS) -v $(mkfile_dir):/app -u $(shell id -u):$(shell id -g)
 
-.PHONY: cli-go
+.PHONY: cli
 cli-go: DOCKER_ARGS=-it -e GOCACHE=/app/.cache
 cli-go:
 	$(DOCKER_RUN) $(GO_IMAGE) bash

@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"hash/fnv"
 
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/environment"
-	"kapigen.kateops.com/internal/gitlab/job"
-	"kapigen.kateops.com/internal/logger"
-	"kapigen.kateops.com/internal/pipeline/jobs/docker"
-	"kapigen.kateops.com/internal/pipeline/types"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	"gitlab.com/kateops/kapigen/cli/internal/pipeline/jobs/docker"
+	types2 "gitlab.com/kateops/kapigen/cli/types"
+	"gitlab.com/kateops/kapigen/dsl/environment"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
+	"gitlab.com/kateops/kapigen/dsl/logger"
 )
 
 type Docker struct {
@@ -24,7 +24,7 @@ type Docker struct {
 	InternalId        string
 }
 
-func (d *Docker) New() types.PipelineConfigInterface {
+func (d *Docker) New() types2.PipelineConfigInterface {
 	return &Docker{}
 }
 
@@ -66,7 +66,7 @@ func (d *Docker) Validate() error {
 	return nil
 }
 
-func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, Id string) (*types.Jobs, error) {
+func (d *Docker) Build(factory *factory.MainFactory, _ types2.PipelineType, Id string) (*types2.Jobs, error) {
 	controller := factory.GetVersionController()
 	tag := controller.GetCurrentPipelineTag(d.Path)
 	var destination []string
@@ -92,7 +92,7 @@ func (d *Docker) Build(factory *factory.MainFactory, _ types.PipelineType, Id st
 		return nil, err
 	}
 	build.AddName(Id)
-	return &types.Jobs{build}, nil
+	return &types2.Jobs{build}, nil
 }
 
 func (d *Docker) GetFinalImageName() string {

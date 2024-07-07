@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"kapigen.kateops.com/internal/version"
+	"gitlab.com/kateops/kapigen/cli/internal/version"
 )
 
 type Settings struct {

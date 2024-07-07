@@ -1,10 +1,10 @@
 package config
 
 import (
-	"kapigen.kateops.com/factory"
-	"kapigen.kateops.com/internal/gitlab/job"
-	"kapigen.kateops.com/internal/pipeline/types"
-	types2 "kapigen.kateops.com/internal/types"
+	"gitlab.com/kateops/kapigen/cli/factory"
+	types2 "gitlab.com/kateops/kapigen/cli/types"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
 type SlimDocker struct {
@@ -36,24 +36,24 @@ type Service struct {
 func (s *Service) Validate() error {
 
 	if s.Name == "" {
-		return types2.NewMissingArgError("service.name")
+		return wrapper.NewMissingArgError("service.name")
 	}
 
 	if s.Port <= 0 {
-		return types2.DetailedErrorf("service: '%s', invalid port %d (must be 1 - 65535)", s.Name, s.Port)
+		return wrapper.DetailedErrorf("service: '%s', invalid port %d (must be 1 - 65535)", s.Name, s.Port)
 	}
 
 	if s.ImageName == "" && s.Docker == nil {
-		return types2.NewMissingArgsError("service.imageName", "service.docker")
+		return wrapper.NewMissingArgsError("service.imageName", "service.docker")
 	}
 
 	return nil
 }
 
-func (s *Service) CreateService(factory *factory.MainFactory, pipelineType types.PipelineType, Id string) (*types.Jobs, *job.Service, error) {
+func (s *Service) CreateService(factory *factory.MainFactory, pipelineType types2.PipelineType, Id string) (*types2.Jobs, *job.Service, error) {
 	if s.Docker != nil {
 		dockerPipeline := s.Docker.DockerConfig()
-		jobs, err := types.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
+		jobs, err := types2.GetPipelineJobs(factory, dockerPipeline, pipelineType, Id)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -63,7 +63,7 @@ func (s *Service) CreateService(factory *factory.MainFactory, pipelineType types
 	} else {
 		service := job.NewService(s.ImageName, s.Name, s.Port)
 
-		return &types.Jobs{}, service, nil
+		return &types2.Jobs{}, service, nil
 	}
 }
 
@@ -77,18 +77,18 @@ func (s *Services) Validate() error {
 			return err
 		}
 		if servicePorts[service.Port] {
-			return types2.DetailedErrorf("service: '%s', referencing occupied port: %d", service.Name, service.Port)
+			return wrapper.DetailedErrorf("service: '%s', referencing occupied port: %d", service.Name, service.Port)
 		}
 		servicePorts[service.Port] = true
 	}
 	return nil
 }
 
-func (s *Services) AddToJob(factory *factory.MainFactory, pipelineType types.PipelineType, Id string, pipelineJobs *types.Jobs, targetJob *types.Job) error {
+func (s *Services) AddToJob(factory *factory.MainFactory, pipelineType types2.PipelineType, Id string, pipelineJobs *types2.Jobs, targetJob *types2.Job) error {
 	for _, service := range *s {
 		jobs, jobService, err := service.CreateService(factory, pipelineType, Id)
 		if err != nil {
-			return types2.DetailedErrorf(err.Error())
+			return wrapper.DetailedErrorf(err.Error())
 		}
 		for _, serviceJob := range jobs.GetJobs() {
 			targetJob.AddJobAsNeed(serviceJob)
@@ -113,4 +113,4 @@ var jobModes = map[JobMode]string{
 	Permissive: "permissive",
 	Disabled:   "disabled",
 }
-var JobModeEnum, _ = types2.NewEnum[JobMode](jobModes)
+var JobModeEnum, _ = wrapper.NewEnum[JobMode](jobModes)

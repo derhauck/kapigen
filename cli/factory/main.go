@@ -2,8 +2,8 @@ package factory
 
 import (
 	"github.com/xanzy/go-gitlab"
-	"kapigen.kateops.com/internal/cli"
-	"kapigen.kateops.com/internal/version"
+	"gitlab.com/kateops/kapigen/cli/internal/cli"
+	"gitlab.com/kateops/kapigen/cli/internal/version"
 )
 
 type MainFactory struct {

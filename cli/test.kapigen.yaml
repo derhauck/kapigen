@@ -7,7 +7,7 @@ pipelines:
   - type: docker
     id: test-cli
     config:
-      path: cli
+      path: .
       name: test-cli
 
   - type: docker
@@ -22,7 +22,7 @@ pipelines:
   - type: docker
     id: duplicate-test
     config:
-      path: cli
+      path: .
       dockerfile: Dockerfile
       name: test-cli
 
@@ -40,19 +40,19 @@ pipelines:
   - type: docker
     id: test-cli2
     config:
-      path: cli
+      path: .
       name: test-cli
 
   - type: docker
     id: test-file2
     config:
-      path: cli
+      path: .
       name: test-file
 
   - type: docker
     id: duplicate-test2
     config:
-      path: cli
+      path: .
       dockerfile: Dockerfile
       name: test-cli
 
@@ -67,19 +67,19 @@ pipelines:
   - type: docker
     id: test-cli3
     config:
-      path: cli
+      path: .
       name: test-cli
 
   - type: docker
     id: test-file3
     config:
-      path: cli
+      path: .
       name: test-file
 
   - type: docker
     id: duplicate-test3
     config:
-      path: cli
+      path: .
       dockerfile: Dockerfile
       name: test-cli
 
