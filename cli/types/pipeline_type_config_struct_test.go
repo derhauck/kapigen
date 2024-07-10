@@ -27,7 +27,9 @@ func TestCreatePipeline(t *testing.T) {
 		}
 		pipeline := map[string]any{}
 		err = yaml.NewDecoder(bytes.NewReader(readFile)).Decode(&pipeline)
-
+		if err != nil {
+			t.Error(err)
+		}
 		snaps.MatchSnapshot(t, pipeline["generic"], pipeline["variables"])
 
 		err = os.Remove(file)
