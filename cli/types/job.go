@@ -274,7 +274,10 @@ func JobsToYamLFile(jobs *Jobs, fileName string) error {
 	// convert jobs to map
 	var ciPipeline = make(map[string]interface{})
 	for _, evaluatedJob := range *jobs {
-		evaluatedJob.RenderNeeds()
+		renderedJob := evaluatedJob.RenderNeeds()
+		if renderedJob == nil {
+			return fmt.Errorf("job '%s' can not be rendered", evaluatedJob.GetName())
+		}
 		ciPipeline[evaluatedJob.GetName()] = evaluatedJob.CiJobYaml
 	}
 	logger.Info("ci job list converted to map")
