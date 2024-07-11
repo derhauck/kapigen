@@ -1,0 +1,128 @@
+
+[TestExtendPipelines/extend_pipeline_functions - 1]
+&types.Jobs{
+    &types.Job{
+        Names: {"test", "testId", "test"},
+        CiJob: &job.CiJob{
+            Artifact:    job.Artifacts{},
+            AfterScript: job.AfterScript{
+                Value: &wrapper.Array[string]{
+                    slice: {},
+                },
+            },
+            BeforeScript: job.BeforeScript{
+                Value: &wrapper.Array[string]{
+                    slice: {},
+                },
+            },
+            Script: job.Script{
+                Value: &wrapper.Array[string]{
+                    slice: {"echo 'hello world'"},
+                },
+            },
+            AllowFailure: job.AllowFailure{},
+            Cache:        job.Cache{
+                Key:   "",
+                Paths: wrapper.Array[string]{
+                    slice: {},
+                },
+                Unprotect: true,
+                Policy:    2,
+                Active:    false,
+            },
+            Variables: {},
+            Tags:      {
+                &job.Tag{
+                    Value: &enum.Tag(0),
+                },
+            },
+            Image: job.Image{
+                Name:       "alpine",
+                Entrypoint: wrapper.Array[string]{},
+                PullPolicy: 0,
+            },
+            Rules: {
+                &job.Rule{
+                    If:           "$KTC_STOP_PIPELINE != \"false\" && $DEBUG == null",
+                    Changes:      wrapper.Array[string]{},
+                    AllowFailure: false,
+                    Variables:    struct {}{},
+                    When:         job.WhenWrapper{
+                        Value: &enum.When(3),
+                    },
+                },
+                &job.Rule{
+                    If:           "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
+                    Changes:      wrapper.Array[string]{},
+                    AllowFailure: false,
+                    Variables:    struct {}{},
+                    When:         job.WhenWrapper{
+                        Value: &enum.When(0),
+                    },
+                },
+                &job.Rule{
+                    If:           "$KTC_TEST_PIPELINE",
+                    Changes:      wrapper.Array[string]{},
+                    AllowFailure: false,
+                    Variables:    struct {}{},
+                    When:         job.WhenWrapper{},
+                },
+            },
+            Stage:    3,
+            Services: job.Services{
+                Values: &[]*job.Service{
+                },
+            },
+            Coverage: "",
+        },
+        Needs: {
+        },
+        currentName: 2,
+        CiJobYaml:   &job.CiJobYaml{
+            Artifacts:    (*job.ArtifactsYaml)(nil),
+            AfterScript:  {},
+            AllowFailure: bool(false),
+            BeforeScript: {},
+            Cache:        (*job.CacheYaml)(nil),
+            Script:       {"echo 'hello world'"},
+            Needs:        &job.NeedsYaml(nil),
+            Variables:    {},
+            Image:        &job.ImageYaml{
+                Name:       "alpine",
+                Entrypoint: nil,
+                PullPolicy: "always",
+            },
+            Rules: &job.RulesYaml{
+                &job.RuleYaml{
+                    If:           "$KTC_STOP_PIPELINE != \"false\" && $DEBUG == null",
+                    Changes:      nil,
+                    AllowFailure: bool(false),
+                    Variables:    struct {}{},
+                    When:         "never",
+                },
+                &job.RuleYaml{
+                    If:           "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
+                    Changes:      nil,
+                    AllowFailure: bool(false),
+                    Variables:    struct {}{},
+                    When:         "on_success",
+                },
+                &job.RuleYaml{
+                    If:           "$KTC_TEST_PIPELINE",
+                    Changes:      nil,
+                    AllowFailure: bool(false),
+                    Variables:    struct {}{},
+                    When:         "on_success",
+                },
+            },
+            Stage:    "dynamic",
+            Services: &job.ServiceYamls{
+            },
+            Tags:     {"pressure:medium"},
+            Coverage: "",
+        },
+        PipelineId:   "testId",
+        ExternalTags: nil,
+    },
+}
+---
