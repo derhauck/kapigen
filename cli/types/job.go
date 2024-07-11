@@ -6,11 +6,9 @@ import (
 
 	"github.com/kylelemons/godebug/diff"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
-	"gitlab.com/kateops/kapigen/dsl/gitlab/pipeline"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/stages"
 	"gitlab.com/kateops/kapigen/dsl/logger"
 	"gitlab.com/kateops/kapigen/dsl/wrapper"
-	"gopkg.in/yaml.v3"
 )
 
 type Job struct {
@@ -268,31 +266,6 @@ func (j *Jobs) FindJobsByPipelineId(pipelineId string) (*Jobs, error) {
 		return &found, fmt.Errorf("can not find pipeline as need: %s", pipelineId)
 	}
 	return &found, nil
-}
-
-func JobsToYamLFile(jobs *Jobs, fileName string) error {
-	// convert jobs to map
-	var ciPipeline = make(map[string]interface{})
-	for _, evaluatedJob := range *jobs {
-		evaluatedJob.RenderNeeds()
-		ciPipeline[evaluatedJob.GetName()] = evaluatedJob.CiJobYaml
-	}
-	logger.Info("ci job list converted to map")
-
-	// add default pipeline settings
-	defaultPipeline := pipeline.NewDefaultCiPipeline().Render()
-	ciPipeline["default"] = defaultPipeline.Default
-	ciPipeline["workflow"] = defaultPipeline.Workflow
-	ciPipeline["stages"] = defaultPipeline.Stages
-	ciPipeline["variables"] = defaultPipeline.Variables
-
-	// convert map to yaml
-	data, err := yaml.Marshal(ciPipeline)
-	if err != nil {
-		return err
-	}
-	logger.Info("converted pipeline to yaml")
-	return os.WriteFile(fileName, data, 0666)
 }
 
 func (j *Jobs) OverwriteTags(tags []string) {

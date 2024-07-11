@@ -1,0 +1,26 @@
+
+[TestCreatePipeline/can_create_pipeline - 1]
+map[string]interface {}{
+    "allow_failure": bool(false),
+    "image":         map[string]interface {}{
+        "name":        "alpine",
+        "pull_policy": "always",
+    },
+    "needs": []interface {}{
+    },
+    "rules": []interface {}{
+    },
+    "script": []interface {}{
+        "echo hello world",
+    },
+    "services": []interface {}{
+    },
+    "stage": "dynamic",
+    "tags":  []interface {}{
+        "pressure:medium",
+    },
+}
+map[string]interface {}{
+    "KTC_STOP_PIPELINE": "false",
+}
+---

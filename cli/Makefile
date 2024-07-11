@@ -18,8 +18,13 @@ build:
 
 .PHONY: test
 test:
-	$(DOCKER_RUN)  -w $(GO_SRC_PATH) $(GO_IMAGE) go test ./...  -coverpkg=gitlab.com/kateops/kapigen/cli/internal/... -coverprofile=profile.cov
+	$(DOCKER_RUN)  -w $(GO_SRC_PATH) $(GO_IMAGE) go test ./... -v  -coverpkg=gitlab.com/kateops/kapigen/cli/internal/... -coverprofile=profile.cov
 	$(DOCKER_RUN)  -w $(GO_SRC_PATH) $(GO_IMAGE) go tool cover -func profile.cov
+
+.PHONY: test-update-snapshots
+test-update-snapshots:
+	$(DOCKER_RUN)  -e  UPDATE_SNAPS=true -w $(GO_SRC_PATH) $(GO_IMAGE) go test ./... -v
+
 
 .PHONY: test-report
 test-report:

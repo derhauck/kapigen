@@ -5,6 +5,7 @@ import (
 
 	"gitlab.com/kateops/kapigen/dsl/gitlab/stages"
 	"gitlab.com/kateops/kapigen/dsl/logger"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 	"gopkg.in/yaml.v3"
 )
 
@@ -80,6 +81,11 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml, externalTags []string) (*CiJobYa
 	}
 	tags := job.Tags.Render()
 
+	rules := job.Rules.GetRenderedValue()
+	if rules == nil {
+		return nil, wrapper.ErrorHandler("rules not allowed to be empty", 2)
+	}
+
 	if len(externalTags) > 0 {
 		tags = externalTags
 	}
@@ -94,7 +100,7 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml, externalTags []string) (*CiJobYa
 		Needs:        needs,
 		Variables:    job.Variables,
 		Image:        image,
-		Rules:        job.Rules.GetRenderedValue(),
+		Rules:        rules,
 		Stage:        stages.Enum().ValueSafe(stage),
 		Services:     job.Services.Render(),
 		Tags:         tags,
