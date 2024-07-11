@@ -148,18 +148,3 @@ func (p *PipelineConfig) Decode(factory *factory.MainFactory, configTypes map[Pi
 
 	return &pipelineJobs, nil
 }
-
-func CreatePipeline(fn func(jobs *Jobs)) {
-	jobs := &Jobs{}
-	fn(jobs)
-	evaluatedJobs, err := jobs.EvaluateNames()
-	if err != nil {
-		logger.ErrorE(err)
-		return
-	}
-	err = JobsToYamLFile(evaluatedJobs, "pipeline.yaml")
-	if err != nil {
-		logger.ErrorE(err)
-		return
-	}
-}

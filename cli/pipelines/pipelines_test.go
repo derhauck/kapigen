@@ -1,4 +1,4 @@
-package types
+package pipelines
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/gkampitakis/go-snaps/snaps"
+	"gitlab.com/kateops/kapigen/cli/types"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/stages"
 	"gopkg.in/yaml.v3"
@@ -14,8 +15,8 @@ import (
 func TestCreatePipeline(t *testing.T) {
 	t.Run("can create pipeline", func(t *testing.T) {
 		file := "pipeline.yaml"
-		CreatePipeline(func(jobs *Jobs) {
-			jobs.AddJob(NewJob("generic", "alpine", func(ciJob *job.CiJob) {
+		CreatePipeline(func(jobs *types.Jobs) {
+			jobs.AddJob(types.NewJob("generic", "alpine", func(ciJob *job.CiJob) {
 				ciJob.TagMediumPressure().
 					AddScript("echo hello world").
 					SetStage(stages.TEST)
@@ -41,8 +42,8 @@ func TestCreatePipeline(t *testing.T) {
 	t.Run("can not create pipeline", func(t *testing.T) {
 		file := "pipeline.yaml"
 		_ = os.Remove(file)
-		CreatePipeline(func(jobs *Jobs) {
-			jobs.AddJob(NewJob("invalid", "alpine", func(ciJob *job.CiJob) {
+		CreatePipeline(func(jobs *types.Jobs) {
+			jobs.AddJob(types.NewJob("invalid", "alpine", func(ciJob *job.CiJob) {
 			}))
 		})
 		_, err := os.ReadFile(file)

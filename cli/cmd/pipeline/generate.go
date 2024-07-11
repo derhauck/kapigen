@@ -9,6 +9,7 @@ import (
 	"gitlab.com/kateops/kapigen/cli/internal/pipeline/config"
 	"gitlab.com/kateops/kapigen/cli/internal/pipeline/jobs"
 	"gitlab.com/kateops/kapigen/cli/internal/version"
+	"gitlab.com/kateops/kapigen/cli/pipelines"
 	"gitlab.com/kateops/kapigen/cli/types"
 	"gitlab.com/kateops/kapigen/dsl/logger"
 	"gopkg.in/yaml.v3"
@@ -95,7 +96,7 @@ var GenerateCmd = &cobra.Command{
 		}
 		pipelineJobs.OverwriteTags(pipelineConfig.Tags)
 		logger.Info("ci jobs named to be unique")
-		return types.JobsToYamLFile(pipelineJobs, pipelineFile)
+		return pipelines.JobsToYamLFile(pipelineJobs, pipelineFile)
 
 	},
 }

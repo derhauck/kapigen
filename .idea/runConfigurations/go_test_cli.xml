@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go test cli" type="GoTestRunConfiguration" factoryName="Go Test" nameIsGenerated="true">
+    <module name="kapigen" />
+    <working_directory value="$PROJECT_DIR$/cli" />
+    <kind value="DIRECTORY" />
+    <package value="gitlab.com/kateops/kapigen/cli/internal/..." />
+    <directory value="$PROJECT_DIR$/cli" />
+    <filePath value="$PROJECT_DIR$" />
+    <option name="build_on_remote_target" value="true" />
+    <framework value="gotest" />
+    <method v="2" />
+  </configuration>
+</component>
