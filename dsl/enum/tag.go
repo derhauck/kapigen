@@ -10,6 +10,7 @@ type Tag int
 const (
 	TagPressureMedium Tag = iota
 	TagPressureExclusive
+	TagDefaultRunner
 )
 
 func (w Tag) String() string {
@@ -20,6 +21,7 @@ func TagEnum() *wrapper.Enum[Tag, string] {
 	enum, err := wrapper.NewEnum[Tag](map[Tag]string{
 		TagPressureMedium:    "pressure:medium",
 		TagPressureExclusive: "pressure:exclusive",
+		TagDefaultRunner:     "${KAPIGEN_DEFAULT_RUNNER_TAG}",
 	})
 	if err != nil {
 		logger.Error(err.Error())

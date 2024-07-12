@@ -3,6 +3,7 @@ package pipelines
 import (
 	"bytes"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/gkampitakis/go-snaps/snaps"
@@ -55,6 +56,44 @@ func TestCreatePipeline(t *testing.T) {
 
 		if err.Error() != "open pipeline.yaml: no such file or directory" {
 			t.Errorf("expectec: %s, received: %s", err, "open pipeline.yaml: no such file or directory")
+		}
+
+	})
+}
+
+func TestReadPipelineConfig(t *testing.T) {
+	t.Run("can create pipelineConfig", func(t *testing.T) {
+		configPath := "../config.kapigen.yaml"
+		config, err := ReadPipelineConfig(configPath)
+		if err != nil {
+			t.Error(err)
+		}
+		if config.Noop == false {
+			t.Error("should be true")
+		}
+
+		if config.Versioning == false {
+			t.Error("should be true")
+		}
+
+		if config.PrivateTokenName != "CI_PIPELINE_TOKEN" {
+			t.Error("should be CI_PIPELINE_TOKEN")
+		}
+
+	})
+	t.Run("can not create pipelineConfig", func(t *testing.T) {
+		configPath := "config.kapigen.yaml-missing"
+		config, err := ReadPipelineConfig(configPath)
+		expectedError := "open config.kapigen.yaml-missing: no such file or directory"
+		if config != nil {
+			t.Error("config should be nil")
+		}
+		if err == nil {
+			t.Error("should contain error")
+			t.FailNow()
+		}
+		if !strings.Contains(err.Error(), expectedError) {
+			t.Errorf("expected: '%s', received: '%s'", expectedError, err)
 		}
 
 	})

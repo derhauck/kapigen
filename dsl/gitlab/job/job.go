@@ -1,8 +1,6 @@
 package job
 
 import (
-	"errors"
-
 	"gitlab.com/kateops/kapigen/dsl/gitlab/stages"
 	"gitlab.com/kateops/kapigen/dsl/logger"
 	"gitlab.com/kateops/kapigen/dsl/wrapper"
@@ -44,7 +42,7 @@ type CiJobYaml struct {
 	Rules        *RulesYaml        `yaml:"rules" json:"rules"`
 	Stage        string            `yaml:"stage" json:"stage"`
 	Services     *ServiceYamls     `yaml:"services,omitempty" json:"services,omitempty"`
-	Tags         []string          `yaml:"tags" json:"tags"`
+	Tags         []string          `yaml:"tags,omitempty" json:"tags,omitempty"`
 	Coverage     string            `yaml:"coverage,omitempty" json:"coverage"`
 }
 
@@ -75,9 +73,6 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml, externalTags []string) (*CiJobYa
 	stage := job.Stage
 	if stage < stages.DYNAMIC {
 		stage = stages.DYNAMIC
-	}
-	if job.Tags == nil {
-		return nil, errors.New("tags are required")
 	}
 	tags := job.Tags.Render()
 

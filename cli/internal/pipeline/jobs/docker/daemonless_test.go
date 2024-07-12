@@ -14,6 +14,7 @@ func TestNewDaemonlessBuildkitBuild(t *testing.T) {
 		}
 		if job == nil {
 			t.Error("should be able to create new job")
+			t.FailNow()
 		}
 		job.CiJob.Rules.AddRules(*job2.DefaultMainBranchRules())
 		if err := job.Render(); err != nil {
