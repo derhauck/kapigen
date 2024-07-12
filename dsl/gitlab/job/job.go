@@ -82,7 +82,7 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml, externalTags []string) (*CiJobYa
 	tags := job.Tags.Render()
 
 	rules := job.Rules.GetRenderedValue()
-	if rules == nil {
+	if rules == nil || len(*rules) == 0 {
 		return nil, wrapper.ErrorHandler("rules not allowed to be empty", 2)
 	}
 

@@ -2,6 +2,8 @@ package docker
 
 import (
 	"testing"
+
+	job2 "gitlab.com/kateops/kapigen/dsl/gitlab/job"
 )
 
 func TestNewDaemonlessBuildkitBuild(t *testing.T) {
@@ -13,6 +15,7 @@ func TestNewDaemonlessBuildkitBuild(t *testing.T) {
 		if job == nil {
 			t.Error("should be able to create new job")
 		}
+		job.CiJob.Rules.AddRules(*job2.DefaultMainBranchRules())
 		if err := job.Render(); err != nil {
 			t.Error(err)
 		}

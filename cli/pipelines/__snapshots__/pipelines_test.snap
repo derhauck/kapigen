@@ -9,6 +9,21 @@ map[string]interface {}{
     "needs": []interface {}{
     },
     "rules": []interface {}{
+        map[string]interface {}{
+            "allow_failure": bool(false),
+            "if":            "$KTC_STOP_PIPELINE != \"false\" && $DEBUG == null",
+            "when":          "never",
+        },
+        map[string]interface {}{
+            "allow_failure": bool(false),
+            "if":            "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
+            "when":          "on_success",
+        },
+        map[string]interface {}{
+            "allow_failure": bool(false),
+            "if":            "$KTC_TEST_PIPELINE",
+            "when":          "on_success",
+        },
     },
     "script": []interface {}{
         "echo hello world",

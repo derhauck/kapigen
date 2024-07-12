@@ -34,6 +34,7 @@ func TestGeneric_Build(t *testing.T) {
 			t.Fail()
 		}
 		genericJob := jobs.GetJobs()[0]
+		genericJob.CiJob.Rules.AddRules(*job.DefaultMainBranchRules())
 		err = genericJob.Render()
 		if err != nil {
 			t.Error(err)
@@ -80,6 +81,7 @@ func TestGeneric_Build(t *testing.T) {
 			t.Fail()
 		}
 		genericJob := jobs.GetJobs()[0]
+		genericJob.CiJob.Rules.AddRules(*job.DefaultMainBranchRules())
 		err = genericJob.Render()
 		if err != nil {
 			t.Error(err)

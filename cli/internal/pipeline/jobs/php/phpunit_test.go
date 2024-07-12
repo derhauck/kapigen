@@ -1,6 +1,10 @@
 package php
 
-import "testing"
+import (
+	"testing"
+
+	job2 "gitlab.com/kateops/kapigen/dsl/gitlab/job"
+)
 
 func TestNewPhpUnit(t *testing.T) {
 	t.Run("Can create phpunit job", func(t *testing.T) {
@@ -10,6 +14,7 @@ func TestNewPhpUnit(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
+			job.CiJob.Rules.AddRules(*job2.DefaultMainBranchRules())
 			err = job.Render()
 			if err != nil {
 				t.Error(err)

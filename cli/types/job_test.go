@@ -143,15 +143,18 @@ func TestJob_Render(t *testing.T) {
 
 	t.Run("renders job correctly", func(t *testing.T) {
 		newJob := NewJob("Test Job", "golang:1.16", func(ciJob *job.CiJob) {
-			ciJob.Tags.Add(enum.TagPressureMedium)
+			ciJob.TagMediumPressure().
+				Rules.AddRules(*job.DefaultMainBranchRules())
 		})
 		err := newJob.Render()
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
+			t.FailNow()
 		}
 
 		if newJob.CiJobYaml == nil {
 			t.Error("expected CiJobYaml to be set after rendering")
+			t.FailNow()
 		}
 		if newJob.CiJobYaml.Image.Name != "golang:1.16" {
 			t.Errorf("unexpected image name: %s", newJob.CiJobYaml.Image.Name)
@@ -175,9 +178,13 @@ func TestJob_DynamicMerge(t *testing.T) {
 	t.Run("merges job with compatible job", func(t *testing.T) {
 		job1 := NewJob("Job 1", "golang:1.16", func(ciJob *job.CiJob) {
 			ciJob.Tags.Add(enum.TagPressureMedium)
+			ciJob.TagMediumPressure().
+				Rules.AddRules(*job.DefaultMainBranchRules())
 		})
 		job2 := NewJob("Job 2", "golang:1.16", func(ciJob *job.CiJob) {
 			ciJob.Tags.Add(enum.TagPressureMedium)
+			ciJob.TagMediumPressure().
+				Rules.AddRules(*job.DefaultMainBranchRules())
 		})
 		jobs := Jobs{job1, job2}
 		job2.AddJobAsNeed(job1)
@@ -206,9 +213,13 @@ func TestJob_DynamicMerge(t *testing.T) {
 	t.Run("does not merge job with incompatible job", func(t *testing.T) {
 		job1 := NewJob("Job 1", "golang:1.16", func(ciJob *job.CiJob) {
 			ciJob.Tags.Add(enum.TagPressureMedium)
+			ciJob.TagMediumPressure().
+				Rules.AddRules(*job.DefaultMainBranchRules())
 		})
 		job2 := NewJob("Job 2", "node:14", func(ciJob *job.CiJob) {
 			ciJob.Tags.Add(enum.TagPressureMedium)
+			ciJob.TagMediumPressure().
+				Rules.AddRules(*job.DefaultMainBranchRules())
 		})
 		jobs := Jobs{job1, job2}
 
@@ -237,18 +248,25 @@ func TestJobs_DynamicMerge(t *testing.T) {
 	t.Run("merges compatible jobs", func(t *testing.T) {
 		job1 := NewJob("Job 1", "golang:1.16", func(ciJob *job.CiJob) {
 			ciJob.Tags.Add(enum.TagPressureMedium)
+			ciJob.TagMediumPressure().
+				Rules.AddRules(*job.DefaultMainBranchRules())
 		})
 		job2 := NewJob("Job 2", "golang:1.16", func(ciJob *job.CiJob) {
 			ciJob.Tags.Add(enum.TagPressureMedium)
+			ciJob.TagMediumPressure().
+				Rules.AddRules(*job.DefaultMainBranchRules())
 		})
 		job3 := NewJob("Job 3", "node:14", func(ciJob *job.CiJob) {
 			ciJob.Tags.Add(enum.TagPressureMedium)
+			ciJob.TagMediumPressure().
+				Rules.AddRules(*job.DefaultMainBranchRules())
 		})
 		jobs := Jobs{job1, job2, job3}
 		job3.AddJobAsNeed(job1)
 		merged, err := jobs.DynamicMerge()
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
+			t.FailNow()
 		}
 
 		if len(merged.GetJobs()) != 2 {
@@ -364,14 +382,21 @@ func TestJobs_OverwriteTags(t *testing.T) {
 func TestJob_RenderNeeds(t *testing.T) {
 	t.Run("render needs", func(t *testing.T) {
 		job1 := NewJob("Job 1", "golang:1.16", func(ciJob *job.CiJob) {
-			ciJob.TagMediumPressure().
-				AddScript("hello world").
-				SetStage(stages.TEST)
+			ciJob.AddScript("hello world").
+				SetStage(stages.TEST).
+				TagMediumPressure().
+				Rules.AddRules(*job.DefaultMainBranchRules())
 		})
 
 		result := job1.RenderNeeds()
+		if result == nil {
+			t.Error("expected rendered job, received nil")
+			t.FailNow()
+		}
+
 		if result.CiJobYaml == nil {
 			t.Error("expected CiJobYaml, received nil")
+			t.FailNow()
 		}
 		if contains(result.CiJobYaml.Tags, stages.Enum().ValueSafe(stages.DYNAMIC)) {
 			t.Error("expected stage to be set to dynamic")

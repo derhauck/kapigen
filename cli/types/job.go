@@ -126,19 +126,28 @@ func (j *Job) compare(job *Job) bool {
 	return false
 }
 
-func (j *Job) toYamlConfiguration() *job.CiJobYaml {
+func (j *Job) toYamlConfiguration() (*job.CiJobYaml, error) {
 	if j.CiJobYaml == nil {
 		err := j.Render()
 		if err != nil {
-			logger.ErrorE(err)
-			return nil
+			return nil, wrapper.ErrorHandler(err.Error(), 2)
 		}
 	}
-	return j.CiJobYaml
+	return j.CiJobYaml, nil
 }
 
 func (j *Job) compareConfiguration(job *Job) bool {
-	if j.toYamlConfiguration().String() == job.toYamlConfiguration().String() {
+	source, err := j.toYamlConfiguration()
+	if err != nil {
+		logger.ErrorE(err)
+		return false
+	}
+	target, err := job.toYamlConfiguration()
+	if err != nil {
+		logger.ErrorE(err)
+		return false
+	}
+	if source.String() == target.String() {
 		return true
 	}
 	if os.Getenv("DEBUG_DIFF") != "" {

@@ -18,7 +18,7 @@ import (
 func TestLoadJobsFromPipelineConfig(t *testing.T) {
 	type args struct {
 		factory        *factory.MainFactory
-		pipelineConfig types2.PipelineConfig
+		pipelineConfig *types2.PipelineConfig
 		configTypes    map[types2.PipelineType]types2.PipelineConfigInterface
 	}
 
@@ -44,7 +44,7 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 			args: args{
 				factory:     mainFactory,
 				configTypes: configTypes,
-				pipelineConfig: types2.PipelineConfig{
+				pipelineConfig: &types2.PipelineConfig{
 					Pipelines: []types2.PipelineTypeConfig{
 						{
 							Type: types2.PipelineType("php"),
@@ -71,7 +71,7 @@ func TestLoadJobsFromPipelineConfig(t *testing.T) {
 			args: args{
 				factory:     mainFactory,
 				configTypes: configTypes,
-				pipelineConfig: types2.PipelineConfig{
+				pipelineConfig: &types2.PipelineConfig{
 					Pipelines: []types2.PipelineTypeConfig{
 						{
 							Type: types2.PipelineType("docker"),

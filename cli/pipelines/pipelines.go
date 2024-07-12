@@ -59,3 +59,17 @@ func CreatePipeline(fn func(jobs *types.Jobs)) {
 		return
 	}
 }
+
+func ReadPipelineConfig(path string) (*types.PipelineConfig, error) {
+	body, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var pipelineConfig types.PipelineConfig
+	err = yaml.Unmarshal(body, &pipelineConfig)
+	if err != nil {
+		return nil, err
+	}
+	return &pipelineConfig, nil
+}

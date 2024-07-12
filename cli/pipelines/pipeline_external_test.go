@@ -50,7 +50,7 @@ func TestExtendPipelines(t *testing.T) {
 			cli.SetMode(version.GetModeFromString(version.Gitlab.Name())),
 		)
 
-		pipelineConfig := types.PipelineConfig{
+		pipelineConfig := &types.PipelineConfig{
 			Pipelines: []types.PipelineTypeConfig{
 				{
 					Type: TestPipeline,

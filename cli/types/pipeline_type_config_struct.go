@@ -102,7 +102,7 @@ func GetPipelineJobs(factory *factory.MainFactory, config PipelineConfigInterfac
 	return jobs, nil
 }
 
-func LoadJobsFromPipelineConfig(factory *factory.MainFactory, pipelineConfig PipelineConfig, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
+func LoadJobsFromPipelineConfig(factory *factory.MainFactory, pipelineConfig *PipelineConfig, configTypes map[PipelineType]PipelineConfigInterface) (*Jobs, error) {
 	if pipelineConfig.DependencyProxy != "" {
 		docker.DEPENDENCY_PROXY = fmt.Sprintf("%s/", pipelineConfig.DependencyProxy)
 	}

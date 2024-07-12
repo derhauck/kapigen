@@ -19,7 +19,8 @@ func TestCreatePipeline(t *testing.T) {
 			jobs.AddJob(types.NewJob("generic", "alpine", func(ciJob *job.CiJob) {
 				ciJob.TagMediumPressure().
 					AddScript("echo hello world").
-					SetStage(stages.TEST)
+					SetStage(stages.TEST).
+					Rules.AddRules(*job.DefaultMainBranchRules())
 			}))
 		})
 		readFile, err := os.ReadFile(file)

@@ -1,8 +1,6 @@
 package pipeline
 
 import (
-	"os"
-
 	"github.com/spf13/cobra"
 	"gitlab.com/kateops/kapigen/cli/factory"
 	"gitlab.com/kateops/kapigen/cli/internal/cli"
@@ -12,7 +10,6 @@ import (
 	"gitlab.com/kateops/kapigen/cli/pipelines"
 	"gitlab.com/kateops/kapigen/cli/types"
 	"gitlab.com/kateops/kapigen/dsl/logger"
-	"gopkg.in/yaml.v3"
 )
 
 var GenerateCmd = &cobra.Command{
@@ -43,13 +40,7 @@ var GenerateCmd = &cobra.Command{
 
 		logger.Info("will read pipeline config from: " + configPath)
 		cmd.SilenceUsage = true
-		body, err := os.ReadFile(configPath)
-		if err != nil {
-			return err
-		}
-
-		var pipelineConfig types.PipelineConfig
-		err = yaml.Unmarshal(body, &pipelineConfig)
+		pipelineConfig, err := pipelines.ReadPipelineConfig(configPath)
 		if err != nil {
 			return err
 		}
