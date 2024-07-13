@@ -17,7 +17,7 @@ func ExtendPipelines(pipelines map[types.PipelineType]types.PipelineConfigInterf
 		config.PipelineConfigTypes[key] = pipe
 	}
 }
-func JobsToYamLFile(jobs *types.Jobs, fileName string) error {
+func JobsToYamLFile(jobs *types.Jobs, mainPipeline *pipeline.CiPipeline, fileName string) error {
 	// convert jobs to map
 	var ciPipeline = make(map[string]interface{})
 	for _, evaluatedJob := range *jobs {
@@ -29,8 +29,15 @@ func JobsToYamLFile(jobs *types.Jobs, fileName string) error {
 	}
 	logger.Info("ci job list converted to map")
 
+	if mainPipeline == nil {
+		mainPipeline = pipeline.NewDefaultCiPipeline()
+	}
+
 	// add default pipeline settings
-	defaultPipeline := pipeline.NewDefaultCiPipeline().Render()
+	defaultPipeline, err := mainPipeline.Render()
+	if err != nil {
+		return err
+	}
 	ciPipeline["default"] = defaultPipeline.Default
 	ciPipeline["workflow"] = defaultPipeline.Workflow
 	ciPipeline["stages"] = defaultPipeline.Stages
@@ -45,15 +52,16 @@ func JobsToYamLFile(jobs *types.Jobs, fileName string) error {
 	return os.WriteFile(fileName, data, 0666)
 }
 
-func CreatePipeline(fn func(jobs *types.Jobs)) {
+func CreatePipeline(fn func(jobs *types.Jobs, mainPipeline *pipeline.CiPipeline)) {
 	jobs := &types.Jobs{}
-	fn(jobs)
+	mainPipeline := &pipeline.CiPipeline{}
+	fn(jobs, mainPipeline)
 	evaluatedJobs, err := jobs.EvaluateNames()
 	if err != nil {
 		logger.ErrorE(err)
 		return
 	}
-	err = JobsToYamLFile(evaluatedJobs, "pipeline.yaml")
+	err = JobsToYamLFile(evaluatedJobs, mainPipeline, "pipeline.yaml")
 	if err != nil {
 		logger.ErrorE(err)
 		return

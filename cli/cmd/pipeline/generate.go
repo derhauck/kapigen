@@ -87,7 +87,7 @@ var GenerateCmd = &cobra.Command{
 		}
 		pipelineJobs.OverwriteTags(pipelineConfig.Tags)
 		logger.Info("ci jobs named to be unique")
-		return pipelines.JobsToYamLFile(pipelineJobs, pipelineFile)
+		return pipelines.JobsToYamLFile(pipelineJobs, nil, pipelineFile)
 
 	},
 }

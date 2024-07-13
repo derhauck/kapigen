@@ -12,31 +12,72 @@ type CiPipelineDefault struct {
 	BeforeScript job.BeforeScript
 }
 
+func (c *CiPipelineDefault) Validate() error {
+
+	return nil
+}
+
 type CiPipelineWorkflow struct {
 	Name  string     `yaml:"name"`
-	Rules *job.Rules `yaml:"rules"`
+	Rules *job.Rules `yaml:"rules,omitempty"`
+}
+
+func (c *CiPipelineWorkflow) Validate() error {
+	if c.Rules == nil {
+		c.Rules = &job.Rules{}
+	}
+
+	return nil
 }
 
 type CiPipeline struct {
 	Stages       *wrapper.Array[string] `yaml:"stages"`
-	Workflow     CiPipelineWorkflow     `yaml:"workflow,omitempty"`
+	Workflow     *CiPipelineWorkflow    `yaml:"workflow,omitempty"`
 	AllowFailure job.AllowFailure       `yaml:"allow_failure,omitempty"`
-	Default      CiPipelineDefault      `yaml:"default,omitempty"`
+	Default      *CiPipelineDefault     `yaml:"default,omitempty"`
 	Variables    map[string]string      `yaml:"variables,omitempty"`
 }
 
-func (c *CiPipeline) Render() *CiPipelineYaml {
+func (c *CiPipeline) Validate() error {
+	if c.Stages == nil {
+		c.Stages = wrapper.NewArray[string]()
+	}
+
+	if c.Workflow == nil {
+		c.Workflow = &CiPipelineWorkflow{}
+	}
+
+	if c.Default == nil {
+		c.Default = &CiPipelineDefault{
+			AfterScript:  job.NewAfterScript(),
+			BeforeScript: job.NewBeforeScript(),
+		}
+	}
+
+	err := c.Workflow.Validate()
+	if err != nil {
+		return err
+	}
+
+	err = c.Default.Validate()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CiPipeline) Render() (*CiPipelineYaml, error) {
 	return NewCiPipelineYaml(c)
 }
 
 func NewDefaultCiPipeline() *CiPipeline {
 	return &CiPipeline{
 		Stages: wrapper.NewArray[string]().Push(stages.Enum().GetValues()...),
-		Default: CiPipelineDefault{
+		Default: &CiPipelineDefault{
 			AfterScript:  job.NewAfterScript(),
 			BeforeScript: job.NewBeforeScript(),
 		},
-		Workflow: CiPipelineWorkflow{
+		Workflow: &CiPipelineWorkflow{
 			Name: "default",
 			Rules: &job.Rules{
 				&job.Rule{
@@ -78,7 +119,11 @@ type CiPipelineYaml struct {
 	Variables map[string]string      `yaml:"variables,omitempty"`
 }
 
-func NewCiPipelineYaml(pipeline *CiPipeline) *CiPipelineYaml {
+func NewCiPipelineYaml(pipeline *CiPipeline) (*CiPipelineYaml, error) {
+	err := pipeline.Validate()
+	if err != nil {
+		return nil, err
+	}
 	return &CiPipelineYaml{
 		Default: CiPipelineDefaultYaml{
 			AfterScript:  pipeline.Default.AfterScript.Value.Get(),
@@ -90,7 +135,7 @@ func NewCiPipelineYaml(pipeline *CiPipeline) *CiPipelineYaml {
 		},
 		Stages:    pipeline.Stages.Get(),
 		Variables: pipeline.Variables,
-	}
+	}, nil
 }
 func (c *CiPipelineYaml) AddToMap(parentMap map[string]interface{}) {
 	parentMap["default"] = c.Default
