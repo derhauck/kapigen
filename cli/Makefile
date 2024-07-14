@@ -23,7 +23,7 @@ test:
 
 .PHONY: test-update-snapshots
 test-update-snapshots:
-	$(DOCKER_RUN)  -e  UPDATE_SNAPS=true -w $(GO_SRC_PATH) $(GO_IMAGE) go test ./... -v
+	$(DOCKER_RUN)  -e  UPDATE_SNAPS=true -w $(GO_SRC_PATH) $(GO_IMAGE) go test ./... -coverpkg=gitlab.com/kateops/kapigen/cli/internal/... -v
 
 
 .PHONY: test-report
@@ -41,17 +41,3 @@ test-pipeline:
 .PHONY: test-pipeline-no-merge
 test-pipeline-no-merge:
 	$(MAKE) run ARGS="pipeline generate -v --config test.kapigen.yaml --no-merge --file pipeline-no-merge.yaml"
-
-.PHONY: lint
-lint:
-	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run
-
-
-.PHONY: lint-fix
-lint-fix:
-	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run -v --fix
-
-
-.PHONY: lint-report
-lint-report:
-	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golaps ngci-lint:v1.59.1 golangci-lint run -v --out-format=junit-xml:junit.xml

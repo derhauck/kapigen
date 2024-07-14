@@ -2,12 +2,6 @@ package wrapper
 
 import "reflect"
 
-type Slice[T any] interface {
-	Add(str T) *Slice[T]
-	AddSeveral(strSlice []T) *Slice[T]
-	Get() []T
-}
-
 type Array[T any] struct {
 	slice []T
 }

@@ -36,13 +36,28 @@ map[string]interface {}{
     },
 }
 map[string]interface {}{
+    "KTC_STOP_PIPELINE": "false",
 }
 map[string]interface {}{
-    "name":  "",
+    "name":  "default",
     "rules": []interface {}{
+        map[string]interface {}{
+            "if":   "$CI_MERGE_REQUEST_ID",
+            "when": "always",
+        },
+        map[string]interface {}{
+            "if":   "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
+            "when": "always",
+        },
+        map[string]interface {}{
+            "if":   "$CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'",
+            "when": "always",
+        },
+        map[string]interface {}{
+            "if":   "$CI_COMMIT_TAG != null",
+            "when": "always",
+        },
     },
-}
-[]interface {}{
 }
 map[string]interface {}{
 }

@@ -8,6 +8,7 @@ import (
 	"gitlab.com/kateops/kapigen/cli/types"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/pipeline"
 	"gitlab.com/kateops/kapigen/dsl/logger"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 	"gopkg.in/yaml.v3"
 )
 
@@ -17,34 +18,34 @@ func ExtendPipelines(pipelines map[types.PipelineType]types.PipelineConfigInterf
 		config.PipelineConfigTypes[key] = pipe
 	}
 }
-func JobsToYamLFile(jobs *types.Jobs, mainPipeline *pipeline.CiPipeline, fileName string) error {
+func JobsToYamLFile(jobs *types.Jobs, ciPipeline *pipeline.CiPipeline, fileName string) error {
 	// convert jobs to map
-	var ciPipeline = make(map[string]interface{})
+	var gitlabPipeline = make(map[string]interface{})
 	for _, evaluatedJob := range *jobs {
 		renderedJob := evaluatedJob.RenderNeeds()
 		if renderedJob == nil {
 			return fmt.Errorf("job '%s' can not be rendered", evaluatedJob.GetName())
 		}
-		ciPipeline[evaluatedJob.GetName()] = evaluatedJob.CiJobYaml
+		gitlabPipeline[evaluatedJob.GetName()] = evaluatedJob.CiJobYaml
 	}
 	logger.Info("ci job list converted to map")
 
-	if mainPipeline == nil {
-		mainPipeline = pipeline.NewDefaultCiPipeline()
+	if ciPipeline == nil {
+		return wrapper.DetailedErrorf("ci pipeline can not be nil")
 	}
 
 	// add default pipeline settings
-	defaultPipeline, err := mainPipeline.Render()
+	defaultPipeline, err := ciPipeline.Render()
 	if err != nil {
 		return err
 	}
-	ciPipeline["default"] = defaultPipeline.Default
-	ciPipeline["workflow"] = defaultPipeline.Workflow
-	ciPipeline["stages"] = defaultPipeline.Stages
-	ciPipeline["variables"] = defaultPipeline.Variables
+	gitlabPipeline["default"] = defaultPipeline.Default
+	gitlabPipeline["workflow"] = defaultPipeline.Workflow
+	gitlabPipeline["stages"] = defaultPipeline.Stages
+	gitlabPipeline["variables"] = defaultPipeline.Variables
 
 	// convert map to yaml
-	data, err := yaml.Marshal(ciPipeline)
+	data, err := yaml.Marshal(gitlabPipeline)
 	if err != nil {
 		return err
 	}
@@ -52,16 +53,16 @@ func JobsToYamLFile(jobs *types.Jobs, mainPipeline *pipeline.CiPipeline, fileNam
 	return os.WriteFile(fileName, data, 0666)
 }
 
-func CreatePipeline(fn func(jobs *types.Jobs, mainPipeline *pipeline.CiPipeline)) {
+func CreatePipeline(fn func(jobs *types.Jobs, ciPipeline *pipeline.CiPipeline)) {
 	jobs := &types.Jobs{}
-	mainPipeline := &pipeline.CiPipeline{}
-	fn(jobs, mainPipeline)
+	ciPipeline := &pipeline.CiPipeline{}
+	fn(jobs, ciPipeline)
 	evaluatedJobs, err := jobs.EvaluateNames()
 	if err != nil {
 		logger.ErrorE(err)
 		return
 	}
-	err = JobsToYamLFile(evaluatedJobs, mainPipeline, "pipeline.yaml")
+	err = JobsToYamLFile(evaluatedJobs, ciPipeline, "pipeline.yaml")
 	if err != nil {
 		logger.ErrorE(err)
 		return

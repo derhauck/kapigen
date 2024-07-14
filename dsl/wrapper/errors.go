@@ -20,6 +20,8 @@ func (c *DetailedError) Full() string {
 func (c *DetailedError) Error() string {
 	return c.Msg
 }
+
+// ErrorHandler creates a new error with the given message and the caller of the function.
 func ErrorHandler(msg string, caller int) error {
 
 	pc, filename, line, _ := runtime.Caller(caller)

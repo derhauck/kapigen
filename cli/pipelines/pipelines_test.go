@@ -17,7 +17,8 @@ import (
 func TestCreatePipeline(t *testing.T) {
 	t.Run("can create pipeline", func(t *testing.T) {
 		file := "pipeline.yaml"
-		CreatePipeline(func(jobs *types.Jobs, mainPipeline *pipeline.CiPipeline) {
+		CreatePipeline(func(jobs *types.Jobs, ciPipeline *pipeline.CiPipeline) {
+			ciPipeline.DefaultCiPipeline()
 			jobs.AddJob(types.NewJob("generic", "alpine", func(ciJob *job.CiJob) {
 				ciJob.TagMediumPressure().
 					AddScript("echo hello world").
@@ -34,7 +35,7 @@ func TestCreatePipeline(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		snaps.MatchSnapshot(t, pipelineConfig["generic"], pipelineConfig["variables"], pipelineConfig["workflow"], pipelineConfig["stages"], pipelineConfig["default"], pipelineConfig["allow_failure"])
+		snaps.MatchSnapshot(t, pipelineConfig["generic"], pipelineConfig["variables"], pipelineConfig["workflow"], pipelineConfig["default"], pipelineConfig["allow_failure"])
 
 		err = os.Remove(file)
 		if err != nil {
@@ -45,7 +46,7 @@ func TestCreatePipeline(t *testing.T) {
 	t.Run("can not create pipeline", func(t *testing.T) {
 		file := "pipeline.yaml"
 		_ = os.Remove(file)
-		CreatePipeline(func(jobs *types.Jobs, mainPipeline *pipeline.CiPipeline) {
+		CreatePipeline(func(jobs *types.Jobs, ciPipeline *pipeline.CiPipeline) {
 			jobs.AddJob(types.NewJob("invalid", "alpine", func(ciJob *job.CiJob) {
 			}))
 		})

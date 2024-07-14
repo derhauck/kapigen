@@ -7,3 +7,18 @@ DOCKER_RUN=docker run --rm $(DOCKER_ARGS) -v $(mkfile_dir):/app -u $(shell id -u
 cli-go: DOCKER_ARGS=-it -e GOCACHE=/app/.cache
 cli-go:
 	$(DOCKER_RUN) $(GO_IMAGE) bash
+
+
+.PHONY: lint
+lint:
+	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run
+
+
+.PHONY: lint-fix
+lint-fix:
+	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run -v --fix
+
+
+.PHONY: lint-report
+lint-report:
+	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golaps ngci-lint:v1.59.1 golangci-lint run -v --out-format=junit-xml:junit.xml

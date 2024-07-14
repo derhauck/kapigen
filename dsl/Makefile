@@ -12,16 +12,7 @@ test:
 	$(DOCKER_RUN) $(GO_IMAGE) go test ./...  -coverpkg=gitlab.com/kateops/kapigen/dsl/... -coverprofile=profile.cov
 	$(DOCKER_RUN) $(GO_IMAGE) go tool cover -func profile.cov
 
-.PHONY: lint
-lint:
-	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run
+.PHONY: test-update-snapshots
+test-update-snapshots:
+	$(DOCKER_RUN)  -e  UPDATE_SNAPS=true -w $(GO_SRC_PATH) $(GO_IMAGE) go test ./... -coverpkg=gitlab.com/kateops/kapigen/dsl/... -v
 
-
-.PHONY: lint-fix
-lint-fix:
-	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run -v --fix
-
-
-.PHONY: lint-report
-lint-report:
-	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golangci-lint:v1.59.1 golangci-lint run -v --out-format=junit-xml:junit.xml
