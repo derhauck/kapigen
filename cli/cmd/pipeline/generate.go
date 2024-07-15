@@ -9,6 +9,7 @@ import (
 	"gitlab.com/kateops/kapigen/cli/internal/version"
 	"gitlab.com/kateops/kapigen/cli/pipelines"
 	"gitlab.com/kateops/kapigen/cli/types"
+	"gitlab.com/kateops/kapigen/dsl/gitlab/pipeline"
 	"gitlab.com/kateops/kapigen/dsl/logger"
 )
 
@@ -86,8 +87,10 @@ var GenerateCmd = &cobra.Command{
 			return err
 		}
 		pipelineJobs.OverwriteTags(pipelineConfig.Tags)
+
+		ciPipeline := pipeline.CiPipeline{}
 		logger.Info("ci jobs named to be unique")
-		return pipelines.JobsToYamLFile(pipelineJobs, nil, pipelineFile)
+		return pipelines.JobsToYamLFile(pipelineJobs, ciPipeline.DefaultCiPipeline(), pipelineFile)
 
 	},
 }
