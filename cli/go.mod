@@ -9,7 +9,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/cobra v1.8.1
 	github.com/xanzy/go-gitlab v0.106.0
-	gitlab.com/kateops/kapigen/dsl v0.0.0-20240714225753-b12940d040c3
+	gitlab.com/kateops/kapigen/dsl v0.0.0-20240715180644-6fcec63453c6
 	gopkg.in/yaml.v3 v3.0.1
 )
 
