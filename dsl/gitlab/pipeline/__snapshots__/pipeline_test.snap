@@ -1,0 +1,47 @@
+
+[TestNewDefaultCiPipeline/create_default_pipeline - 1]
+(*pipeline.CiPipelineDefault)(nil)
+&pipeline.CiPipelineWorkflow{
+    Name:  "default",
+    Rules: &job.Rules{
+        &job.Rule{
+            If:           "$CI_MERGE_REQUEST_ID",
+            Changes:      wrapper.Array[string]{},
+            AllowFailure: false,
+            Variables:    struct {}{},
+            When:         job.WhenWrapper{
+                Value: &enum.When(2),
+            },
+        },
+        &job.Rule{
+            If:           "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
+            Changes:      wrapper.Array[string]{},
+            AllowFailure: false,
+            Variables:    struct {}{},
+            When:         job.WhenWrapper{
+                Value: &enum.When(2),
+            },
+        },
+        &job.Rule{
+            If:           "$CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'",
+            Changes:      wrapper.Array[string]{},
+            AllowFailure: false,
+            Variables:    struct {}{},
+            When:         job.WhenWrapper{
+                Value: &enum.When(2),
+            },
+        },
+        &job.Rule{
+            If:           "$CI_COMMIT_TAG != null",
+            Changes:      wrapper.Array[string]{},
+            AllowFailure: false,
+            Variables:    struct {}{},
+            When:         job.WhenWrapper{
+                Value: &enum.When(2),
+            },
+        },
+    },
+}
+map[string]string{"KTC_STOP_PIPELINE":"false"}
+int(8)
+---
