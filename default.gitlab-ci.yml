@@ -50,7 +50,7 @@ Reports - Junit:
     name: registry.gitlab.com/kateops/kapigen/cli:${KAPIGEN_VERSION}
     entrypoint: [""]
   script:
-    - kapigen pipeline reports -v --private-token ${KAPIGEN_PRIVATE_TOKEN_NAME}
+    - kapigen pipeline reports -v --private-token "${KAPIGEN_PRIVATE_TOKEN_NAME}"
   coverage: "/INFO:.+: ([0-9.]+)/"
   artifacts:
     reports:
