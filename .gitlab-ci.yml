@@ -162,7 +162,7 @@ Reports - Junit:
     - cd cli
   script:
     - go mod download
-    - go run . pipeline reports -v
+    - go run . pipeline reports -v --private-token ${KAPIGEN_PRIVATE_TOKEN_NAME}
   coverage: "/INFO:.+: ([0-9.]+)/"
   artifacts:
     reports:
