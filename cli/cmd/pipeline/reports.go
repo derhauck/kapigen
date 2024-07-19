@@ -89,7 +89,7 @@ var ReportsCmd = &cobra.Command{
 					for _, artifact := range job.Artifacts {
 						if artifact.FileType == "junit" {
 							reportJobs.Push(*job)
-							logger.Info(fmt.Sprintf("found reports in job: %s coverage: %f", job.Name, job.Coverage))
+							logger.Info(fmt.Sprintf("found reports in job: %s -  coverage: %f", job.Name, job.Coverage))
 						}
 					}
 				}
