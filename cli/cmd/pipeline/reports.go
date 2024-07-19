@@ -39,21 +39,21 @@ var ReportsCmd = &cobra.Command{
 		}
 		logger.Info("will create settings")
 
-		logger.Info("will read pipeline config from: " + configPath)
+		logger.Info("will try to read pipeline config from: " + configPath)
 		cmd.SilenceUsage = true
-		body, err := os.ReadFile(configPath)
-		if err != nil {
-			return err
+		if body, err := os.ReadFile(configPath); err != nil {
+			logger.ErrorE(err)
+		} else {
+			var pipelineConfig types.PipelineConfig
+			err = yaml.Unmarshal(body, &pipelineConfig)
+			if err != nil {
+				logger.ErrorE(err)
+			}
+			if privateTokenName == "" && err == nil {
+				privateTokenName = pipelineConfig.PrivateTokenName
+			}
 		}
 
-		var pipelineConfig types.PipelineConfig
-		err = yaml.Unmarshal(body, &pipelineConfig)
-		if err != nil {
-			return err
-		}
-		if privateTokenName == "" {
-			privateTokenName = pipelineConfig.PrivateTokenName
-		}
 		logger.Debug("will use private token: " + privateTokenName)
 		settings := cli.NewSettings(
 			cli.SetMode(version.GetModeFromString(version.Gitlab.Name())),
