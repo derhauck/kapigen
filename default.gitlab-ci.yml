@@ -9,7 +9,7 @@ workflow:
     - when: never
 variables:
   KAPIGEN_VERSION: latest
-  KAPIGEN_DEFAULT_RUNNER_TAG: pressure:medium
+#  KAPIGEN_DEFAULT_RUNNER_TAG: pressure:medium
 default:
   tags:
     - ${KAPIGEN_DEFAULT_RUNNER_TAG}
