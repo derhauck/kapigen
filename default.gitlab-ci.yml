@@ -45,8 +45,8 @@ Trigger Build:
       - artifact: pipeline.yaml
         job: Build
 
-    forward:
-      pipeline_variables: true
+#    forward:
+#      pipeline_variables: true
 
 Build (DSL):
   stage: build
@@ -74,8 +74,8 @@ Trigger Build (DSL):
       - artifact: .kapigen/pipeline.yaml
         job: Build (DSL)
 
-    forward:
-      pipeline_variables: true
+#    forward:
+#      pipeline_variables: true
 
 Reports - Junit:
   stage: collect
