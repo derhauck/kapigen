@@ -143,3 +143,34 @@ func TestArray_Has(t *testing.T) {
 	})
 
 }
+
+func TestGetSlice(t *testing.T) {
+	t.Run("get filled slice", func(t *testing.T) {
+		expectation := []string{"test", "test2", "test3", "test4", "test5"}
+		array := NewArray[string]()
+		array.slice = expectation
+
+		slice := GetSlice[string](array)
+		if slice == nil {
+			t.Error("should be able to get slice")
+		}
+
+		if reflect.DeepEqual(slice, expectation) == false {
+			t.Error("should have same elements")
+		}
+	})
+
+	t.Run("get empty slice", func(t *testing.T) {
+		array := NewArray[string]()
+
+		slice := GetSlice[string](array)
+		if slice == nil {
+			t.Error("should be able to get slice")
+		}
+
+		if len(slice) != 0 {
+			t.Error("should have no elements")
+		}
+
+	})
+}

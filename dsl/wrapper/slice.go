@@ -16,6 +16,13 @@ func (s *Array[T]) Get() []T {
 	return s.slice
 }
 
+func GetSlice[T any](array *Array[T]) []T {
+	if array.slice == nil {
+		return []T{}
+	}
+	return array.Get()
+}
+
 func (s *Array[T]) Push(elements ...T) *Array[T] {
 	s.slice = append(s.slice, elements...)
 	return s
