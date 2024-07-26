@@ -161,7 +161,7 @@ func TestGetSlice(t *testing.T) {
 	})
 
 	t.Run("get empty slice", func(t *testing.T) {
-		array := NewArray[string]()
+		array := &Array[string]{}
 
 		slice := GetSlice[string](array)
 		if slice == nil {

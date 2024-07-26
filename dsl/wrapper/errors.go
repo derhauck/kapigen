@@ -18,7 +18,7 @@ func (c *DetailedError) Full() string {
 	return fmt.Sprintf("%s\n=> FILE:\t%s:%d\n=> FUNCTION:\t%s\n=> MESSAGE:\t%s%s", delimiter, c.Filename, c.Line, c.Name, c.Msg, delimiter)
 }
 func (c *DetailedError) Error() string {
-	return c.Msg
+	return c.Full()
 }
 
 // ErrorHandler creates a new error with the given message and the caller of the function.

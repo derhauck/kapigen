@@ -2,6 +2,7 @@ package environment
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -70,7 +71,7 @@ func TestLookup(t *testing.T) {
 		t.Parallel()
 		var test Variable = UNREACHABLE
 		result, err := test.Lookup()
-		if err != nil && err.Error() != "env var '' is not set" {
+		if err != nil && !strings.Contains(err.Error(), "env var '' is not set") {
 			t.Errorf("Unexpected error looking up test var: %s", err.Error())
 		}
 		if result != "" {
