@@ -90,7 +90,7 @@ func TestServices_Validate(t *testing.T) {
 				{Name: "service1", Port: 8080, ImageName: "test-image"},
 				{Name: "", Port: 8081, ImageName: "test-image"},
 			},
-			expected: fmt.Sprintf("service.name"),
+			expected: "service.name",
 		},
 	}
 
