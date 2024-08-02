@@ -43,7 +43,7 @@ func TestExtendPipelines(t *testing.T) {
 	t.Run("extend pipeline functions", func(t *testing.T) {
 		const TestPipeline types.PipelineType = "test"
 
-		pipelines.ExtendPipelines(map[types.PipelineType]types.PipelineConfigInterface{
+		pipelines.ExtendPipelinesTypes(map[types.PipelineType]types.PipelineConfigInterface{
 			TestPipeline: &TestPipelineConfig{},
 		})
 		settings := cli.NewSettings(

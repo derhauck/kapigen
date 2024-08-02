@@ -39,18 +39,6 @@ type CiPipeline struct {
 }
 
 func (c *CiPipeline) Validate() error {
-	if c.Stages == nil {
-		c.Stages = wrapper.NewArray[string]()
-	}
-
-	if c.Workflow == nil {
-		c.Workflow = &CiPipelineWorkflow{}
-	}
-
-	if c.Default == nil {
-		c.Default = &CiPipelineDefault{}
-	}
-
 	err := c.Workflow.Validate()
 	if err != nil {
 		return err
@@ -140,7 +128,7 @@ func NewCiPipelineYaml(pipeline *CiPipeline) (*CiPipelineYaml, error) {
 	return &CiPipelineYaml{
 		Default:   NewCiPipelineDefaultYaml(pipeline.Default),
 		Workflow:  NewCiPipelineWorkflowYaml(pipeline.Workflow),
-		Stages:    pipeline.Stages.Get(),
+		Stages:    wrapper.GetSlice(pipeline.Stages),
 		Variables: pipeline.Variables,
 	}, nil
 }

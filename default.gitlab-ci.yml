@@ -9,7 +9,7 @@ workflow:
     - when: never
 variables:
   KAPIGEN_VERSION: latest
-  KAPIGEN_DEFAULT_RUNNER_TAG: pressure:medium
+#  KAPIGEN_DEFAULT_RUNNER_TAG: pressure:medium
 default:
   tags:
     - ${KAPIGEN_DEFAULT_RUNNER_TAG}
@@ -23,6 +23,10 @@ Build:
   image:
     name: registry.gitlab.com/kateops/kapigen/cli:${KAPIGEN_VERSION}
     entrypoint: [""]
+  rules:
+    - exists:
+        - .kapigen/*.go
+      when: never
   script:
     - kapigen pipeline generate -v  --mode gitlab
   artifacts:
@@ -31,16 +35,47 @@ Build:
 
 Trigger Build:
   stage: trigger
+  rules:
+    - exists:
+        - .kapigen/*.go
+      when: never
   trigger:
     strategy: depend
     include:
       - artifact: pipeline.yaml
         job: Build
 
-    forward:
-      pipeline_variables: true
+#    forward:
+#      pipeline_variables: true
 
+Build (DSL):
+  stage: build
+  rules:
+    - exists:
+        - .kapigen/*.go
+  image:
+    name: golang:1.22
+  script:
+    - cd .kapigen
+    - go mod download
+    - go run .
+  artifacts:
+    paths:
+      - .kapigen/pipeline.yaml
 
+Trigger Build (DSL):
+  rules:
+    - exists:
+        - .kapigen/*.go
+  stage: trigger
+  trigger:
+    strategy: depend
+    include:
+      - artifact: .kapigen/pipeline.yaml
+        job: Build (DSL)
+
+#    forward:
+#      pipeline_variables: true
 
 Reports - Junit:
   stage: collect

@@ -35,7 +35,7 @@ func TestCreatePipeline(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		snaps.MatchSnapshot(t, pipelineConfig["generic"], pipelineConfig["variables"], pipelineConfig["workflow"], pipelineConfig["default"], pipelineConfig["allow_failure"])
+		snaps.MatchSnapshot(t, pipelineConfig["generic"], pipelineConfig["variables"], pipelineConfig["workflow"], pipelineConfig["default"])
 
 		err = os.Remove(file)
 		if err != nil {

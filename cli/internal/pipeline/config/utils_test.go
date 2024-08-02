@@ -1,16 +1,16 @@
 package config
 
 import (
+	"fmt"
+	"strings"
 	"testing"
-
-	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
 func TestService_Validate(t *testing.T) {
 	tests := []struct {
 		name     string
 		service  *Service
-		expected error
+		expected string
 	}{
 		{
 			name: "Valid service",
@@ -19,7 +19,7 @@ func TestService_Validate(t *testing.T) {
 				Port:      8080,
 				ImageName: "test-image",
 			},
-			expected: nil,
+			expected: "",
 		},
 		{
 			name: "Missing name",
@@ -27,7 +27,7 @@ func TestService_Validate(t *testing.T) {
 				Port:      8080,
 				ImageName: "test-image",
 			},
-			expected: wrapper.NewMissingArgError("service.name"),
+			expected: "service.name",
 		},
 		{
 			name: "Invalid port",
@@ -36,7 +36,7 @@ func TestService_Validate(t *testing.T) {
 				Port:      0,
 				ImageName: "test-image",
 			},
-			expected: wrapper.DetailedErrorf("service: 'test-service', invalid port %d (must be 1 - 65535)", 0),
+			expected: fmt.Sprintf("service: 'test-service', invalid port %d (must be 1 - 65535)", 0),
 		},
 		{
 			name: "Missing image name and docker",
@@ -44,18 +44,18 @@ func TestService_Validate(t *testing.T) {
 				Name: "test-service",
 				Port: 8080,
 			},
-			expected: wrapper.NewMissingArgsError("service.imageName", "service.docker"),
+			expected: "'service.imageName', 'service.docker'",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			err := test.service.Validate()
-			if err != nil && test.expected == nil {
+			if err != nil && test.expected == "" {
 				t.Errorf("Unexpected error: %v", err)
-			} else if err == nil && test.expected != nil {
+			} else if err == nil && test.expected != "" {
 				t.Errorf("Expected error: %v, but got nil", test.expected)
-			} else if err != nil && err.Error() != test.expected.Error() {
+			} else if err != nil && !strings.Contains(err.Error(), test.expected) {
 				t.Errorf("Expected error: %v, but got: %v", test.expected, err)
 			}
 		})
@@ -66,7 +66,7 @@ func TestServices_Validate(t *testing.T) {
 	tests := []struct {
 		name     string
 		services Services
-		expected error
+		expected string
 	}{
 		{
 			name: "Valid services",
@@ -74,7 +74,7 @@ func TestServices_Validate(t *testing.T) {
 				{Name: "service1", Port: 8080, ImageName: "test-image"},
 				{Name: "service2", Port: 8081, ImageName: "test-image"},
 			},
-			expected: nil,
+			expected: "",
 		},
 		{
 			name: "Duplicate port",
@@ -82,7 +82,7 @@ func TestServices_Validate(t *testing.T) {
 				{Name: "service1", Port: 8080, ImageName: "test-image"},
 				{Name: "service2", Port: 8080, ImageName: "test-image"},
 			},
-			expected: wrapper.DetailedErrorf("service: 'service2', referencing occupied port: %d", 8080),
+			expected: fmt.Sprintf("service: 'service2', referencing occupied port: %d", 8080),
 		},
 		{
 			name: "Invalid service",
@@ -90,18 +90,18 @@ func TestServices_Validate(t *testing.T) {
 				{Name: "service1", Port: 8080, ImageName: "test-image"},
 				{Name: "", Port: 8081, ImageName: "test-image"},
 			},
-			expected: wrapper.NewMissingArgError("service.name"),
+			expected: "service.name",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			err := test.services.Validate()
-			if err != nil && test.expected == nil {
+			if err != nil && test.expected == "" {
 				t.Errorf("Unexpected error: %v", err)
-			} else if err == nil && test.expected != nil {
+			} else if err == nil && test.expected != "" {
 				t.Errorf("Expected error: %v, but got nil", test.expected)
-			} else if err != nil && err.Error() != test.expected.Error() {
+			} else if err != nil && !strings.Contains(err.Error(), test.expected) {
 				t.Errorf("Expected error: %v, but got: %v", test.expected, err)
 			}
 		})

@@ -12,7 +12,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func ExtendPipelines(pipelines map[types.PipelineType]types.PipelineConfigInterface) {
+func ExtendPipelinesTypes(pipelines map[types.PipelineType]types.PipelineConfigInterface) {
 	for key, pipe := range pipelines {
 		logger.Info(fmt.Sprintf("extend pipelines types with: %s", key.String()))
 		config.PipelineConfigTypes[key] = pipe
