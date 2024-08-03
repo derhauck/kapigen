@@ -32,9 +32,7 @@
             },
             Variables: {},
             Tags:      {
-                &job.Tag{
-                    Value: &enum.Tag(0),
-                },
+                &job.Tag{},
             },
             Image: job.Image{
                 Name:       "alpine",

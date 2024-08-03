@@ -22,3 +22,11 @@ lint-fix:
 .PHONY: lint-report
 lint-report:
 	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golaps ngci-lint:v1.59.1 golangci-lint run -v --out-format=junit-xml:junit.xml
+
+.PHONY: lcc # line count complete (including tests)
+lcc:
+	find . -name *.go -not -path "**/.pkg/*" -exec cat {} \; | wc -l
+
+.PHONY: lc # line count
+lc:
+	find . -name *.go -not -path "**/.pkg/*" -not -name *_test.go -exec cat {} \; | wc -l
