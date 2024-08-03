@@ -26,28 +26,50 @@ func TestNewTag(t *testing.T) {
 			t.Error("should not be nil")
 		}
 
-		if tag != nil && tag.Value != nil && *tag.Value != enum.TagPressureMedium {
-			t.Error("should be the default")
+		if tag != nil && tag.Value != nil && tag.Value.String() != enum.TagPressureMedium.String() {
+			t.Errorf("should be the default '%s'", enum.TagPressureMedium.String())
 		}
 	})
 }
 
+type TestTag string
+
+func (t *TestTag) String() string {
+	value := *t
+	return string(value)
+}
+
 func TestTags_Add(t *testing.T) {
+	testTag := TestTag("test")
+	test2Tag := TestTag("test2")
 	tests := []struct {
 		name string
-		want []enum.Tag
+		want []Tagger
 	}{
 		{
 			name: "can add one",
-			want: []enum.Tag{
+			want: []Tagger{
 				enum.TagPressureMedium,
 			},
 		},
 		{
 			name: "can add two",
-			want: []enum.Tag{
+			want: []Tagger{
 				enum.TagPressureMedium,
 				enum.TagPressureExclusive,
+			},
+		},
+		{
+			name: "can add custom",
+			want: []Tagger{
+				&testTag,
+			},
+		},
+		{
+			name: "can add two custom",
+			want: []Tagger{
+				&testTag,
+				&test2Tag,
 			},
 		},
 	}
@@ -64,13 +86,11 @@ func TestTags_Add(t *testing.T) {
 						hasTag = true
 					}
 				}
-
 				if hasTag != true {
 					t.Errorf("Add() = %v, want %v", actualTags, tag)
 				}
 				hasTag = false
 			}
-
 		})
 	}
 }

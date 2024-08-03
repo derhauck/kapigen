@@ -2,13 +2,18 @@ package job
 
 import (
 	"gitlab.com/kateops/kapigen/dsl/enum"
+	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
-type Tag struct {
-	Value *enum.Tag
+type Tagger interface {
+	wrapper.Stringer
 }
 
-func NewTag(tag *enum.Tag) *Tag {
+type Tag struct {
+	Value Tagger
+}
+
+func NewTag(tag Tagger) *Tag {
 	var overrideTag enum.Tag
 	if tag == nil {
 		overrideTag = enum.TagPressureMedium
@@ -16,6 +21,7 @@ func NewTag(tag *enum.Tag) *Tag {
 			Value: &overrideTag,
 		}
 	}
+
 	return &Tag{
 		Value: tag,
 	}
@@ -35,8 +41,8 @@ func (c *Tags) Get() []*Tag {
 	return *c
 }
 
-func (c *Tags) Add(tag enum.Tag) *Tags {
-	appended := append(c.Get(), NewTag(&tag))
+func (c *Tags) Add(tag Tagger) *Tags {
+	appended := append(c.Get(), NewTag(tag))
 	newCis := Tags(appended)
 	*c = newCis
 	return c
