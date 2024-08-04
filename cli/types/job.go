@@ -45,11 +45,11 @@ func (j *Job) AddSeveralNeeds(needs *Needs) *Job {
 	return j
 }
 
-func (j *Job) RenderNeeds() *Job {
+func (j *Job) RenderNeeds() (*Job, error) {
 	if j.CiJobYaml == nil {
 		err := j.Render()
 		if err != nil {
-			return nil
+			return nil, err
 		}
 	}
 	if j.Needs != nil {
@@ -60,7 +60,7 @@ func (j *Job) RenderNeeds() *Job {
 			j.CiJobYaml.Needs = nil
 		}
 	}
-	return j
+	return j, nil
 }
 
 func (j *Job) GetName() string {
@@ -179,7 +179,7 @@ func (j *Job) Render() error {
 	var err error
 	j.CiJobYaml, err = j.CiJob.Render(j.Needs.NeedsYaml(), j.ExternalTags)
 	if err != nil {
-		return fmt.Errorf("job='%s'  can not be rendered: %w", j.Names, err)
+		return fmt.Errorf("job '%s'  can not be rendered: %w", j.GetName(), err)
 	}
 	return nil
 }
@@ -202,15 +202,6 @@ func (j *Jobs) AddJob(job *Job) *Jobs {
 }
 func (j *Jobs) GetJobs() []*Job {
 	return *j
-}
-
-func (j *Job) EvaluateNeeds(needs *Needs) {
-	if needs != nil {
-		for _, need := range needs.GetNeeds() {
-			j.Needs.AddNeed(need)
-		}
-	}
-
 }
 
 func (j *Jobs) DynamicMerge() (*Jobs, error) {
@@ -285,4 +276,23 @@ func (j *Jobs) OverwriteTags(tags []string) {
 			}
 		}
 	}
+}
+
+func (j *Jobs) SanityCheck() error {
+	for _, currentJob := range j.GetJobs() {
+		// check all required needs are also in pipeline
+		for _, currentNeedJob := range currentJob.Needs.GetNeeds() {
+			found := false
+			for _, currentPipelineJob := range j.GetJobs() {
+				if currentPipelineJob == currentNeedJob.Job {
+					found = true
+				}
+			}
+			if !found {
+				return fmt.Errorf("job '%s' requires job '%s' which is not in pipeline", currentJob.GetName(), currentNeedJob.Job.GetName())
+			}
+		}
+
+	}
+	return nil
 }

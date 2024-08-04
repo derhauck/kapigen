@@ -388,7 +388,10 @@ func TestJob_RenderNeeds(t *testing.T) {
 				Rules.AddRules(*job.DefaultMainBranchRules())
 		})
 
-		result := job1.RenderNeeds()
+		result, err := job1.RenderNeeds()
+		if err != nil {
+			t.Error(err)
+		}
 		if result == nil {
 			t.Error("expected rendered job, received nil")
 			t.FailNow()
@@ -409,4 +412,53 @@ func TestJob_RenderNeeds(t *testing.T) {
 		}
 
 	})
+}
+
+func TestJobs_SanityCheck(t *testing.T) {
+	job1 := NewJob("job 1", "alpine", nil)
+	job2 := NewJob("job 2", "alpine", nil)
+	job3 := NewJob("job 3", "alpine", nil)
+
+	job3need := NewJob("job 3 need", "alpine", nil)
+	job3need.AddJobAsNeed(job3)
+	tests := []struct {
+		name    string
+		j       Jobs
+		wantErr bool
+	}{
+		{
+			"can not find job 3",
+			Jobs{
+				job1,
+				job2,
+				job3need,
+			},
+			true,
+		},
+		{
+			"can find job 3",
+			Jobs{
+				job1,
+				job2,
+				job3,
+				job3need,
+			},
+			false,
+		},
+		{
+			"can not find job 3, only one job",
+			Jobs{
+				job3need,
+			},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.j.SanityCheck()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SanityCheck() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }

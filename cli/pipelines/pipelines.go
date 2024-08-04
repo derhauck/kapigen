@@ -19,12 +19,17 @@ func ExtendPipelinesTypes(pipelines map[types.PipelineType]types.PipelineConfigI
 	}
 }
 func JobsToYamLFile(jobs *types.Jobs, ciPipeline *pipeline.CiPipeline, fileName string) error {
+
+	if err := jobs.SanityCheck(); err != nil {
+		return err
+	}
+
 	// convert jobs to map
 	var gitlabPipeline = make(map[string]interface{})
 	for _, evaluatedJob := range *jobs {
-		renderedJob := evaluatedJob.RenderNeeds()
-		if renderedJob == nil {
-			return fmt.Errorf("job '%s' can not be rendered", evaluatedJob.GetName())
+		_, err := evaluatedJob.RenderNeeds()
+		if err != nil {
+			return err
 		}
 		gitlabPipeline[evaluatedJob.GetName()] = evaluatedJob.CiJobYaml
 	}
