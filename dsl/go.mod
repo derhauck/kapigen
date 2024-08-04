@@ -3,7 +3,7 @@ module gitlab.com/kateops/kapigen/dsl
 go 1.21
 
 require (
-	github.com/gkampitakis/go-snaps v0.5.4
+	github.com/gkampitakis/go-snaps v0.5.7
 	gopkg.in/yaml.v3 v3.0.1
 )
 
