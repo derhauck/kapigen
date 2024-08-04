@@ -24,9 +24,18 @@ lint-report:
 	$(DOCKER_RUN) -v ${PWD}/.cache:/.cache golangci/golaps ngci-lint:v1.59.1 golangci-lint run -v --out-format=junit-xml:junit.xml
 
 .PHONY: lcc # line count complete (including tests)
-lcc:
-	find . -name *.go -not -path "**/.pkg/*" -exec cat {} \; | wc -l
+lcc: params=. -name "*.go" -not -path "**/.pkg/*"
+lcc: -lc
 
 .PHONY: lc # line count
-lc:
-	find . -name *.go -not -path "**/.pkg/*" -not -name *_test.go -exec cat {} \; | wc -l
+lc: params=. -name "*.go" -not -path "**/.pkg/*" -not -name "*_test.go"
+lc: -lc
+
+.PHONY: -lc
+-lc:
+	@echo "Files: $(params)"
+	@echo "================================================="
+	@find $(params)
+	@echo "================================================="
+	@echo "Total:"
+	@find $(params) -exec cat {} \; | wc -l
