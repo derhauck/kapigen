@@ -21,8 +21,7 @@ stages:
 .std:
   rules:
     - exists:
-        paths:
-          - .kapigen/*.go
+        - .kapigen/*.go
       when: never
     - if: $CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_EVENT_TYPE == "merged_result"
     - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
