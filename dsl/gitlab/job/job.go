@@ -18,9 +18,10 @@ type CiJob struct {
 	Tags         Tags              `yaml:"tags"`
 	Image        Image
 	Rules        Rules
-	Stage        stages.Stage `yaml:"stage"`
-	Services     Services     `yaml:"services"`
-	Coverage     string       `yaml:"coverage"`
+	Stage        stages.Stage           `yaml:"stage"`
+	Services     Services               `yaml:"services"`
+	Coverage     string                 `yaml:"coverage"`
+	Secrets      map[string]VaultSecret `yaml:"secrets"`
 }
 
 func (c *CiJob) Render(needs *NeedsYaml, externalTags []string) (*CiJobYaml, error) {
