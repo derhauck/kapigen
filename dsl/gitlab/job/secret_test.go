@@ -34,21 +34,27 @@ func TestEnumVaultEngineName(t *testing.T) {
 func TestNewVaultSecretYaml(t *testing.T) {
 	t.Run("can create valid new secret yaml", func(t *testing.T) {
 		expectation := &VaultSecretYaml{
-			Engine: VaultSecretEngineYaml{
-				Path: "mount",
-				Name: "kv-v2",
+			Vault: VaultSecretConfigYaml{
+				Engine: VaultSecretEngineYaml{
+					Path: "mount",
+					Name: "kv-v2",
+				},
+				Path:  "path",
+				Field: "field",
 			},
-			Path:  "path",
-			Field: "field",
+
 			Token: "token",
 		}
 		yaml := NewVaultSecretYaml(&VaultSecret{
-			Engine: VaultSecretEngine{
-				Path: "mount",
-				Name: EnumVaultSecretEngineKv2,
+			Vault: VaultSecretConfig{
+				Engine: VaultSecretEngine{
+					Path: "mount",
+					Name: EnumVaultSecretEngineKv2,
+				},
+				Path:  "path",
+				Field: "field",
 			},
-			Path:  "path",
-			Field: "field",
+
 			Token: "token",
 		})
 

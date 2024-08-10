@@ -72,6 +72,7 @@
                 },
             },
             Coverage: "",
+            Secrets:  {},
         },
         Needs: {
         },
@@ -118,6 +119,8 @@
             },
             Tags:     {"pressure:medium"},
             Coverage: "",
+            Secrets:  &job.SecretsYaml{
+            },
         },
         PipelineId:   "testId",
         ExternalTags: nil,

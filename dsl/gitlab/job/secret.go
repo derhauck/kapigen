@@ -21,20 +21,46 @@ func EnumVaultSecretEngineName() *wrapper.Enum[VaultSecretEngineName, string] {
 	return enum
 }
 
+type Secret interface {
+	Secret() Secret
+}
+
+type Secrets map[string]Secret
+
+func (s *Secrets) Render() *SecretsYaml {
+	secretsYaml := SecretsYaml{}
+	for k, v := range *s {
+		switch v.(type) {
+		case *VaultSecret:
+			secretsYaml[k] = NewVaultSecretYaml(v.(*VaultSecret))
+		}
+
+	}
+	return &secretsYaml
+}
+
+type SecretYaml interface {
+	SecretYaml() SecretYaml
+}
+type SecretsYaml map[string]SecretYaml
 type VaultSecretEngine struct {
 	Name VaultSecretEngineName
 	Path string
 }
 
 type VaultSecret struct {
-	vault VaultSecretConfig `yaml:"vault"`
+	Vault VaultSecretConfig `yaml:"vault"`
+	Token string            `yaml:"token,omitempty"`
+}
+
+func (v *VaultSecret) Secret() Secret {
+	return v
 }
 
 type VaultSecretConfig struct {
 	Engine VaultSecretEngine
 	Path   string
 	Field  string
-	Token  string
 }
 
 type VaultSecretEngineYaml struct {
@@ -49,18 +75,28 @@ func NewVaultSecretEngineYaml(engine *VaultSecretEngine) *VaultSecretEngineYaml 
 	}
 }
 
-type VaultSecretYaml struct {
+type VaultSecretConfigYaml struct {
 	Engine VaultSecretEngineYaml `yaml:"engine"`
 	Path   string                `yaml:"path"`
 	Field  string                `yaml:"field"`
-	Token  string                `yaml:"token,omitempty"`
+}
+
+type VaultSecretYaml struct {
+	Vault VaultSecretConfigYaml `yaml:"vault"`
+	Token string                `yaml:"token,omitempty"`
+}
+
+func (v *VaultSecretYaml) SecretYaml() SecretYaml {
+	return v
 }
 
 func NewVaultSecretYaml(secret *VaultSecret) *VaultSecretYaml {
 	return &VaultSecretYaml{
-		Engine: *NewVaultSecretEngineYaml(&secret.Engine),
-		Path:   secret.Path,
-		Field:  secret.Field,
-		Token:  secret.Token,
+		Vault: VaultSecretConfigYaml{
+			Engine: *NewVaultSecretEngineYaml(&secret.Vault.Engine),
+			Path:   secret.Vault.Path,
+			Field:  secret.Vault.Field,
+		},
+		Token: secret.Token,
 	}
 }

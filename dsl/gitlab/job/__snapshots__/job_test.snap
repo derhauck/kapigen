@@ -1,0 +1,126 @@
+
+[TestNewCiJobYaml/can_create_new_CiJobYaml_from_CiJob - 1]
+&job.CiJob{
+    Artifact:     job.Artifacts{},
+    AfterScript:  job.AfterScript{},
+    BeforeScript: job.BeforeScript{},
+    Script:       job.Script{
+        Value: &wrapper.Array[string]{
+            slice: {},
+        },
+    },
+    AllowFailure: job.AllowFailure{},
+    Cache:        job.Cache{
+        Key:   "",
+        Paths: wrapper.Array[string]{
+            slice: {},
+        },
+        Unprotect: true,
+        Policy:    2,
+        Active:    false,
+    },
+    Variables: {},
+    Tags:      nil,
+    Image:     job.Image{
+        Name:       "image",
+        Entrypoint: wrapper.Array[string]{},
+        PullPolicy: 0,
+    },
+    Rules: {
+        &job.Rule{
+            If:           "$KTC_STOP_PIPELINE != \"false\" && $DEBUG == null",
+            Changes:      wrapper.Array[string]{},
+            AllowFailure: false,
+            Variables:    struct {}{},
+            When:         job.WhenWrapper{
+                Value: &enum.When(3),
+            },
+        },
+        &job.Rule{
+            If:           "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
+            Changes:      wrapper.Array[string]{},
+            AllowFailure: false,
+            Variables:    struct {}{},
+            When:         job.WhenWrapper{
+                Value: &enum.When(0),
+            },
+        },
+        &job.Rule{
+            If:           "$KTC_TEST_PIPELINE",
+            Changes:      wrapper.Array[string]{},
+            AllowFailure: false,
+            Variables:    struct {}{},
+            When:         job.WhenWrapper{},
+        },
+    },
+    Stage:    5,
+    Services: job.Services{
+        Values: &[]*job.Service{
+        },
+    },
+    Coverage: "coverage",
+    Secrets:  {
+        "TEST": &job.VaultSecret{
+            Vault: job.VaultSecretConfig{
+                Engine: job.VaultSecretEngine{Name:0x0, Path:"mount"},
+                Path:   "path",
+                Field:  "field",
+            },
+            Token: "token",
+        },
+    },
+}
+&job.CiJobYaml{
+    Artifacts:    (*job.ArtifactsYaml)(nil),
+    AfterScript:  nil,
+    AllowFailure: bool(false),
+    BeforeScript: nil,
+    Cache:        (*job.CacheYaml)(nil),
+    Script:       {},
+    Needs:        (*job.NeedsYaml)(nil),
+    Variables:    {},
+    Image:        &job.ImageYaml{
+        Name:       "image",
+        Entrypoint: nil,
+        PullPolicy: "always",
+    },
+    Rules: &job.RulesYaml{
+        &job.RuleYaml{
+            If:           "$KTC_STOP_PIPELINE != \"false\" && $DEBUG == null",
+            Changes:      nil,
+            AllowFailure: bool(false),
+            Variables:    struct {}{},
+            When:         "never",
+        },
+        &job.RuleYaml{
+            If:           "$CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH",
+            Changes:      nil,
+            AllowFailure: bool(false),
+            Variables:    struct {}{},
+            When:         "on_success",
+        },
+        &job.RuleYaml{
+            If:           "$KTC_TEST_PIPELINE",
+            Changes:      nil,
+            AllowFailure: bool(false),
+            Variables:    struct {}{},
+            When:         "on_success",
+        },
+    },
+    Stage:    "dynamic",
+    Services: &job.ServiceYamls{
+    },
+    Tags:     {"pressure:medium"},
+    Coverage: "coverage",
+    Secrets:  &job.SecretsYaml{
+        "TEST": &job.VaultSecretYaml{
+            Vault: job.VaultSecretConfigYaml{
+                Engine: job.VaultSecretEngineYaml{Name:"kv-v2", Path:"mount"},
+                Path:   "path",
+                Field:  "field",
+            },
+            Token: "token",
+        },
+    },
+}
+---

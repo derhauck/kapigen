@@ -28,6 +28,19 @@ map[string]interface {}{
     "script": []interface {}{
         "echo hello world",
     },
+    "secrets": map[string]interface {}{
+        "TEST": map[string]interface {}{
+            "token": "token",
+            "vault": map[string]interface {}{
+                "engine": map[string]interface {}{
+                    "name": "kv-v2",
+                    "path": "mount",
+                },
+                "field": "field",
+                "path":  "path",
+            },
+        },
+    },
     "services": []interface {}{
     },
     "stage": "dynamic",
@@ -60,4 +73,62 @@ map[string]interface {}{
     },
 }
 nil
+---
+
+[TestCreatePipeline/can_create_pipeline - 2]
+default: null
+generic:
+    allow_failure: false
+    script:
+        - echo hello world
+    needs: []
+    image:
+        name: alpine
+        pull_policy: always
+    rules:
+        - if: $KTC_STOP_PIPELINE != "false" && $DEBUG == null
+          allow_failure: false
+          when: never
+        - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+          allow_failure: false
+          when: on_success
+        - if: $KTC_TEST_PIPELINE
+          allow_failure: false
+          when: on_success
+    stage: dynamic
+    services: []
+    tags:
+        - pressure:medium
+    secrets:
+        TEST:
+            vault:
+                engine:
+                    name: kv-v2
+                    path: mount
+                path: path
+                field: field
+            token: token
+stages:
+    - lint
+    - init
+    - build
+    - test
+    - release
+    - dynamic
+    - trigger
+    - final
+variables:
+    KTC_STOP_PIPELINE: "false"
+workflow:
+    name: default
+    rules:
+        - if: $CI_MERGE_REQUEST_ID
+          when: always
+        - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+          when: always
+        - if: $CI_MERGE_REQUEST_IID && $CI_PIPELINE_SOURCE == 'merge_request_event'
+          when: always
+        - if: $CI_COMMIT_TAG != null
+          when: always
+
 ---
