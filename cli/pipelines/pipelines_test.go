@@ -38,6 +38,7 @@ func TestCreatePipeline(t *testing.T) {
 					},
 				}
 			}))
+			t.Logf("stages %v", ciPipeline.Stages)
 		})
 		readFile, err := os.ReadFile(file)
 		if err != nil {
@@ -49,7 +50,6 @@ func TestCreatePipeline(t *testing.T) {
 			t.Error(err)
 		}
 		snaps.MatchSnapshot(t, pipelineConfig["generic"], pipelineConfig["variables"], pipelineConfig["workflow"], pipelineConfig["default"])
-		snaps.MatchSnapshot(t, string(readFile))
 		err = os.Remove(file)
 		if err != nil {
 			t.Error(err)

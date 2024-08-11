@@ -22,7 +22,7 @@ func EnumVaultSecretEngineName() *wrapper.Enum[VaultSecretEngineName, string] {
 }
 
 type Secret interface {
-	Secret() Secret
+	Render() SecretYaml
 }
 
 type Secrets map[string]Secret
@@ -30,11 +30,7 @@ type Secrets map[string]Secret
 func (s *Secrets) Render() *SecretsYaml {
 	secretsYaml := SecretsYaml{}
 	for k, v := range *s {
-		switch v.(type) {
-		case *VaultSecret:
-			secretsYaml[k] = NewVaultSecretYaml(v.(*VaultSecret))
-		}
-
+		secretsYaml[k] = v.Render()
 	}
 	return &secretsYaml
 }
@@ -53,8 +49,8 @@ type VaultSecret struct {
 	Token string            `yaml:"token,omitempty"`
 }
 
-func (v *VaultSecret) Secret() Secret {
-	return v
+func (v *VaultSecret) Render() SecretYaml {
+	return NewVaultSecretYaml(v)
 }
 
 type VaultSecretConfig struct {

@@ -18,19 +18,17 @@ const (
 	FINAL
 )
 
-var values = map[Stage]string{
-	LINT:    "lint",
-	INIT:    "init",
-	BUILD:   "build",
-	TEST:    "test",
-	RELEASE: "release",
-	DYNAMIC: "dynamic",
-	TRIGGER: "trigger",
-	FINAL:   "final",
-}
-
 func Enum() *wrapper.Enum[Stage, string] {
-	enum, err := wrapper.NewEnum[Stage](values)
+	enum, err := wrapper.NewEnum[Stage](map[Stage]string{
+		LINT:    "lint",
+		INIT:    "init",
+		BUILD:   "build",
+		TEST:    "test",
+		RELEASE: "release",
+		DYNAMIC: "dynamic",
+		TRIGGER: "trigger",
+		FINAL:   "final",
+	})
 	if err != nil {
 		logger.Error(err.Error())
 	}

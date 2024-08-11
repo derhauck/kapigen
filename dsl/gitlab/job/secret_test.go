@@ -63,3 +63,43 @@ func TestNewVaultSecretYaml(t *testing.T) {
 		}
 	})
 }
+
+func TestVaultSecretYaml_SecretYaml(t *testing.T) {
+	t.Run("can get VaultSecretYaml from SecretYaml function", func(t *testing.T) {
+		yaml := VaultSecretYaml{
+			Vault: VaultSecretConfigYaml{
+				Engine: VaultSecretEngineYaml{
+					Path: "mount",
+					Name: "kv-v2",
+				},
+				Path:  "path",
+				Field: "field",
+			},
+		}
+
+		result := yaml.SecretYaml()
+		switch secret := result.(type) {
+		case *VaultSecretYaml:
+			t.Log("success")
+			if secret.Vault.Engine.Path != yaml.Vault.Engine.Path {
+				t.Errorf("expected %v, received %v", yaml.Vault.Engine.Path, secret.Vault.Engine.Path)
+			}
+
+			if secret.Vault.Engine.Name != yaml.Vault.Engine.Name {
+				t.Errorf("expected %v, received %v", yaml.Vault.Engine.Name, secret.Vault.Engine.Name)
+			}
+
+			if secret.Vault.Path != yaml.Vault.Path {
+				t.Errorf("expected %v, received %v", yaml.Vault.Path, secret.Vault.Path)
+			}
+
+			if secret.Vault.Field != yaml.Vault.Field {
+				t.Errorf("expected %v, received %v", yaml.Vault.Field, secret.Vault.Field)
+			}
+
+		default:
+			t.Errorf("expected *VaultSecretYaml, received %v", result)
+		}
+
+	})
+}
