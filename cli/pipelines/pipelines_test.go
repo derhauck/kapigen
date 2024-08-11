@@ -38,7 +38,6 @@ func TestCreatePipeline(t *testing.T) {
 					},
 				}
 			}))
-			t.Logf("stages %v", ciPipeline.Stages)
 		})
 		readFile, err := os.ReadFile(file)
 		if err != nil {
