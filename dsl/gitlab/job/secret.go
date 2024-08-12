@@ -4,6 +4,32 @@ import (
 	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
+type IdToken struct {
+	AUD string
+}
+
+type IdTokens map[string]*IdToken
+
+func (i *IdTokens) Render() *IdTokensYaml {
+	idTokensYaml := IdTokensYaml{}
+	for k, v := range *i {
+		idTokensYaml[k] = v.Render()
+	}
+	return &idTokensYaml
+}
+
+type IdTokenYaml struct {
+	AUD string `yaml:"aud"`
+}
+
+func (i *IdToken) Render() IdTokenYaml {
+	return IdTokenYaml{
+		AUD: i.AUD,
+	}
+}
+
+type IdTokensYaml map[string]IdTokenYaml
+
 type VaultSecretEngineName byte
 
 const (
@@ -47,6 +73,24 @@ type VaultSecretEngine struct {
 type VaultSecret struct {
 	Vault VaultSecretConfig `yaml:"vault"`
 	Token string            `yaml:"token,omitempty"`
+}
+
+func NewVaultSecret(engineName VaultSecretEngineName, enginePath string, path string, field string, token string) *VaultSecret {
+	return &VaultSecret{
+		Vault: VaultSecretConfig{
+			Engine: VaultSecretEngine{
+				Name: engineName,
+				Path: enginePath,
+			},
+			Path:  path,
+			Field: field,
+		},
+		Token: token,
+	}
+}
+
+func NewVaultKv2Secret(enginePath string, path string, field string, token string) *VaultSecret {
+	return NewVaultSecret(EnumVaultSecretEngineKv2, enginePath, path, field, token)
 }
 
 func (v *VaultSecret) Render() SecretYaml {

@@ -2,7 +2,9 @@
 [TestCreatePipeline/can_create_pipeline - 1]
 map[string]interface {}{
     "allow_failure": bool(false),
-    "image":         map[string]interface {}{
+    "id_tokens":     map[string]interface {}{
+    },
+    "image": map[string]interface {}{
         "name":        "alpine",
         "pull_policy": "always",
     },

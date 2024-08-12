@@ -103,3 +103,27 @@ func TestVaultSecretYaml_SecretYaml(t *testing.T) {
 
 	})
 }
+
+func TestIdTokens_Render(t *testing.T) {
+	expectation := &IdTokensYaml{
+		"TEST": IdTokenYaml{
+			AUD: "test",
+		},
+		"TEST2": IdTokenYaml{
+			AUD: "test2",
+		},
+	}
+
+	tokens := IdTokens{
+		"TEST": &IdToken{
+			AUD: "test",
+		},
+		"TEST2": &IdToken{
+			AUD: "test2",
+		},
+	}
+	actual := tokens.Render()
+	if !reflect.DeepEqual(actual, expectation) {
+		t.Errorf("expected %v, received %v", expectation, actual)
+	}
+}
