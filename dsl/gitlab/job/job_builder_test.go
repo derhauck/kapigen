@@ -76,3 +76,30 @@ func TestCiJob_AddSecret(t *testing.T) {
 		}
 	})
 }
+
+func TestCiJob_AddIdToken(t *testing.T) {
+	t.Run("can add new IdToken", func(t *testing.T) {
+		job := &CiJob{}
+		job.AddIdToken("TEST", "https://test.aud")
+
+		if job.IdTokens["TEST"].AUD != "https://test.aud" {
+			t.Errorf("expected %v, got %v", "https://test.aud", job.IdTokens["TEST"])
+		}
+	})
+
+	t.Run("can overwrite IdToken", func(t *testing.T) {
+
+		job := &CiJob{
+			IdTokens: IdTokens{
+				"TEST": &IdToken{
+					AUD: "https://unexpected.aud",
+				},
+			},
+		}
+		job.AddIdToken("TEST", "https://test.aud")
+
+		if job.IdTokens["TEST"].AUD != "https://test.aud" {
+			t.Errorf("expected %v, got %v", "https://test.aud", job.IdTokens["TEST"])
+		}
+	})
+}

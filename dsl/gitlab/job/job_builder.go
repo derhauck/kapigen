@@ -131,14 +131,16 @@ func (c *CiJob) AddSecret(name string, secret Secret) *CiJob {
 	return c
 }
 
-func (c *CiJob) AddIdToken(name string, token *IdToken) *CiJob {
+func (c *CiJob) AddIdToken(name string, aud string) *CiJob {
 	if c.IdTokens == nil {
 		c.IdTokens = IdTokens{}
 	}
 	if c.IdTokens[name] != nil {
 		logger.Infof("id token %s already exists, will be overwritten", name)
 	}
-	c.IdTokens[name] = token
+	c.IdTokens[name] = &IdToken{
+		AUD: aud,
+	}
 
 	return c
 }
