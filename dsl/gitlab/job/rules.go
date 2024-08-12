@@ -107,7 +107,7 @@ func NewRulesWorkflowYaml(rules Rules) *RuleWorkflowYaml {
 	for i := 0; i < len(rules); i++ {
 		var currentRule = rules[i]
 		if err := validateWorkflowRule(currentRule); err != nil {
-			logger.Error(err.Error())
+			logger.ErrorE(err)
 			continue
 		}
 		rulesYaml = append(rulesYaml, &RuleYaml{

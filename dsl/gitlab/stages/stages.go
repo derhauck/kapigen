@@ -30,7 +30,7 @@ func Enum() *wrapper.Enum[Stage, string] {
 		FINAL:   "final",
 	})
 	if err != nil {
-		logger.Error(err.Error())
+		logger.ErrorE(err)
 	}
 	return enum
 }
