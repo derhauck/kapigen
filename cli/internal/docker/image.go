@@ -44,7 +44,7 @@ func (c Image) String() string {
 
 		return value.Image
 	}
-	logger.Error(fmt.Sprintf("Not found for id: '%d'", c))
+	logger.Errorf("Not found for id: '%d'", c)
 
 	if values[Alpine_3_18].Proxy {
 		return fmt.Sprintf("%s%s", DEPENDENCY_PROXY, values[Alpine_3_18].Image)

@@ -24,7 +24,7 @@ func TagEnum() *wrapper.Enum[Tag, string] {
 		TagDefaultRunner:     "${KAPIGEN_DEFAULT_RUNNER_TAG}",
 	})
 	if err != nil {
-		logger.Error(err.Error())
+		logger.ErrorE(err)
 	}
 	return enum
 }

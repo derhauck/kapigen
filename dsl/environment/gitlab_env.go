@@ -1,7 +1,6 @@
 package environment
 
 import (
-	"fmt"
 	"os"
 
 	"gitlab.com/kateops/kapigen/dsl/logger"
@@ -58,7 +57,7 @@ func (v Variable) Key() string {
 	if v, ok := values[v]; ok {
 		return v
 	}
-	logger.Error(fmt.Sprintf("not found env var for id: '%d'", v))
+	logger.Errorf("not found env var for id: '%d'", v)
 	return ""
 }
 
@@ -82,7 +81,7 @@ func (v Variable) SetIfEmpty(value string) bool {
 func (v Variable) Get() string {
 	value := os.Getenv(v.Key())
 	if value == "" {
-		logger.Error(fmt.Sprintf("env var '%s' is not set", v.Key()))
+		logger.Errorf("env var '%s' is not set", v.Key())
 	}
 	return value
 }

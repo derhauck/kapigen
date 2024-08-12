@@ -26,7 +26,7 @@ func WhenEnum() *wrapper.Enum[When, string] {
 		WhenNever:     "never",
 	})
 	if err != nil {
-		logger.Error(err.Error())
+		logger.ErrorE(err)
 	}
 	return enum
 }

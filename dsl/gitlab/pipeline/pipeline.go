@@ -4,6 +4,7 @@ import (
 	"gitlab.com/kateops/kapigen/dsl/enum"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/job"
 	"gitlab.com/kateops/kapigen/dsl/gitlab/stages"
+	"gitlab.com/kateops/kapigen/dsl/logger"
 	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
@@ -75,7 +76,7 @@ func (c *CiPipeline) DefaultCiPipeline() *CiPipeline {
 	c.Variables = map[string]string{
 		"KTC_STOP_PIPELINE": "false",
 	}
-
+	logger.DebugAny(c.Stages)
 	return c
 }
 

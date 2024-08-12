@@ -167,7 +167,7 @@ var ReportsCmd = &cobra.Command{
 				filePath := filepath.Join(artifactsDir, f.Name)
 
 				if !strings.HasPrefix(filePath, filepath.Clean(artifactsDir)+string(os.PathSeparator)) {
-					logger.Error(fmt.Sprintf("invalid file path: %s", filePath))
+					logger.Errorf("invalid file path: %s", filePath)
 					return
 				}
 				if f.FileInfo().IsDir() {

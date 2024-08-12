@@ -24,6 +24,19 @@ func TestCreatePipeline(t *testing.T) {
 					AddScript("echo hello world").
 					SetStage(stages.TEST).
 					Rules.AddRules(*job.DefaultMainBranchRules())
+				ciJob.Secrets = job.Secrets{
+					"TEST": &job.VaultSecret{
+						Vault: job.VaultSecretConfig{
+							Engine: job.VaultSecretEngine{
+								Name: job.EnumVaultSecretEngineKv2,
+								Path: "mount",
+							},
+							Path:  "path",
+							Field: "field",
+						},
+						Token: "token",
+					},
+				}
 			}))
 		})
 		readFile, err := os.ReadFile(file)
@@ -36,7 +49,6 @@ func TestCreatePipeline(t *testing.T) {
 			t.Error(err)
 		}
 		snaps.MatchSnapshot(t, pipelineConfig["generic"], pipelineConfig["variables"], pipelineConfig["workflow"], pipelineConfig["default"])
-
 		err = os.Remove(file)
 		if err != nil {
 			t.Error(err)

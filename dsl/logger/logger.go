@@ -29,6 +29,10 @@ func Info(msg ...string) {
 	log(level.Info, msg...)
 }
 
+func Infof(msg string, args ...any) {
+	log(level.Info, fmt.Sprintf(msg, args...))
+}
+
 func Debug(msg ...string) {
 	log(level.Debug, msg...)
 }
@@ -39,6 +43,10 @@ func DebugAny(msg any) {
 }
 func Error(msg ...string) {
 	log(level.Error, msg...)
+}
+
+func Errorf(msg string, args ...any) {
+	log(level.Error, fmt.Sprintf(msg, args...))
 }
 
 func ErrorE(err error) {

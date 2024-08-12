@@ -1,7 +1,6 @@
 package environment
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 
@@ -35,7 +34,7 @@ func getMergeRequestIdFromEnv() int {
 	id := CI_MERGE_REQUEST_ID.Get()
 	i, err := strconv.ParseInt(id, 10, 32)
 	if err != nil {
-		logger.Error(fmt.Sprintf("could not parse merge request id %s", id))
+		logger.Errorf("could not parse merge request id %s", id)
 		return 0
 	}
 	return int(i)
@@ -45,7 +44,7 @@ func getMergeRequestIdFromCommit(message string) int {
 	reg := regexp.MustCompile("![0-9]+")
 	stringId := reg.FindString(message)
 	if stringId == "" {
-		logger.Error(fmt.Sprintf("no merge request id found in commit message: %s", message))
+		logger.Errorf("no merge request id found in commit message: %s", message)
 		return 0
 	}
 	intId, err := strconv.ParseInt(stringId[1:], 10, 32)
