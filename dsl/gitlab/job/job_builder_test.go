@@ -103,3 +103,22 @@ func TestCiJob_AddIdToken(t *testing.T) {
 		}
 	})
 }
+
+func TestCiJob_AddEnvironment(t *testing.T) {
+	t.Run("can add new Environment", func(t *testing.T) {
+
+		expectation := &Environment{
+			Url:  "https://test.url",
+			Name: "test",
+		}
+		job := &CiJob{}
+		job.AddEnvironment(&Environment{
+			Url:  "https://test.url",
+			Name: "test",
+		})
+
+		if !reflect.DeepEqual(job.Environment, expectation) {
+			t.Errorf("expected: %v, received: %v", expectation, job.Environment)
+		}
+	})
+}

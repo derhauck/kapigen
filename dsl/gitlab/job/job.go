@@ -23,6 +23,7 @@ type CiJob struct {
 	Coverage     string       `yaml:"coverage"`
 	Secrets      Secrets      `yaml:"secrets"`
 	IdTokens     IdTokens     `yaml:"id_tokens"`
+	Environment  *Environment `yaml:"environment,omitempty"`
 }
 
 func (c *CiJob) Render(needs *NeedsYaml, externalTags []string) (*CiJobYaml, error) {
@@ -48,6 +49,7 @@ type CiJobYaml struct {
 	Coverage     string            `yaml:"coverage,omitempty" json:"coverage"`
 	Secrets      *SecretsYaml      `yaml:"secrets,omitempty" json:"secrets,omitempty"`
 	IdTokens     *IdTokensYaml     `yaml:"id_tokens,omitempty" json:"id_tokens,omitempty"`
+	Environment  *EnvironmentYaml  `yaml:"environment,omitempty" json:"environment,omitempty"`
 }
 
 func (c *CiJobYaml) String() string {
@@ -78,6 +80,11 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml, externalTags []string) (*CiJobYa
 	if stage < stages.DYNAMIC {
 		stage = stages.DYNAMIC
 	}
+
+	var environment *EnvironmentYaml
+	if job.Environment != nil {
+		environment = job.Environment.Render()
+	}
 	tags := job.Tags.Render()
 
 	rules := job.Rules.GetRenderedValue()
@@ -106,6 +113,7 @@ func NewCiJobYaml(job *CiJob, needs *NeedsYaml, externalTags []string) (*CiJobYa
 		Coverage:     job.Coverage,
 		Secrets:      job.Secrets.Render(),
 		IdTokens:     job.IdTokens.Render(),
+		Environment:  environment,
 	}, nil
 }
 

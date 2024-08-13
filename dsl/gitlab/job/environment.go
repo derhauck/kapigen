@@ -1,7 +1,6 @@
 package job
 
 import (
-	"gitlab.com/kateops/kapigen/dsl/logger"
 	"gitlab.com/kateops/kapigen/dsl/wrapper"
 )
 
@@ -20,17 +19,13 @@ const (
 )
 
 func EnvironmentActionEnum() *wrapper.Enum[EnvironmentAction, string] {
-	enum, err := wrapper.NewEnum[EnvironmentAction](map[EnvironmentAction]string{
+	enum, _ := wrapper.NewEnum[EnvironmentAction](map[EnvironmentAction]string{
 		EnvironmentActionStart:   "start",
 		EnvironmentActionPrepare: "prepare",
 		EnvironmentActionStop:    "stop",
 		EnvironmentActionVerify:  "verify",
 		EnvironmentActionAccess:  "access",
 	})
-	if err != nil {
-		logger.ErrorE(wrapper.DetailedErrorE(err))
-		return nil
-	}
 	return enum
 }
 
@@ -49,37 +44,38 @@ const (
 )
 
 func EnvironmentTierEnum() *wrapper.Enum[EnvironmentTier, string] {
-	enum, err := wrapper.NewEnum[EnvironmentTier](map[EnvironmentTier]string{
+	enum, _ := wrapper.NewEnum[EnvironmentTier](map[EnvironmentTier]string{
 		EnvironmentTierProduction: "production",
 		EnvironmentTierStaging:    "staging",
 		EnvironmentTierTesting:    "testing",
 		EnvironmentTierDeployment: "development",
 		EnvironmentTierOther:      "other",
 	})
-	if err != nil {
-		logger.ErrorE(wrapper.DetailedErrorE(err))
-		return nil
-	}
 	return enum
 }
 
 type Environment struct {
 	Name           string
 	Url            string
-	OnStop         string
+	OnStop         wrapper.GetNamer
 	Action         EnvironmentAction
 	AutoStopIn     string
-	DeploymentTier string
+	DeploymentTier EnvironmentTier
 }
 
 func (e Environment) Render() *EnvironmentYaml {
+	var onStop string
+	if e.OnStop != nil {
+		onStop = e.OnStop.GetName()
+	}
+
 	return &EnvironmentYaml{
 		Name:           e.Name,
 		Url:            e.Url,
-		OnStop:         e.OnStop,
+		OnStop:         onStop,
 		Action:         e.Action.String(),
 		AutoStopIn:     e.AutoStopIn,
-		DeploymentTier: e.DeploymentTier,
+		DeploymentTier: e.DeploymentTier.String(),
 	}
 }
 
@@ -87,6 +83,7 @@ type EnvironmentYaml struct {
 	Name           string `yaml:"name,omitempty"`
 	Url            string `yaml:"url,omitempty"`
 	OnStop         string `yaml:"on_stop,omitempty"`
+	OnStopJob      *CiJob
 	Action         string `yaml:"action,omitempty"`
 	AutoStopIn     string `yaml:"auto_stop_in"`
 	DeploymentTier string `yaml:"deployment_tier,omitempty"`

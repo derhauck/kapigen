@@ -144,3 +144,9 @@ func (c *CiJob) AddIdToken(name string, aud string) *CiJob {
 
 	return c
 }
+
+func (c *CiJob) AddEnvironment(environment *Environment) *CiJob {
+	c.Environment = environment
+
+	return c
+}
