@@ -71,9 +71,10 @@
                 Values: &[]*job.Service{
                 },
             },
-            Coverage: "",
-            Secrets:  {},
-            IdTokens: {},
+            Coverage:    "",
+            Secrets:     {},
+            IdTokens:    {},
+            Environment: (*job.Environment)(nil),
         },
         Needs: {
         },
@@ -124,6 +125,7 @@
             },
             IdTokens: &job.IdTokensYaml{
             },
+            Environment: (*job.EnvironmentYaml)(nil),
         },
         PipelineId:   "testId",
         ExternalTags: nil,

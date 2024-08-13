@@ -69,7 +69,8 @@
             Token: "token",
         },
     },
-    IdTokens: {},
+    IdTokens:    {},
+    Environment: (*job.Environment)(nil),
 }
 &job.CiJobYaml{
     Artifacts:    (*job.ArtifactsYaml)(nil),
@@ -125,5 +126,6 @@
     },
     IdTokens: &job.IdTokensYaml{
     },
+    Environment: (*job.EnvironmentYaml)(nil),
 }
 ---
